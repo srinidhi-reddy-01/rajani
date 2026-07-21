@@ -13,7 +13,7 @@ Read PLAN.md before any feature work. It is the source of truth for scope and se
 
 ## Product rules (do not violate)
 
-1. `packages.base_price_pp` / `menu_items.base_price_pp` are per-plate prices at the 500-plate baseline. `pricing_tiers` is deprecated — don't read it.
+1. `packages.base_price_pp` / `menu_items.base_price_pp` are per-plate prices at the 500-plate baseline (the admin panel says so wherever a price is entered). `pricing_tiers` is deprecated — don't read it. Every user-facing price is `basePricePp * getPlateMultiplier(plates)` (`lib/pricing.ts`): multiplier 1 at 500 plates, piecewise linear (not one straight line - there's a kink at 500) from +10% at 100 plates down to −10% at 1000 plates, clamped flat outside that range. Use `quotePerPlate(basePricePp, plates)` everywhere a price renders - never read `base_price_pp` directly for display.
 2. Every displayed quote carries the disclaimer: "Actual price may vary by 10–15% based on dish changes and plate-count updates. Please confirm with the caterer for final booking."
 3. Dish-level prices are VISIBLE to users on the vendor profile. Discovery cards show packages only, never loose menu items.
 4. Browsing is anonymous. Phone number is required only to submit an enquiry or tasting request, via the CTA modals on the vendor profile.

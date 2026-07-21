@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 import type { Package, Vendor } from "@/lib/types/database";
+import { quotePerPlate } from "@/lib/pricing";
 
 export type MatchedVendor = Pick<
   Vendor,
@@ -10,6 +11,7 @@ export type MatchedVendor = Pick<
 };
 
 export type DiscoverCriteria = {
+  plates: number;
   cuisines?: string[];
   budgetPp?: number;
   sort?: "match" | "price";
@@ -41,7 +43,7 @@ export async function getMatchedVendors(criteria: DiscoverCriteria): Promise<Dis
     .map((v) => {
       const activePackages = (v.packages ?? []).filter((p) => p.is_active);
       if (activePackages.length === 0) return null;
-      const lowestPackagePrice = Math.min(...activePackages.map((p) => p.base_price_pp));
+      const lowestPackagePrice = Math.min(...activePackages.map((p) => quotePerPlate(p.base_price_pp, criteria.plates)));
       return { ...v, packages: activePackages, lowestPackagePrice };
     })
     .filter((v): v is MatchedVendor => v !== null);

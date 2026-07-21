@@ -24,7 +24,7 @@ export function CsvImportForm({
           {pending ? "Importing..." : "Import CSV"}
         </button>
       </form>
-      <p className="text-xs text-ink-muted">Columns: category, dish_name, price_pp</p>
+      <p className="text-xs text-ink-muted">Columns: category, dish_name, price_pp (price per plate at 500 plates)</p>
       {state.status === "done" && (
         <div className="flex flex-col gap-1 rounded-lg border border-border p-3 text-xs">
           <p className="font-medium text-ink">{state.created} dish{state.created === 1 ? "" : "es"} created.</p>

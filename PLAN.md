@@ -60,9 +60,22 @@ caterer for final booking."*
 ## Pricing
 
 `packages.base_price_pp` and `menu_items.base_price_pp` are prices **per plate at 500
-plates**. `pricing_tiers` is deprecated — the table exists but no application code
-reads it. (A platform-wide dynamic multiplier based on plate count may replace flat
-pricing later; if so, this section is the source of truth for the current formula.)
+plates** — the admin panel says so everywhere a price is entered. `pricing_tiers` is
+deprecated; the table exists but no application code reads it.
+
+Every user-facing price is computed from the baseline via a single platform-wide
+multiplier, `getPlateMultiplier(plates)` in `lib/pricing.ts`:
+
+- 500 plates → base price (multiplier 1).
+- Piecewise linear, **not** one straight line: 100 → 1000 has a kink at 500, because
+  the three anchor points (100 → +10%, 500 → 0%, 1000 → −10%) aren't collinear. The
+  100→500 segment moves −2.5%/100 plates; the 500→1000 segment moves −2%/100 plates.
+- Below 100 plates, clamp at +10%. Above 1000 plates, clamp at −10%.
+- Reference points: 300 plates ≈ +5%, 750 plates ≈ −5%.
+
+Used everywhere a price renders: discovery cards, vendor profiles, package/dish
+prices, and the quote stored on an enquiry/tasting request. Unit tested at 50, 100,
+300, 500, 750, 1000, and 1500 plates (`lib/pricing.test.ts`, `npm test`).
 
 ## Decisions locked
 

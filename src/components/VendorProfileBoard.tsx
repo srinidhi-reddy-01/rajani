@@ -129,7 +129,8 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
                   </div>
                   {pkg.description && <p className="text-sm text-ink-muted">{pkg.description}</p>}
                   <p className="mt-2 text-lg font-semibold text-gold-600">
-                    {formatInr(pkg.base_price_pp)} <span className="text-sm font-normal text-ink-muted">/ plate</span>
+                    {formatInr(quotePerPlate(pkg.base_price_pp, guidedContext.plates))}{" "}
+                    <span className="text-sm font-normal text-ink-muted">/ plate at {guidedContext.plates} plates</span>
                   </p>
                   {pkg.min_plates && <p className="text-xs text-ink-muted">Minimum {pkg.min_plates} plates</p>}
                 </button>
@@ -162,7 +163,9 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
                         />
                         {item.name}
                       </span>
-                      <span className="whitespace-nowrap text-sm font-medium text-gold-600">{formatInr(item.base_price_pp)}</span>
+                      <span className="whitespace-nowrap text-sm font-medium text-gold-600">
+                        {formatInr(quotePerPlate(item.base_price_pp, guidedContext.plates))}
+                      </span>
                     </li>
                   ))}
                 </ul>

@@ -196,6 +196,7 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
             </form>
           )}
         </div>
+        <p className="-mt-3 text-xs text-ink-muted">All prices below are per plate at 500 plates.</p>
 
         <div className="border-b border-border pb-6">
           <h3 className="mb-2 text-sm font-medium text-ink">Bulk import (CSV)</h3>

@@ -12,8 +12,9 @@ export default async function DiscoverPage({
   const cuisineList = cuisines ? cuisines.split(",").filter(Boolean) : [];
   const budgetPp = budget ? Number(budget) : undefined;
   const sortMode = sort === "price" ? "price" : "match";
+  const plateCount = plates ? Number(plates) : 500;
 
-  const { matched, others } = await getMatchedVendors({ cuisines: cuisineList, budgetPp, sort: sortMode });
+  const { matched, others } = await getMatchedVendors({ plates: plateCount, cuisines: cuisineList, budgetPp, sort: sortMode });
 
   const criteriaParams = new URLSearchParams();
   if (plates) criteriaParams.set("plates", plates);
@@ -61,7 +62,7 @@ export default async function DiscoverPage({
               {budgetPp && sortMode === "match" && <h2 className="text-sm font-medium text-ink-muted">Within your budget</h2>}
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {matched.map((vendor) => (
-                  <VendorMatchCard key={vendor.id} vendor={vendor} contextQuery={contextQuery} />
+                  <VendorMatchCard key={vendor.id} vendor={vendor} plates={plateCount} contextQuery={contextQuery} />
                 ))}
               </div>
             </section>
@@ -72,7 +73,7 @@ export default async function DiscoverPage({
               <h2 className="text-sm font-medium text-ink-muted">More options</h2>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {others.map((vendor) => (
-                  <VendorMatchCard key={vendor.id} vendor={vendor} budgetLabel={vendor.budgetLabel} contextQuery={contextQuery} />
+                  <VendorMatchCard key={vendor.id} vendor={vendor} plates={plateCount} budgetLabel={vendor.budgetLabel} contextQuery={contextQuery} />
                 ))}
               </div>
             </section>

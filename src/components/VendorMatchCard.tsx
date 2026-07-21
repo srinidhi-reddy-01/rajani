@@ -1,13 +1,15 @@
 import Link from "next/link";
 import type { MatchedVendor } from "@/lib/queries/discover";
-import { formatInr } from "@/lib/pricing";
+import { formatInr, quotePerPlate } from "@/lib/pricing";
 
 export function VendorMatchCard({
   vendor,
+  plates,
   budgetLabel,
   contextQuery,
 }: {
   vendor: MatchedVendor;
+  plates: number;
   budgetLabel?: "above" | "below";
   contextQuery?: string;
 }) {
@@ -49,7 +51,7 @@ export function VendorMatchCard({
         {previewPackages.map((pkg) => (
           <li key={pkg.id} className="flex items-center justify-between gap-3 text-sm">
             <span className="text-ink">{pkg.name}</span>
-            <span className="font-semibold text-gold-600">{formatInr(pkg.base_price_pp)}/plate</span>
+            <span className="font-semibold text-gold-600">{formatInr(quotePerPlate(pkg.base_price_pp, plates))}/plate</span>
           </li>
         ))}
         {extraCount > 0 && <li className="text-xs text-ink-muted">+{extraCount} more package{extraCount > 1 ? "s" : ""}</li>}

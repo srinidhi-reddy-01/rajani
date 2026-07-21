@@ -19,8 +19,21 @@ export type Vendor = {
   serviceable_areas: string[];
   pricing_model: "final" | "flexible";
   status: "sourced" | "contacted" | "onboarding" | "priced" | "live" | "paused";
+  description: string | null;
+  logo_url: string | null;
+  is_demo: boolean;
   created_at: string;
   updated_at: string;
+};
+
+export type Cuisine = {
+  id: number;
+  name: string;
+};
+
+export type EventType = {
+  id: number;
+  name: string;
 };
 
 export type MenuCategory = {
@@ -56,6 +69,7 @@ export type Package = {
   name: string;
   description: string | null;
   base_price_pp: number;
+  min_plates: number | null;
   is_default: boolean;
   is_active: boolean;
   created_at: string;
@@ -76,6 +90,13 @@ export type PackageSlotItem = {
   is_default: boolean;
 };
 
+// What isn't already a dedicated enquiries column (plates/budget/date/event_type/quoted_pp are).
+export type EnquirySelection = {
+  cuisines: string[];
+  package_id: string | null;
+  package_name: string | null;
+};
+
 export type Enquiry = {
   id: string;
   vendor_id: string;
@@ -87,7 +108,7 @@ export type Enquiry = {
   plates: number;
   meal_type: "breakfast" | "lunch" | "dinner";
   budget_pp: number | null;
-  menu_selection: unknown;
+  menu_selection: EnquirySelection;
   quoted_pp: number;
   status: "new" | "accepted" | "declined" | "booked" | "expired";
   vendor_responded_at: string | null;
@@ -100,7 +121,20 @@ export type TastingRequest = {
   user_phone: string;
   user_name: string | null;
   status: "new" | "contacted" | "completed" | "cancelled";
+  context: EnquiryContext | null;
   created_at: string;
+};
+
+// Snapshot of the user's guided-flow selections at enquiry/tasting-request time.
+export type EnquiryContext = {
+  plates: number;
+  cuisines: string[];
+  budget_pp: number | null;
+  event_date: string;
+  event_type: string;
+  package_id: string | null;
+  package_name: string | null;
+  quoted_pp: number | null;
 };
 
 // Minimal shape so the supabase-js client is typed; extend as more tables are queried.
@@ -126,6 +160,8 @@ export type Database = {
       package_slot_items: Table<PackageSlotItem>;
       enquiries: Table<Enquiry>;
       tasting_requests: Table<TastingRequest>;
+      cuisines: Table<Cuisine>;
+      event_types: Table<EventType>;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

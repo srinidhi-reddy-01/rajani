@@ -76,17 +76,58 @@ export type PackageSlotItem = {
   is_default: boolean;
 };
 
+export type Enquiry = {
+  id: string;
+  vendor_id: string;
+  user_phone: string;
+  user_name: string | null;
+  event_type: string;
+  event_date: string;
+  location: string | null;
+  plates: number;
+  meal_type: "breakfast" | "lunch" | "dinner";
+  budget_pp: number | null;
+  menu_selection: unknown;
+  quoted_pp: number;
+  status: "new" | "accepted" | "declined" | "booked" | "expired";
+  vendor_responded_at: string | null;
+  created_at: string;
+};
+
+export type TastingRequest = {
+  id: string;
+  vendor_id: string;
+  user_phone: string;
+  user_name: string | null;
+  status: "new" | "contacted" | "completed" | "cancelled";
+  created_at: string;
+};
+
 // Minimal shape so the supabase-js client is typed; extend as more tables are queried.
+// `Relationships: []` on every table (and Views/Functions below) is required to satisfy
+// supabase-js's GenericSchema constraint - omitting them silently degrades insert/update
+// argument types to `never` instead of raising a clear error.
+type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
+  Row: Row;
+  Insert: Insert;
+  Update: Update;
+  Relationships: [];
+};
+
 export type Database = {
   public: {
     Tables: {
-      vendors: { Row: Vendor; Insert: Partial<Vendor>; Update: Partial<Vendor> };
-      menu_categories: { Row: MenuCategory; Insert: Partial<MenuCategory>; Update: Partial<MenuCategory> };
-      menu_items: { Row: MenuItem; Insert: Partial<MenuItem>; Update: Partial<MenuItem> };
-      pricing_tiers: { Row: PricingTier; Insert: Partial<PricingTier>; Update: Partial<PricingTier> };
-      packages: { Row: Package; Insert: Partial<Package>; Update: Partial<Package> };
-      package_slots: { Row: PackageSlot; Insert: Partial<PackageSlot>; Update: Partial<PackageSlot> };
-      package_slot_items: { Row: PackageSlotItem; Insert: Partial<PackageSlotItem>; Update: Partial<PackageSlotItem> };
+      vendors: Table<Vendor>;
+      menu_categories: Table<MenuCategory>;
+      menu_items: Table<MenuItem>;
+      pricing_tiers: Table<PricingTier>;
+      packages: Table<Package>;
+      package_slots: Table<PackageSlot>;
+      package_slot_items: Table<PackageSlotItem>;
+      enquiries: Table<Enquiry>;
+      tasting_requests: Table<TastingRequest>;
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
   };
 };

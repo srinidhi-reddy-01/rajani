@@ -58,6 +58,13 @@ export async function deleteVendor(vendorId: string, returnTo: string): Promise<
   redirect(returnTo);
 }
 
+export async function deleteAllDemoVendors(): Promise<void> {
+  await assertAdminSession();
+  const { error } = await supabaseAdmin.from("vendors").delete().eq("is_demo", true);
+  if (error) throw error;
+  revalidatePath("/admin");
+}
+
 export type CreateVendorState = { status: "idle" | "success"; error?: string };
 
 export async function createVendor(_prevState: CreateVendorState, formData: FormData): Promise<CreateVendorState> {

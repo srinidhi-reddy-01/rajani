@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ALL_VENDOR_STATUSES, listVendorsForPipeline, type VendorPipelineRow } from "@/lib/admin/queries";
-import { deleteVendor, setVendorStatus } from "@/lib/admin/actions";
+import { deleteAllDemoVendors, deleteVendor, setVendorStatus } from "@/lib/admin/actions";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { StatusSelect } from "@/components/StatusSelect";
 
@@ -48,6 +48,14 @@ export default async function AdminPipelinePage({
           >
             + New vendor
           </Link>
+          <form action={deleteAllDemoVendors}>
+            <ConfirmSubmitButton
+              confirmMessage="Delete all demo vendors? This cannot be undone."
+              className="h-9 cursor-pointer rounded-lg border border-red-200 px-3 text-xs font-medium text-red-600 transition hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+            >
+              Delete all demo vendors
+            </ConfirmSubmitButton>
+          </form>
         </div>
       </div>
 

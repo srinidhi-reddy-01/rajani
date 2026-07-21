@@ -1,5 +1,7 @@
 # Claude Code instructions — Project Catering
 
+@AGENTS.md
+
 Read PLAN.md before any feature work. It is the source of truth for scope and sequencing.
 
 ## Stack

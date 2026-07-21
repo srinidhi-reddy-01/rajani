@@ -5,16 +5,19 @@ import { formatInr } from "@/lib/pricing";
 export function VendorMatchCard({
   vendor,
   budgetLabel,
+  contextQuery,
 }: {
   vendor: MatchedVendor;
   budgetLabel?: "above" | "below";
+  contextQuery?: string;
 }) {
   const previewPackages = [...vendor.packages].sort((a, b) => a.base_price_pp - b.base_price_pp).slice(0, 2);
   const extraCount = vendor.packages.length - previewPackages.length;
+  const href = contextQuery ? `/vendors/${vendor.slug}?${contextQuery}` : `/vendors/${vendor.slug}`;
 
   return (
     <Link
-      href={`/vendors/${vendor.slug}`}
+      href={href}
       className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-border bg-surface p-5 shadow-card transition duration-150 ease-out hover:-translate-y-0.5 hover:border-gold-500 hover:shadow-card-hover focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
     >
       <div className="flex items-start justify-between gap-2">

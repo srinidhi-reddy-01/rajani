@@ -24,6 +24,7 @@ export default async function DiscoverPage({
 
   const priceSortHref = `/discover?${criteriaParams.toString()}&sort=price`;
   const matchSortHref = `/discover?${criteriaParams.toString()}&sort=match`;
+  const contextQuery = criteriaParams.toString();
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-10">
@@ -60,7 +61,7 @@ export default async function DiscoverPage({
               {budgetPp && sortMode === "match" && <h2 className="text-sm font-medium text-ink-muted">Within your budget</h2>}
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {matched.map((vendor) => (
-                  <VendorMatchCard key={vendor.id} vendor={vendor} />
+                  <VendorMatchCard key={vendor.id} vendor={vendor} contextQuery={contextQuery} />
                 ))}
               </div>
             </section>
@@ -71,7 +72,7 @@ export default async function DiscoverPage({
               <h2 className="text-sm font-medium text-ink-muted">More options</h2>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {others.map((vendor) => (
-                  <VendorMatchCard key={vendor.id} vendor={vendor} budgetLabel={vendor.budgetLabel} />
+                  <VendorMatchCard key={vendor.id} vendor={vendor} budgetLabel={vendor.budgetLabel} contextQuery={contextQuery} />
                 ))}
               </div>
             </section>

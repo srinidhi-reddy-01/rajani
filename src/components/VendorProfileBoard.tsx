@@ -3,12 +3,39 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { VendorProfile } from "@/lib/queries/vendors";
-import { formatInr, QUOTE_DISCLAIMER } from "@/lib/pricing";
+import { formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
+import { submitEnquiry, submitTastingRequest } from "@/lib/consumer/actions";
+import { CtaModal } from "@/components/CtaModal";
 
-export function VendorProfileBoard({ vendor }: { vendor: VendorProfile }) {
+type GuidedContext = {
+  plates: number;
+  cuisines: string[];
+  budgetPp: number | null;
+  eventDate: string;
+  eventType: string;
+};
+
+const ctaButtonClass =
+  "h-14 flex-1 cursor-pointer rounded-lg text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
+
+export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorProfile; guidedContext: GuidedContext }) {
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(
     vendor.packages.find((p) => p.is_default)?.id ?? vendor.packages[0]?.id ?? null
   );
+  const [openModal, setOpenModal] = useState<"enquire" | "tasting" | null>(null);
+
+  const selectedPackage = vendor.packages.find((p) => p.id === selectedPackageId) ?? null;
+
+  const ctaContext = {
+    plates: guidedContext.plates,
+    cuisines: guidedContext.cuisines,
+    budgetPp: guidedContext.budgetPp,
+    eventDate: guidedContext.eventDate,
+    eventType: guidedContext.eventType,
+    packageId: selectedPackage?.id ?? null,
+    packageName: selectedPackage?.name ?? null,
+    quotedPp: selectedPackage ? quotePerPlate(selectedPackage.base_price_pp, guidedContext.plates) : null,
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -119,6 +146,30 @@ export function VendorProfileBoard({ vendor }: { vendor: VendorProfile }) {
       </section>
 
       <p className="text-xs text-ink-muted">{QUOTE_DISCLAIMER}</p>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 p-4 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-4xl gap-3">
+          <button type="button" onClick={() => setOpenModal("tasting")} className={`${ctaButtonClass} border border-royal-700 text-royal-700 hover:bg-royal-100`}>
+            Get sample box
+          </button>
+          <button type="button" onClick={() => setOpenModal("enquire")} className={`${ctaButtonClass} bg-royal-700 text-white hover:bg-royal-800`}>
+            Enquire for booking
+          </button>
+        </div>
+      </div>
+
+      <CtaModal
+        open={openModal === "enquire"}
+        onClose={() => setOpenModal(null)}
+        title="Enquire for booking"
+        action={submitEnquiry.bind(null, vendor.id, ctaContext)}
+      />
+      <CtaModal
+        open={openModal === "tasting"}
+        onClose={() => setOpenModal(null)}
+        title="Get a sample box"
+        action={submitTastingRequest.bind(null, vendor.id, ctaContext)}
+      />
     </div>
   );
 }

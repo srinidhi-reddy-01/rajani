@@ -1,8 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbf8f2;
+  --foreground: #241b2f;
+
+  /* Royal purple + gold celebration palette — design tokens.
+     Used consistently across consumer and admin UI. */
+  --color-royal-50: #f4f1fb;
+  --color-royal-100: #ede7f9;
+  --color-royal-600: #5b249b;
+  --color-royal-700: #4c1d95;
+  --color-royal-800: #3b1673;
+
+  --color-gold-100: #f7efd3;
+  --color-gold-500: #c9a227;
+  --color-gold-600: #a9860f;
+
+  --color-ivory: #fbf8f2;
+  --color-surface: #ffffff;
+
+  --color-ink: #241b2f;
+  --color-ink-muted: #6b6572;
+  --color-border: #e7e1db;
 }
 
 @theme inline {
@@ -10,6 +29,26 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-royal-50: var(--color-royal-50);
+  --color-royal-100: var(--color-royal-100);
+  --color-royal-600: var(--color-royal-600);
+  --color-royal-700: var(--color-royal-700);
+  --color-royal-800: var(--color-royal-800);
+
+  --color-gold-100: var(--color-gold-100);
+  --color-gold-500: var(--color-gold-500);
+  --color-gold-600: var(--color-gold-600);
+
+  --color-ivory: var(--color-ivory);
+  --color-surface: var(--color-surface);
+
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-border: var(--color-border);
+
+  --shadow-card: 0 1px 2px rgba(76, 29, 149, 0.04), 0 4px 16px rgba(76, 29, 149, 0.06);
+  --shadow-card-hover: 0 2px 4px rgba(76, 29, 149, 0.06), 0 12px 28px rgba(76, 29, 149, 0.1);
 }
 
 body {

@@ -9,7 +9,7 @@ export function PlateCountControl({
 }) {
   return (
     <label className="flex items-center gap-3 text-sm">
-      <span className="font-medium text-neutral-700">Plates</span>
+      <span className="font-medium text-ink-muted">Plates</span>
       <input
         type="number"
         min={1}
@@ -18,7 +18,7 @@ export function PlateCountControl({
           const next = Number(e.target.value);
           onChange(Number.isFinite(next) && next > 0 ? next : 1);
         }}
-        className="w-28 rounded-md border border-neutral-300 px-3 py-1.5 text-sm focus:border-neutral-500 focus:outline-none"
+        className="h-11 w-28 rounded-lg border border-border bg-surface px-3 text-sm text-ink transition focus:border-royal-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-100"
       />
     </label>
   );

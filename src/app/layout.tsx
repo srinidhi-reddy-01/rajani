@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Catering — Hyderabad caterers, instant quotes",
-  description: "Browse Hyderabad caterers with live, per-plate computed quotes.",
+  title: "Rajani — Hyderabad caterers, real prices upfront",
+  description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
 };
 
 export default function RootLayout({
@@ -35,7 +35,7 @@ export default function RootLayout({
               href="/"
               className="rounded-sm text-lg font-semibold text-royal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
             >
-              Catering
+              Rajani
             </Link>
           </div>
         </header>

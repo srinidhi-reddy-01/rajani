@@ -1,30 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import type { VendorProfile } from "@/lib/queries/vendors";
-import { formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
-import { PlateCountControl } from "@/components/PlateCountControl";
+import { formatInr, QUOTE_DISCLAIMER } from "@/lib/pricing";
 
 export function VendorProfileBoard({ vendor }: { vendor: VendorProfile }) {
-  const [plates, setPlates] = useState(500);
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(
     vendor.packages.find((p) => p.is_default)?.id ?? vendor.packages[0]?.id ?? null
-  );
-
-  const packageQuotes = useMemo(
-    () =>
-      vendor.packages.map((pkg) => ({
-        pkg,
-        quotePp: quotePerPlate(pkg.base_price_pp, vendor.pricing_tiers, plates),
-      })),
-    [vendor.packages, vendor.pricing_tiers, plates]
   );
 
   return (
     <div className="flex flex-col gap-8">
       <Link
-        href="/"
+        href="/discover"
         className="w-fit rounded-sm text-sm text-ink-muted transition hover:text-royal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
       >
         ← Back to caterers
@@ -35,12 +24,13 @@ export function VendorProfileBoard({ vendor }: { vendor: VendorProfile }) {
           <h1 className="text-2xl font-semibold text-royal-700">{vendor.name}</h1>
           {vendor.gbp_rating != null && (
             <span className="whitespace-nowrap text-sm text-ink-muted">
-              <span className="text-gold-500">★</span> {vendor.gbp_rating.toFixed(1)}
+              <span className="text-gold-500">★</span> {vendor.gbp_rating.toFixed(1)} Google rating
               {vendor.gbp_rating_count != null && <span> ({vendor.gbp_rating_count} ratings)</span>}
             </span>
           )}
         </div>
         {vendor.area && <p className="text-sm text-ink-muted">{vendor.area}</p>}
+        {vendor.description && <p className="text-sm text-ink">{vendor.description}</p>}
         <div className="flex flex-wrap gap-1.5">
           {[...vendor.cuisine_specialities, ...vendor.event_specialities].map((tag) => (
             <span key={tag} className="rounded-full bg-royal-100 px-2 py-0.5 text-xs text-royal-700">
@@ -50,17 +40,13 @@ export function VendorProfileBoard({ vendor }: { vendor: VendorProfile }) {
         </div>
       </div>
 
-      <div className="sticky top-0 z-10 -mx-6 border-y border-border bg-surface/95 px-6 py-3 backdrop-blur">
-        <PlateCountControl plates={plates} onChange={setPlates} />
-      </div>
-
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-royal-700">Packages</h2>
-        {packageQuotes.length === 0 ? (
+        {vendor.packages.length === 0 ? (
           <p className="text-sm text-ink-muted">No packages published yet.</p>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {packageQuotes.map(({ pkg, quotePp }) => {
+            {vendor.packages.map((pkg) => {
               const selected = pkg.id === selectedPackageId;
               return (
                 <button
@@ -89,8 +75,9 @@ export function VendorProfileBoard({ vendor }: { vendor: VendorProfile }) {
                   </div>
                   {pkg.description && <p className="text-sm text-ink-muted">{pkg.description}</p>}
                   <p className="mt-2 text-lg font-semibold text-gold-600">
-                    {formatInr(quotePp)} <span className="text-sm font-normal text-ink-muted">/ plate</span>
+                    {formatInr(pkg.base_price_pp)} <span className="text-sm font-normal text-ink-muted">/ plate</span>
                   </p>
+                  {pkg.min_plates && <p className="text-xs text-ink-muted">Minimum {pkg.min_plates} plates</p>}
                 </button>
               );
             })}
@@ -121,9 +108,7 @@ export function VendorProfileBoard({ vendor }: { vendor: VendorProfile }) {
                         />
                         {item.name}
                       </span>
-                      <span className="whitespace-nowrap text-sm font-medium text-gold-600">
-                        {formatInr(quotePerPlate(item.base_price_pp, vendor.pricing_tiers, plates))}
-                      </span>
+                      <span className="whitespace-nowrap text-sm font-medium text-gold-600">{formatInr(item.base_price_pp)}</span>
                     </li>
                   ))}
                 </ul>

@@ -1,15 +1,9 @@
-import type { PricingTier } from "@/lib/types/database";
-
-// Every base_price_pp is priced at the 500-plate baseline. The vendor's pricing_tiers
-// define a plate-count adjustment band; outside any band, the baseline price stands.
-export function adjustmentPctForPlates(tiers: PricingTier[], plates: number): number {
-  const tier = tiers.find((t) => plates >= t.min_plates && plates <= t.max_plates);
-  return tier ? tier.adjustment_pct : 0;
-}
-
-export function quotePerPlate(basePricePp: number, tiers: PricingTier[], plates: number): number {
-  const adjustmentPct = adjustmentPctForPlates(tiers, plates);
-  return basePricePp * (1 + adjustmentPct / 100);
+// pricing_tiers is deprecated (see 0004 migration) - base_price_pp is a flat per-plate
+// price on its own. `plates` is accepted (unused for now) so every call site is already
+// wired for the platform-wide dynamic multiplier landing in a later update.
+export function quotePerPlate(basePricePp: number, plates: number): number {
+  void plates;
+  return basePricePp;
 }
 
 export const QUOTE_DISCLAIMER =

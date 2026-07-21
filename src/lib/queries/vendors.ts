@@ -1,18 +1,19 @@
 import { supabase } from "@/lib/supabase/client";
-import type { MenuCategory, MenuItem, Package, Vendor } from "@/lib/types/database";
+import type { MenuCategory, MenuItem, Package, Vendor, VendorMedia } from "@/lib/types/database";
 
 export type VendorProfile = Vendor & {
   packages: Package[];
   menu_categories: (MenuCategory & { menu_items: MenuItem[] })[];
+  vendor_media: VendorMedia[];
 };
 
-type VendorProfileRow = Vendor & { packages: Package[] };
+type VendorProfileRow = Vendor & { packages: Package[]; vendor_media: VendorMedia[] };
 type CategoryWithItemsRow = MenuCategory & { menu_items: MenuItem[] };
 
 export async function getVendorProfile(slug: string): Promise<VendorProfile | null> {
   const { data: vendor, error } = await supabase
     .from("vendors")
-    .select("*, packages(*)")
+    .select("*, packages(*), vendor_media(*)")
     .eq("slug", slug)
     .eq("status", "live")
     .maybeSingle()

@@ -90,6 +90,14 @@ export type PackageSlotItem = {
   is_default: boolean;
 };
 
+export type VendorMedia = {
+  id: string;
+  vendor_id: string;
+  url: string;
+  event_date: string | null;
+  created_at: string;
+};
+
 // What isn't already a dedicated enquiries column (plates/budget/date/event_type/quoted_pp are).
 export type EnquirySelection = {
   cuisines: string[];
@@ -162,6 +170,7 @@ export type Database = {
       tasting_requests: Table<TastingRequest>;
       cuisines: Table<Cuisine>;
       event_types: Table<EventType>;
+      vendor_media: Table<VendorMedia>;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

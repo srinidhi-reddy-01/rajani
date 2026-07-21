@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { listVendorsForPipeline, VENDOR_PIPELINE_ORDER, type VendorPipelineRow } from "@/lib/admin/queries";
-import { advanceVendorStatus } from "@/lib/admin/actions";
+import { ALL_VENDOR_STATUSES, listVendorsForPipeline, type VendorPipelineRow } from "@/lib/admin/queries";
+import { deleteVendor, setVendorStatus } from "@/lib/admin/actions";
+import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
+import { StatusSelect } from "@/components/StatusSelect";
 
 const PAGE_SIZE = 25;
 
@@ -38,7 +40,15 @@ export default async function AdminPipelinePage({
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-royal-700">Vendor pipeline</h1>
-        <p className="text-sm text-ink-muted">{total} vendors</p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-ink-muted">{total} vendors</p>
+          <Link
+            href="/admin/vendors/new"
+            className="h-9 flex items-center rounded-lg bg-royal-700 px-3 text-xs font-medium text-white transition hover:bg-royal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+          >
+            + New vendor
+          </Link>
+        </div>
       </div>
 
       {blocked && (
@@ -56,12 +66,11 @@ export default async function AdminPipelinePage({
             className="h-11 rounded-lg border border-border bg-surface px-3 text-sm text-ink focus:border-royal-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-100"
           >
             <option value="">All</option>
-            {VENDOR_PIPELINE_ORDER.map((s) => (
+            {ALL_VENDOR_STATUSES.map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
-            <option value="paused">paused</option>
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm text-ink-muted">
@@ -93,47 +102,57 @@ export default async function AdminPipelinePage({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {vendors.map((vendor) => {
-              const nextIndex = VENDOR_PIPELINE_ORDER.indexOf(vendor.status as (typeof VENDOR_PIPELINE_ORDER)[number]) + 1;
-              const nextStatus = nextIndex > 0 && nextIndex < VENDOR_PIPELINE_ORDER.length ? VENDOR_PIPELINE_ORDER[nextIndex] : null;
-              return (
-                <tr key={vendor.id}>
-                  <td className="px-4 py-3 text-ink">
-                    <Link
-                      href={`/admin/vendors/${vendor.id}`}
-                      className="rounded-sm font-medium hover:text-royal-700 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
-                    >
-                      {vendor.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-ink-muted">{vendor.area ?? "—"}</td>
-                  <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLES[vendor.status]}`}>{vendor.status}</span>
-                  </td>
-                  <td className="px-4 py-3 text-ink-muted">
-                    {vendor.gbp_rating != null ? (
-                      <>
-                        <span className="text-gold-500">★</span> {vendor.gbp_rating.toFixed(1)}
-                      </>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {nextStatus && (
-                      <form action={advanceVendorStatus.bind(null, vendor.id, returnTo)}>
-                        <button
-                          type="submit"
-                          className="h-9 cursor-pointer rounded-lg border border-royal-600 px-3 text-xs font-medium text-royal-700 transition hover:bg-royal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
-                        >
-                          Advance to {nextStatus}
-                        </button>
-                      </form>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+            {vendors.map((vendor) => (
+              <tr key={vendor.id}>
+                <td className="px-4 py-3 text-ink">
+                  <Link
+                    href={`/admin/vendors/${vendor.id}`}
+                    className="rounded-sm font-medium hover:text-royal-700 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+                  >
+                    {vendor.name}
+                  </Link>
+                  {vendor.is_demo && (
+                    <span className="ml-2 rounded-full bg-gold-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-gold-600">
+                      Demo
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-ink-muted">{vendor.area ?? "—"}</td>
+                <td className="px-4 py-3">
+                  <span className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLES[vendor.status]}`}>{vendor.status}</span>
+                </td>
+                <td className="px-4 py-3 text-ink-muted">
+                  {vendor.gbp_rating != null ? (
+                    <>
+                      <span className="text-gold-500">★</span> {vendor.gbp_rating.toFixed(1)}
+                    </>
+                  ) : (
+                    "—"
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <form action={setVendorStatus.bind(null, vendor.id)} className="flex items-center gap-1.5">
+                      <input type="hidden" name="__returnTo" value={returnTo} />
+                      <StatusSelect
+                        name="status"
+                        defaultValue={vendor.status}
+                        options={ALL_VENDOR_STATUSES}
+                        className="h-9 rounded-lg border border-border bg-surface px-2 text-xs text-ink focus:border-royal-600 focus:outline-none"
+                      />
+                    </form>
+                    <form action={deleteVendor.bind(null, vendor.id, returnTo)}>
+                      <ConfirmSubmitButton
+                        confirmMessage={`Delete ${vendor.name}? This cannot be undone.`}
+                        className="h-9 cursor-pointer rounded-lg border border-red-200 px-2 text-xs font-medium text-red-600 transition hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+                      >
+                        Delete
+                      </ConfirmSubmitButton>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

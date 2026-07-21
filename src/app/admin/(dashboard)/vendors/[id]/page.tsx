@@ -1,25 +1,40 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { computeGoLiveGate, getVendorDetail, VENDOR_PIPELINE_ORDER } from "@/lib/admin/queries";
+import { ALL_VENDOR_STATUSES, computeGoLiveGate, DISH_SUGGESTIONS, getVendorDetail, listCuisines, listEventTypes } from "@/lib/admin/queries";
 import {
+  addCuisineOption,
+  addEventTypeOption,
+  addExactDishesToPackage,
   addMenuCategory,
   addMenuItem,
   addPackage,
   addPackageSlot,
   addPackageSlotItem,
-  addPricingTier,
-  advanceVendorStatus,
+  addSuggestedMenuItem,
   deleteMenuCategory,
   deleteMenuItem,
   deletePackage,
   deletePackageSlot,
   deletePackageSlotItem,
-  deletePricingTier,
+  deleteVendor,
+  deleteVendorMedia,
+  importMenuCsv,
+  provisionStandardCategories,
   setDefaultPackage,
+  setVendorStatus,
   updateMenuItem,
   updatePackage,
+  updateVendorCuisines,
+  updateVendorEventTypes,
   updateVendorProfile,
+  uploadVendorLogo,
+  uploadVendorMedia,
 } from "@/lib/admin/actions";
+import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
+import { SpecialitySelector } from "@/components/SpecialitySelector";
+import { LogoUploadForm } from "@/components/LogoUploadForm";
+import { MediaUploadForm } from "@/components/MediaUploadForm";
+import { CsvImportForm } from "@/components/CsvImportForm";
 
 const inputClass =
   "h-11 rounded-lg border border-border bg-surface px-3 text-sm text-ink focus:border-royal-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-100";
@@ -32,13 +47,11 @@ const dangerButtonClass =
 
 export default async function AdminVendorEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const vendor = await getVendorDetail(id);
+  const [vendor, cuisines, eventTypes] = await Promise.all([getVendorDetail(id), listCuisines(), listEventTypes()]);
   if (!vendor) notFound();
 
   const gate = computeGoLiveGate(vendor);
   const returnTo = `/admin/vendors/${vendor.id}`;
-  const nextIndex = VENDOR_PIPELINE_ORDER.indexOf(vendor.status as (typeof VENDOR_PIPELINE_ORDER)[number]) + 1;
-  const nextStatus = nextIndex > 0 && nextIndex < VENDOR_PIPELINE_ORDER.length ? VENDOR_PIPELINE_ORDER[nextIndex] : null;
   const allItems = vendor.menu_categories.flatMap((c) => c.menu_items.map((i) => ({ ...i, categoryName: c.name })));
 
   return (
@@ -48,16 +61,33 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
           ← Back to pipeline
         </Link>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold text-royal-700">{vendor.name}</h1>
-          <div className="flex items-center gap-3">
-            <span className="rounded-full bg-royal-100 px-2 py-0.5 text-xs text-royal-700">{vendor.status}</span>
-            {nextStatus && (
-              <form action={advanceVendorStatus.bind(null, vendor.id, returnTo)}>
-                <button type="submit" className={secondaryButtonClass}>
-                  Advance to {nextStatus}
-                </button>
-              </form>
+          <h1 className="text-2xl font-semibold text-royal-700">
+            {vendor.name}
+            {vendor.is_demo && (
+              <span className="ml-2 rounded-full bg-gold-100 px-1.5 py-0.5 align-middle text-[10px] font-medium uppercase text-gold-600">
+                Demo
+              </span>
             )}
+          </h1>
+          <div className="flex items-center gap-2">
+            <form action={setVendorStatus.bind(null, vendor.id)} className="flex items-center gap-1.5">
+              <input type="hidden" name="__returnTo" value={returnTo} />
+              <select name="status" defaultValue={vendor.status} className={`${inputClass} h-9 w-36 text-xs`}>
+                {ALL_VENDOR_STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className={secondaryButtonClass}>
+                Save
+              </button>
+            </form>
+            <form action={deleteVendor.bind(null, vendor.id, "/admin")}>
+              <ConfirmSubmitButton confirmMessage={`Delete ${vendor.name}? This cannot be undone.`} className={dangerButtonClass}>
+                Delete vendor
+              </ConfirmSubmitButton>
+            </form>
           </div>
         </div>
       </div>
@@ -65,11 +95,7 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
       <section className="rounded-2xl border border-border bg-surface p-5 shadow-card">
         <h2 className="mb-3 text-lg font-semibold text-royal-700">Go-live checklist</h2>
         <ul className="flex flex-col gap-1.5 text-sm">
-          {[
-            { label: "At least one priced, active menu item", ok: !vendor.menu_categories.every((c) => c.menu_items.every((i) => !i.is_active)) },
-            { label: "At least one pricing tier", ok: vendor.pricing_tiers.length > 0 },
-            { label: "A default, active package", ok: vendor.packages.some((p) => p.is_default && p.is_active) },
-          ].map((check) => (
+          {[{ label: "At least one active package", ok: vendor.packages.some((p) => p.is_active) }].map((check) => (
             <li key={check.label} className="flex items-center gap-2">
               <span className={check.ok ? "text-green-600" : "text-red-500"}>{check.ok ? "✓" : "✕"}</span>
               <span className={check.ok ? "text-ink" : "text-ink-muted"}>{check.label}</span>
@@ -79,6 +105,17 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         {!gate.canGoLive && vendor.status !== "live" && (
           <p className="mt-3 text-xs text-ink-muted">Missing before this vendor can go live: {gate.missing.join(", ")}.</p>
         )}
+        <p className="mt-2 text-xs text-ink-muted">Everything else (menu, media, description) is optional.</p>
+      </section>
+
+      <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-card">
+        <h2 className="text-lg font-semibold text-royal-700">Showcase</h2>
+        <LogoUploadForm action={uploadVendorLogo.bind(null, vendor.id)} currentUrl={vendor.logo_url} />
+        <MediaUploadForm
+          action={uploadVendorMedia.bind(null, vendor.id)}
+          deleteAction={deleteVendorMedia.bind(null, vendor.id)}
+          media={vendor.vendor_media}
+        />
       </section>
 
       <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-card">
@@ -104,13 +141,9 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
             Address
             <input type="text" name="address" defaultValue={vendor.address ?? ""} className={inputClass} />
           </label>
-          <label className="flex flex-col gap-1 text-sm text-ink-muted">
-            Cuisine specialities (comma-separated, max 2)
-            <input type="text" name="cuisine_specialities" defaultValue={vendor.cuisine_specialities.join(", ")} className={inputClass} />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-ink-muted">
-            Event specialities (comma-separated, max 2)
-            <input type="text" name="event_specialities" defaultValue={vendor.event_specialities.join(", ")} className={inputClass} />
+          <label className="flex flex-col gap-1 text-sm text-ink-muted sm:col-span-2">
+            Description
+            <textarea name="description" defaultValue={vendor.description ?? ""} rows={3} className={`${inputClass} h-auto py-2`} />
           </label>
           <label className="flex flex-col gap-1 text-sm text-ink-muted">
             Pricing model
@@ -129,128 +162,134 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
             </button>
           </div>
         </form>
+
+        <div className="grid grid-cols-1 gap-6 border-t border-border pt-4 sm:grid-cols-2">
+          <SpecialitySelector
+            label="Cuisine specialities"
+            fieldName="cuisines"
+            newFieldName="new_cuisine"
+            options={cuisines}
+            selected={vendor.cuisine_specialities}
+            saveAction={updateVendorCuisines.bind(null, vendor.id)}
+            addAction={addCuisineOption.bind(null, vendor.id)}
+          />
+          <SpecialitySelector
+            label="Event specialities"
+            fieldName="event_types"
+            newFieldName="new_event_type"
+            options={eventTypes}
+            selected={vendor.event_specialities}
+            saveAction={updateVendorEventTypes.bind(null, vendor.id)}
+            addAction={addEventTypeOption.bind(null, vendor.id)}
+          />
+        </div>
       </section>
 
-      <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-card">
-        <h2 className="text-lg font-semibold text-royal-700">Pricing tiers</h2>
-        {vendor.pricing_tiers.length > 0 && (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-border text-ink-muted">
-                <th className="py-2 font-medium">Min plates</th>
-                <th className="py-2 font-medium">Max plates</th>
-                <th className="py-2 font-medium">Adjustment %</th>
-                <th className="py-2 font-medium"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {vendor.pricing_tiers
-                .sort((a, b) => a.min_plates - b.min_plates)
-                .map((tier) => (
-                  <tr key={tier.id}>
-                    <td className="py-2 text-ink">{tier.min_plates}</td>
-                    <td className="py-2 text-ink">{tier.max_plates}</td>
-                    <td className="py-2 text-ink">{tier.adjustment_pct > 0 ? "+" : ""}{tier.adjustment_pct}%</td>
-                    <td className="py-2">
-                      <form action={deletePricingTier.bind(null, tier.id, vendor.id)}>
+      <section className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-royal-700">Menu</h2>
+          {vendor.menu_categories.length === 0 && (
+            <form action={provisionStandardCategories.bind(null, vendor.id)}>
+              <button type="submit" className={secondaryButtonClass}>
+                Set up standard categories
+              </button>
+            </form>
+          )}
+        </div>
+
+        <div className="border-b border-border pb-6">
+          <h3 className="mb-2 text-sm font-medium text-ink">Bulk import (CSV)</h3>
+          <CsvImportForm action={importMenuCsv.bind(null, vendor.id)} />
+        </div>
+
+        {vendor.menu_categories.map((category) => {
+          const suggestions = (DISH_SUGGESTIONS[category.name] ?? []).filter(
+            (s) => !category.menu_items.some((i) => i.name === s)
+          );
+          return (
+            <div key={category.id} className="flex flex-col gap-3 border-t border-border pt-4 first:border-t-0 first:pt-0">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-ink">{category.name}</h3>
+                <form action={deleteMenuCategory.bind(null, category.id, vendor.id)}>
+                  <button type="submit" className={dangerButtonClass}>
+                    Delete category (and its items)
+                  </button>
+                </form>
+              </div>
+
+              {category.menu_items.length > 0 && (
+                <ul className="flex flex-col gap-2">
+                  {category.menu_items.map((item) => (
+                    <li key={item.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border px-3 py-2">
+                      <span className="min-w-40 text-sm text-ink">
+                        {item.name} <span className="text-xs text-ink-muted">({item.is_veg ? "veg" : "non-veg"})</span>
+                      </span>
+                      <form action={updateMenuItem.bind(null, item.id, vendor.id)} className="flex items-center gap-3">
+                        <label className="flex items-center gap-1 text-xs text-ink-muted">
+                          ₹
+                          <input
+                            type="number"
+                            step="0.01"
+                            name="base_price_pp"
+                            defaultValue={item.base_price_pp}
+                            className="h-9 w-24 rounded-lg border border-border bg-surface px-2 text-sm"
+                          />
+                        </label>
+                        <label className="flex items-center gap-1 text-xs text-ink-muted">
+                          <input type="checkbox" name="is_active" defaultChecked={item.is_active} className="h-5 w-5" />
+                          Active
+                        </label>
+                        <button type="submit" className={secondaryButtonClass}>
+                          Save
+                        </button>
+                      </form>
+                      <form action={deleteMenuItem.bind(null, item.id, vendor.id)}>
                         <button type="submit" className={dangerButtonClass}>
                           Delete
                         </button>
                       </form>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        )}
-        <form action={addPricingTier.bind(null, vendor.id)} className="flex flex-wrap items-end gap-3">
-          <label className="flex flex-col gap-1 text-sm text-ink-muted">
-            Min plates
-            <input type="number" name="min_plates" min={1} required className={`${inputClass} w-28`} />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-ink-muted">
-            Max plates
-            <input type="number" name="max_plates" min={1} required className={`${inputClass} w-28`} />
-          </label>
-          <label className="flex flex-col gap-1 text-sm text-ink-muted">
-            Adjustment %
-            <input type="number" step="0.01" name="adjustment_pct" required className={`${inputClass} w-28`} />
-          </label>
-          <button type="submit" className={secondaryButtonClass}>
-            Add tier
-          </button>
-        </form>
-      </section>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-      <section className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
-        <h2 className="text-lg font-semibold text-royal-700">Menu</h2>
-        {vendor.menu_categories.map((category) => (
-          <div key={category.id} className="flex flex-col gap-3 border-t border-border pt-4 first:border-t-0 first:pt-0">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium text-ink">{category.name}</h3>
-              <form action={deleteMenuCategory.bind(null, category.id, vendor.id)}>
-                <button type="submit" className={dangerButtonClass}>
-                  Delete category (and its items)
+              {suggestions.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-ink-muted">Suggestions:</span>
+                  {suggestions.map((s) => (
+                    <form key={s} action={async () => addSuggestedMenuItem(vendor.id, category.id, s)}>
+                      <button
+                        type="submit"
+                        className="cursor-pointer rounded-full border border-gold-500 px-2.5 py-1 text-xs text-gold-600 transition hover:bg-gold-100"
+                      >
+                        + {s}
+                      </button>
+                    </form>
+                  ))}
+                </div>
+              )}
+
+              <form action={addMenuItem.bind(null, vendor.id)} className="flex flex-wrap items-end gap-3">
+                <input type="hidden" name="category_id" value={category.id} />
+                <label className="flex flex-col gap-1 text-xs text-ink-muted">
+                  Name
+                  <input type="text" name="name" required className={`${inputClass} h-9 w-40`} />
+                </label>
+                <label className="flex flex-col gap-1 text-xs text-ink-muted">
+                  ₹ / plate
+                  <input type="number" step="0.01" name="base_price_pp" required className={`${inputClass} h-9 w-24`} />
+                </label>
+                <label className="flex items-center gap-1 text-xs text-ink-muted">
+                  <input type="checkbox" name="is_veg" defaultChecked className="h-5 w-5" />
+                  Veg
+                </label>
+                <button type="submit" className={secondaryButtonClass}>
+                  Add item
                 </button>
               </form>
             </div>
-
-            {category.menu_items.length > 0 && (
-              <ul className="flex flex-col gap-2">
-                {category.menu_items.map((item) => (
-                  <li key={item.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border px-3 py-2">
-                    <span className="min-w-40 text-sm text-ink">
-                      {item.name} <span className="text-xs text-ink-muted">({item.is_veg ? "veg" : "non-veg"})</span>
-                    </span>
-                    <form action={updateMenuItem.bind(null, item.id, vendor.id)} className="flex items-center gap-3">
-                      <label className="flex items-center gap-1 text-xs text-ink-muted">
-                        ₹
-                        <input
-                          type="number"
-                          step="0.01"
-                          name="base_price_pp"
-                          defaultValue={item.base_price_pp}
-                          className="h-9 w-24 rounded-lg border border-border bg-surface px-2 text-sm"
-                        />
-                      </label>
-                      <label className="flex items-center gap-1 text-xs text-ink-muted">
-                        <input type="checkbox" name="is_active" defaultChecked={item.is_active} className="h-5 w-5" />
-                        Active
-                      </label>
-                      <button type="submit" className={secondaryButtonClass}>
-                        Save
-                      </button>
-                    </form>
-                    <form action={deleteMenuItem.bind(null, item.id, vendor.id)}>
-                      <button type="submit" className={dangerButtonClass}>
-                        Delete
-                      </button>
-                    </form>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            <form action={addMenuItem.bind(null, vendor.id)} className="flex flex-wrap items-end gap-3">
-              <input type="hidden" name="category_id" value={category.id} />
-              <label className="flex flex-col gap-1 text-xs text-ink-muted">
-                Name
-                <input type="text" name="name" required className={`${inputClass} h-9 w-40`} />
-              </label>
-              <label className="flex flex-col gap-1 text-xs text-ink-muted">
-                ₹ / plate
-                <input type="number" step="0.01" name="base_price_pp" required className={`${inputClass} h-9 w-24`} />
-              </label>
-              <label className="flex items-center gap-1 text-xs text-ink-muted">
-                <input type="checkbox" name="is_veg" defaultChecked className="h-5 w-5" />
-                Veg
-              </label>
-              <button type="submit" className={secondaryButtonClass}>
-                Add item
-              </button>
-            </form>
-          </div>
-        ))}
+          );
+        })}
 
         <form action={addMenuCategory.bind(null, vendor.id)} className="flex items-end gap-3 border-t border-border pt-4">
           <label className="flex flex-col gap-1 text-sm text-ink-muted">
@@ -294,8 +333,12 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                 <input type="text" name="description" defaultValue={pkg.description ?? ""} className={`${inputClass} h-9 w-64`} />
               </label>
               <label className="flex flex-col gap-1 text-xs text-ink-muted">
-                ₹ / plate
-                <input type="number" step="0.01" name="base_price_pp" defaultValue={pkg.base_price_pp} className={`${inputClass} h-9 w-24`} />
+                ₹ / plate at 500 plates
+                <input type="number" step="0.01" name="base_price_pp" defaultValue={pkg.base_price_pp} className={`${inputClass} h-9 w-32`} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-ink-muted">
+                Min plates (optional)
+                <input type="number" name="min_plates" defaultValue={pkg.min_plates ?? ""} className={`${inputClass} h-9 w-24`} />
               </label>
               <label className="flex items-center gap-1 text-xs text-ink-muted">
                 <input type="checkbox" name="is_active" defaultChecked={pkg.is_active} className="h-5 w-5" />
@@ -306,7 +349,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
               </button>
             </form>
 
-            <div className="flex flex-col gap-2 pl-4">
+            <div className="flex flex-col gap-3 pl-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">By category rule</p>
               {pkg.package_slots.map((slot) => {
                 const category = vendor.menu_categories.find((c) => c.id === slot.category_id);
                 const slotItems = slot.package_slot_items
@@ -384,6 +428,27 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                 </form>
               )}
             </div>
+
+            {allItems.length > 0 && (
+              <details className="pl-4">
+                <summary className="cursor-pointer text-xs font-medium uppercase tracking-wide text-ink-muted">
+                  Or pick exact dishes
+                </summary>
+                <form action={addExactDishesToPackage.bind(null, pkg.id, vendor.id)} className="mt-2 flex flex-col gap-2">
+                  <div className="flex max-h-48 flex-col gap-1 overflow-y-auto rounded-lg border border-border p-3">
+                    {allItems.map((item) => (
+                      <label key={item.id} className="flex items-center gap-2 text-sm text-ink">
+                        <input type="checkbox" name="item_ids" value={item.id} className="h-4 w-4" />
+                        {item.name} <span className="text-xs text-ink-muted">({item.categoryName})</span>
+                      </label>
+                    ))}
+                  </div>
+                  <button type="submit" className={`${secondaryButtonClass} w-fit`}>
+                    Add selected dishes
+                  </button>
+                </form>
+              </details>
+            )}
           </div>
         ))}
 
@@ -397,8 +462,12 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
             <input type="text" name="description" className={inputClass} />
           </label>
           <label className="flex flex-col gap-1 text-sm text-ink-muted">
-            ₹ / plate
-            <input type="number" step="0.01" name="base_price_pp" required className={`${inputClass} w-32`} />
+            ₹ / plate at 500 plates
+            <input type="number" step="0.01" name="base_price_pp" required className={`${inputClass} w-40`} />
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-ink-muted">
+            Min plates (optional)
+            <input type="number" name="min_plates" className={`${inputClass} w-28`} />
           </label>
           <button type="submit" className={secondaryButtonClass}>
             Add package
@@ -406,9 +475,7 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         </form>
       </section>
 
-      <p className="text-xs text-ink-muted">
-        Prices above are the ₹ 500-plate baseline; the consumer site recomputes live per plate count.
-      </p>
+      <p className="text-xs text-ink-muted">Prices above are per plate at 500 plates.</p>
     </div>
   );
 }

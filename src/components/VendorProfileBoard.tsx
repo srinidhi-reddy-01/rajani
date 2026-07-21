@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { VendorProfile } from "@/lib/queries/vendors";
 import { formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
 import { submitEnquiry, submitTastingRequest } from "@/lib/consumer/actions";
@@ -48,7 +49,18 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
 
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-start justify-between gap-2">
-          <h1 className="text-2xl font-semibold text-royal-700">{vendor.name}</h1>
+          <div className="flex items-center gap-3">
+            {vendor.logo_url && (
+              <Image
+                src={vendor.logo_url}
+                alt={`${vendor.name} logo`}
+                width={48}
+                height={48}
+                className="h-12 w-12 rounded-lg border border-border object-cover"
+              />
+            )}
+            <h1 className="text-2xl font-semibold text-royal-700">{vendor.name}</h1>
+          </div>
           {vendor.gbp_rating != null && (
             <span className="whitespace-nowrap text-sm text-ink-muted">
               <span className="text-gold-500">★</span> {vendor.gbp_rating.toFixed(1)} Google rating
@@ -66,6 +78,21 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
           ))}
         </div>
       </div>
+
+      {vendor.vendor_media.length > 0 && (
+        <div className="flex gap-3 overflow-x-auto">
+          {vendor.vendor_media.map((m) => (
+            <Image
+              key={m.id}
+              src={m.url}
+              alt={`${vendor.name} photo`}
+              width={200}
+              height={150}
+              className="h-36 w-48 shrink-0 rounded-2xl border border-border object-cover"
+            />
+          ))}
+        </div>
+      )}
 
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-royal-700">Packages</h2>

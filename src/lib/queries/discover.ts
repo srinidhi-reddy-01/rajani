@@ -4,7 +4,7 @@ import { quotePerPlate } from "@/lib/pricing";
 
 export type MatchedVendor = Pick<
   Vendor,
-  "id" | "name" | "slug" | "area" | "gbp_rating" | "gbp_rating_count" | "cuisine_specialities"
+  "id" | "name" | "slug" | "area" | "gbp_rating" | "gbp_rating_count" | "cuisine_specialities" | "cover_image_url"
 > & {
   packages: Package[];
   lowestPackagePrice: number;
@@ -24,7 +24,7 @@ export type DiscoverResult = {
 
 type VendorWithPackagesRow = Pick<
   Vendor,
-  "id" | "name" | "slug" | "area" | "gbp_rating" | "gbp_rating_count" | "cuisine_specialities"
+  "id" | "name" | "slug" | "area" | "gbp_rating" | "gbp_rating_count" | "cuisine_specialities" | "cover_image_url"
 > & {
   packages: Package[];
 };
@@ -34,7 +34,7 @@ const BUDGET_BAND_TOLERANCE = 0.1;
 export async function getMatchedVendors(criteria: DiscoverCriteria): Promise<DiscoverResult> {
   const { data, error } = await supabase
     .from("vendors")
-    .select("id, name, slug, area, gbp_rating, gbp_rating_count, cuisine_specialities, packages(*)")
+    .select("id, name, slug, area, gbp_rating, gbp_rating_count, cuisine_specialities, cover_image_url, packages(*)")
     .eq("status", "live")
     .returns<VendorWithPackagesRow[]>();
   if (error) throw error;

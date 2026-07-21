@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fbf8f2;
+  --background: #faf6ee;
   --foreground: #241b2f;
 
-  /* Royal purple + gold celebration palette — design tokens.
-     Used consistently across consumer and admin UI. */
+  /* Design system — deep charcoal/aubergine dark surfaces, ivory content areas, gold
+     accent used sparingly (prices, ratings, dividers). No pure black or pure white
+     anywhere: charcoal-900 stands in for black, cream-50 for white-on-dark text. */
   --color-royal-50: #f4f1fb;
   --color-royal-100: #ede7f9;
   --color-royal-600: #5b249b;
@@ -16,8 +17,13 @@
   --color-gold-500: #c9a227;
   --color-gold-600: #a9860f;
 
-  --color-ivory: #fbf8f2;
-  --color-surface: #ffffff;
+  --color-charcoal-900: #1c1420;
+  --color-charcoal-800: #2a1f2e;
+  --color-charcoal-700: #392c3f;
+  --color-cream-50: #f3ead9;
+
+  --color-ivory: #faf6ee;
+  --color-surface: #fffdf9;
 
   --color-ink: #241b2f;
   --color-ink-muted: #6b6572;
@@ -25,10 +31,16 @@
 }
 
 @theme inline {
+  /* 8px spacing rhythm: Tailwind's default --spacing (0.25rem/4px) already expresses 8px
+     multiples via even-numbered utilities (p-2, gap-4, h-12...) - redefining the base unit
+     globally silently doubles every value already written against the default scale
+     (h-12 meant 48px, not 96px), so the scale stays default and the "8px" discipline is
+     just: prefer even-numbered spacing utilities. */
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
 
   --color-royal-50: var(--color-royal-50);
   --color-royal-100: var(--color-royal-100);
@@ -40,6 +52,11 @@
   --color-gold-500: var(--color-gold-500);
   --color-gold-600: var(--color-gold-600);
 
+  --color-charcoal-900: var(--color-charcoal-900);
+  --color-charcoal-800: var(--color-charcoal-800);
+  --color-charcoal-700: var(--color-charcoal-700);
+  --color-cream-50: var(--color-cream-50);
+
   --color-ivory: var(--color-ivory);
   --color-surface: var(--color-surface);
 
@@ -47,12 +64,13 @@
   --color-ink-muted: var(--color-ink-muted);
   --color-border: var(--color-border);
 
-  --shadow-card: 0 1px 2px rgba(76, 29, 149, 0.04), 0 4px 16px rgba(76, 29, 149, 0.06);
-  --shadow-card-hover: 0 2px 4px rgba(76, 29, 149, 0.06), 0 12px 28px rgba(76, 29, 149, 0.1);
+  --shadow-card: 0 1px 2px rgba(28, 20, 32, 0.04), 0 4px 16px rgba(28, 20, 32, 0.06);
+  --shadow-card-hover: 0 2px 4px rgba(28, 20, 32, 0.06), 0 12px 28px rgba(28, 20, 32, 0.12);
+  --shadow-elevated: 0 8px 16px rgba(28, 20, 32, 0.12), 0 24px 48px rgba(28, 20, 32, 0.18);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }

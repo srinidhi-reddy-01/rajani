@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import { FadeIn } from "@/components/motion/FadeIn";
 
 const FEATURES = [
   {
@@ -18,27 +20,44 @@ const FEATURES = [
 export default function Home() {
   return (
     <main className="flex flex-col">
-      <section className="border-b border-border bg-royal-700 px-6 py-20 text-center text-white">
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-6">
-          <h1 className="text-4xl font-semibold sm:text-5xl">Rajani</h1>
-          <p className="text-lg text-royal-100">
-            Find a Hyderabad caterer for your wedding, birthday, or event — with real prices, upfront.
-          </p>
-          <Link
-            href="/find"
-            className="h-12 cursor-pointer rounded-lg bg-gold-500 px-8 text-base font-medium text-royal-800 transition hover:bg-gold-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white flex items-center"
-          >
-            Find your caterer
-          </Link>
+      <section className="relative overflow-hidden bg-charcoal-900 px-4 py-24 text-center sm:py-32">
+        <Image
+          src="https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=1600&q=75&auto=format&fit=crop"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900 via-charcoal-900/80 to-charcoal-900/40" />
+        <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-6">
+          <FadeIn>
+            <h1 className="font-serif text-5xl font-semibold text-cream-50 sm:text-6xl">Rajani</h1>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <p className="text-lg text-cream-50/80">
+              Find a Hyderabad caterer for your wedding, birthday, or event — with real prices, upfront.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.16}>
+            <Link
+              href="/find"
+              className="flex h-12 cursor-pointer items-center rounded-lg bg-gold-500 px-8 text-base font-medium text-charcoal-900 transition hover:bg-gold-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream-50"
+            >
+              Find your caterer
+            </Link>
+          </FadeIn>
         </div>
       </section>
 
-      <section className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-8 px-6 py-16 sm:grid-cols-3">
-        {FEATURES.map((f) => (
-          <div key={f.title} className="flex flex-col gap-2">
-            <h2 className="text-lg font-semibold text-royal-700">{f.title}</h2>
-            <p className="text-sm text-ink-muted">{f.body}</p>
-          </div>
+      <section className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-8 px-4 py-16 sm:grid-cols-3">
+        {FEATURES.map((f, i) => (
+          <FadeIn key={f.title} delay={i * 0.06}>
+            <div className="flex flex-col gap-2">
+              <h2 className="font-serif text-lg font-semibold text-charcoal-900">{f.title}</h2>
+              <p className="text-sm text-ink-muted">{f.body}</p>
+            </div>
+          </FadeIn>
         ))}
       </section>
     </main>

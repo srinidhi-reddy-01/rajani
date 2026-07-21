@@ -24,7 +24,7 @@ export default async function VendorPage({
   };
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-10 pb-28">
+    <main className="pb-28">
       <VendorProfileBoard vendor={vendor} guidedContext={guidedContext} />
     </main>
   );

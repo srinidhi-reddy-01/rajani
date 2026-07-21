@@ -21,6 +21,7 @@ export type Vendor = {
   status: "sourced" | "contacted" | "onboarding" | "priced" | "live" | "paused";
   description: string | null;
   logo_url: string | null;
+  cover_image_url: string | null;
   is_demo: boolean;
   created_at: string;
   updated_at: string;

@@ -4,6 +4,7 @@ import type {
   Cuisine,
   Enquiry,
   EventType,
+  MatchRequest,
   MenuCategory,
   MenuItem,
   Package,
@@ -162,6 +163,14 @@ export async function listTastingRequests(status?: string): Promise<TastingReque
     .order("created_at", { ascending: false });
   if (status) query = query.eq("status", status as TastingRequest["status"]);
   const { data, error } = await query.returns<TastingRequestRow[]>();
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function listMatchRequests(status?: string): Promise<MatchRequest[]> {
+  let query = supabaseAdmin.from("match_requests").select("*").order("created_at", { ascending: false });
+  if (status) query = query.eq("status", status as MatchRequest["status"]);
+  const { data, error } = await query.returns<MatchRequest[]>();
   if (error) throw error;
   return data ?? [];
 }

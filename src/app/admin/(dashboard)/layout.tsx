@@ -27,6 +27,9 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
               <Link href="/admin/tasting" className={navLinkClass}>
                 Tasting requests
               </Link>
+              <Link href="/admin/match-requests" className={navLinkClass}>
+                Match requests
+              </Link>
             </nav>
           </div>
           <form action={logoutAction}>

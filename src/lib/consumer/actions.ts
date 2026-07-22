@@ -76,6 +76,33 @@ export async function submitEnquiry(
   return { status: "success" };
 }
 
+export async function submitMatchRequest(_prevState: CtaState, formData: FormData): Promise<CtaState> {
+  const phone = String(formData.get("phone") ?? "").trim();
+  if (!PHONE_REGEX.test(phone)) {
+    return { status: "idle", error: "Enter a valid 10-digit Indian mobile number." };
+  }
+
+  const plates = formData.get("plates") ? Number(formData.get("plates")) : null;
+  const budgetPp = formData.get("budget_pp") ? Number(formData.get("budget_pp")) : null;
+  const cuisines = String(formData.get("cuisines") ?? "")
+    .split(",")
+    .map((c) => c.trim())
+    .filter(Boolean);
+
+  const { error } = await supabaseAdmin.from("match_requests").insert({
+    user_phone: phone,
+    user_name: String(formData.get("name") ?? "").trim() || null,
+    event_type: String(formData.get("event_type") ?? "").trim() || null,
+    event_date: String(formData.get("event_date") ?? "").trim() || null,
+    plates: plates && Number.isFinite(plates) ? plates : null,
+    budget_pp: budgetPp && Number.isFinite(budgetPp) ? budgetPp : null,
+    cuisines,
+  });
+  if (error) throw error;
+
+  return { status: "success" };
+}
+
 export async function submitTastingRequest(
   vendorId: string,
   context: CtaContext,

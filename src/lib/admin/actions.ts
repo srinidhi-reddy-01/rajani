@@ -701,3 +701,17 @@ export async function updateTastingStatus(tastingId: string, formData: FormData)
 
   revalidatePath("/admin/tasting");
 }
+
+export async function updateMatchRequestStatus(matchRequestId: string, formData: FormData): Promise<void> {
+  await assertAdminSession();
+  const status = String(formData.get("status") ?? "");
+  if (!["new", "contacted", "closed"].includes(status)) return;
+
+  const { error } = await supabaseAdmin
+    .from("match_requests")
+    .update({ status: status as "new" | "contacted" | "closed" })
+    .eq("id", matchRequestId);
+  if (error) throw error;
+
+  revalidatePath("/admin/match-requests");
+}

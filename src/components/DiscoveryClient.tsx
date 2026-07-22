@@ -5,6 +5,7 @@ import type { Cuisine, EventType } from "@/lib/types/database";
 import type { DiscoverableVendor } from "@/lib/matching";
 import { matchVendors } from "@/lib/matching";
 import { VendorMatchCard } from "@/components/VendorMatchCard";
+import { MatchMeForm } from "@/components/MatchMeForm";
 import { QUOTE_DISCLAIMER, formatInr } from "@/lib/pricing";
 
 const PLATE_STEP = 50;
@@ -197,6 +198,8 @@ export function DiscoveryClient({
         {budgetPp !== "" ? `Budget shown as ${formatInr(Number(budgetPp))}/plate. ` : ""}
         {QUOTE_DISCLAIMER}
       </p>
+
+      <MatchMeForm cuisines={cuisines} eventTypes={eventTypes} />
     </div>
   );
 }

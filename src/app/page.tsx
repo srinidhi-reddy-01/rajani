@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
+import { MatchMeForm } from "@/components/MatchMeForm";
+import { getCuisines, getEventTypes } from "@/lib/queries/lookups";
 
 const FEATURES = [
   {
@@ -17,7 +19,9 @@ const FEATURES = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const [cuisines, eventTypes] = await Promise.all([getCuisines(), getEventTypes()]);
+
   return (
     <main className="flex flex-col">
       <section className="relative overflow-hidden bg-charcoal-900 px-4 py-24 text-center sm:py-32">
@@ -59,6 +63,10 @@ export default function Home() {
             </div>
           </FadeIn>
         ))}
+      </section>
+
+      <section className="mx-auto w-full max-w-2xl px-4 pb-16">
+        <MatchMeForm cuisines={cuisines} eventTypes={eventTypes} />
       </section>
     </main>
   );

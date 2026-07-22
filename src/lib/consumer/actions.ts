@@ -1,6 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { notifyNewEnquiry, notifyNewMatchRequest, notifyNewTastingRequest } from "@/lib/email";
 import type { EnquirySelection, PackageItemSelection } from "@/lib/types/database";
 
 const PHONE_REGEX = /^[6-9]\d{9}$/;
@@ -57,21 +58,37 @@ export async function submitEnquiry(
     package_name: context.packageName,
     selection: context.selection,
   };
+  const eventType = context.eventType || "Other";
+  const eventDate = context.eventDate || new Date().toISOString().slice(0, 10);
+  const plates = context.plates || 500;
 
   const { error } = await supabaseAdmin.from("enquiries").insert({
     vendor_id: vendorId,
     user_phone: phone,
     // The guided flow no longer collects meal_type; dinner is the common case for
     // Hyderabad wedding/event catering and the column has no default to fall back on.
-    event_type: context.eventType || "Other",
-    event_date: context.eventDate || new Date().toISOString().slice(0, 10),
-    plates: context.plates || 500,
+    event_type: eventType,
+    event_date: eventDate,
+    plates,
     meal_type: "dinner",
     budget_pp: context.budgetPp,
     menu_selection: selection,
     quoted_pp: context.quotedPp ?? 0,
   });
   if (error) throw error;
+
+  await notifyNewEnquiry({
+    vendorId,
+    phone,
+    plates,
+    eventDate,
+    eventType,
+    budgetPp: context.budgetPp,
+    cuisines: context.cuisines,
+    packageName: context.packageName,
+    quotedPp: context.quotedPp,
+    selection: context.selection,
+  });
 
   return { status: "success" };
 }
@@ -89,16 +106,32 @@ export async function submitMatchRequest(_prevState: CtaState, formData: FormDat
     .map((c) => c.trim())
     .filter(Boolean);
 
+  const name = String(formData.get("name") ?? "").trim() || null;
+  const eventType = String(formData.get("event_type") ?? "").trim() || null;
+  const eventDate = String(formData.get("event_date") ?? "").trim() || null;
+  const normalizedPlates = plates && Number.isFinite(plates) ? plates : null;
+  const normalizedBudgetPp = budgetPp && Number.isFinite(budgetPp) ? budgetPp : null;
+
   const { error } = await supabaseAdmin.from("match_requests").insert({
     user_phone: phone,
-    user_name: String(formData.get("name") ?? "").trim() || null,
-    event_type: String(formData.get("event_type") ?? "").trim() || null,
-    event_date: String(formData.get("event_date") ?? "").trim() || null,
-    plates: plates && Number.isFinite(plates) ? plates : null,
-    budget_pp: budgetPp && Number.isFinite(budgetPp) ? budgetPp : null,
+    user_name: name,
+    event_type: eventType,
+    event_date: eventDate,
+    plates: normalizedPlates,
+    budget_pp: normalizedBudgetPp,
     cuisines,
   });
   if (error) throw error;
+
+  await notifyNewMatchRequest({
+    phone,
+    name,
+    eventType,
+    eventDate,
+    plates: normalizedPlates,
+    budgetPp: normalizedBudgetPp,
+    cuisines,
+  });
 
   return { status: "success" };
 }
@@ -130,6 +163,19 @@ export async function submitTastingRequest(
     },
   });
   if (error) throw error;
+
+  await notifyNewTastingRequest({
+    vendorId,
+    phone,
+    plates: context.plates,
+    eventDate: context.eventDate,
+    eventType: context.eventType,
+    budgetPp: context.budgetPp,
+    cuisines: context.cuisines,
+    packageName: context.packageName,
+    quotedPp: context.quotedPp,
+    selection: context.selection,
+  });
 
   return { status: "success" };
 }

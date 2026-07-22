@@ -10,7 +10,7 @@ import { formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
 import { submitEnquiry, submitTastingRequest } from "@/lib/consumer/actions";
 import { CtaModal } from "@/components/CtaModal";
 import { vendorCoverImage } from "@/lib/images";
-import { PackageSelector, isSelectionComplete, type SlotSelection } from "@/components/PackageSelector";
+import { PackageSelector, type SlotSelection } from "@/components/PackageSelector";
 
 type GuidedContext = {
   plates: number;
@@ -49,6 +49,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
     vendor.packages.find((p) => p.is_default)?.id ?? vendor.packages[0]?.id ?? null
   );
   const [slotSelection, setSlotSelection] = useState<SlotSelection>({});
+  const [menuSelectorOpen, setMenuSelectorOpen] = useState(false);
   const [openModal, setOpenModal] = useState<"enquire" | "tasting" | null>(null);
 
   const galleryPhotos = vendor.vendor_media.filter((m) => m.kind === "gallery");
@@ -56,10 +57,12 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
 
   const selectedPackage = vendor.packages.find((p) => p.id === selectedPackageId) ?? null;
   const hasSlots = (selectedPackage?.slots.length ?? 0) > 0;
-  const selectionComplete = !hasSlots || (selectedPackage ? isSelectionComplete(selectedPackage.slots, slotSelection) : false);
 
+  // Menu customisation is entirely optional and never blocks "Check availability" (#3):
+  // if the user never opened the selector, the enquiry carries the package alone -
+  // opening it and engaging with the (preselected) defaults is what counts as "customised".
   const itemSelection: PackageItemSelection[] = useMemo(() => {
-    if (!selectedPackage) return [];
+    if (!selectedPackage || !menuSelectorOpen) return [];
     return selectedPackage.slots.map((slot) => {
       const selectedIds = slotSelection[slot.id] ?? [];
       const selectedOptions = slot.options.filter((o) => selectedIds.includes(o.itemId));
@@ -71,7 +74,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         selected_item_names: selectedOptions.map((o) => o.name),
       };
     });
-  }, [selectedPackage, slotSelection]);
+  }, [selectedPackage, slotSelection, menuSelectorOpen]);
 
   const ctaContext = {
     plates,
@@ -236,11 +239,23 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
 
         {selectedPackage && hasSlots && (
           <section className="flex flex-col gap-4 rounded-2xl border border-royal-100 bg-royal-50/40 p-4 sm:p-6">
-            <div>
-              <h2 className="font-serif text-lg font-semibold text-royal-700">Choose menu items to get exact quote</h2>
-              <p className="text-sm text-ink-muted">Defaults are preselected — swap freely within each category.</p>
-            </div>
-            <PackageSelector key={selectedPackage.id} slots={selectedPackage.slots} onChange={setSlotSelection} />
+            <button
+              type="button"
+              onClick={() => setMenuSelectorOpen((v) => !v)}
+              className="flex cursor-pointer items-center justify-between gap-2 text-left"
+            >
+              <div>
+                <h2 className="font-serif text-lg font-semibold text-royal-700">Choose menu items to get the exact quote</h2>
+                <p className="text-sm text-ink-muted">Optional — availability works with just the package above.</p>
+              </div>
+              <span className="shrink-0 text-royal-700">{menuSelectorOpen ? "−" : "+"}</span>
+            </button>
+            {menuSelectorOpen && (
+              <>
+                <p className="text-sm text-ink-muted">Defaults are preselected — swap freely within each category.</p>
+                <PackageSelector key={selectedPackage.id} slots={selectedPackage.slots} onChange={setSlotSelection} />
+              </>
+            )}
           </section>
         )}
 
@@ -291,7 +306,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
           {selectedPackage && (
             <div className="flex items-center justify-between text-xs text-ink-muted">
               <span>
-                {hasSlots
+                {menuSelectorOpen
                   ? `${selectedPackage.name} — ${Object.values(slotSelection).reduce((n, ids) => n + ids.length, 0)} items selected`
                   : selectedPackage.name}
               </span>
@@ -310,11 +325,10 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
             </button>
             <button
               type="button"
-              disabled={!selectionComplete}
               onClick={() => setOpenModal("enquire")}
               className={`${ctaButtonClass} bg-royal-700 text-cream-50 hover:bg-royal-800`}
             >
-              {hasSlots ? "Check availability" : "Enquire for booking"}
+              Check availability
             </button>
           </div>
         </div>
@@ -323,7 +337,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
       <CtaModal
         open={openModal === "enquire"}
         onClose={() => setOpenModal(null)}
-        title="Enquire for booking"
+        title="Check availability"
         action={submitEnquiry.bind(null, vendor.id, ctaContext)}
       />
       <CtaModal

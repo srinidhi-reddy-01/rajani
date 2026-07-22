@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { MenuCategory, MenuItem, Package, PackageSlot, PackageSlotItem, Vendor, VendorMedia } from "@/lib/types/database";
 
@@ -31,7 +32,9 @@ type VendorProfileRow = Vendor & {
 };
 type CategoryWithItemsRow = MenuCategory & { menu_items: MenuItem[] };
 
-export async function getVendorProfile(slug: string): Promise<VendorProfile | null> {
+// Wrapped in React's cache() so generateMetadata and the page component (both call
+// this per-request) share one fetch instead of hitting Supabase twice.
+export const getVendorProfile = cache(async (slug: string): Promise<VendorProfile | null> => {
   const { data: vendor, error } = await supabase
     .from("vendors")
     .select("*, packages(*, package_slots(*, package_slot_items(*))), vendor_media(*)")
@@ -82,4 +85,4 @@ export async function getVendorProfile(slug: string): Promise<VendorProfile | nu
     packages,
     menu_categories: categoryList,
   };
-}
+});

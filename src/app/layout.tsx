@@ -17,9 +17,25 @@ const inter = Inter({
   display: "swap",
 });
 
+// Set NEXT_PUBLIC_SITE_URL to the real production domain once one is chosen; this
+// fallback keeps OG/Twitter URLs valid in the meantime.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rajani.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Rajani — Hyderabad caterers, real prices upfront",
   description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
+  openGraph: {
+    title: "Rajani — Hyderabad caterers, real prices upfront",
+    description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
+    siteName: "Rajani",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rajani — Hyderabad caterers, real prices upfront",
+    description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
+  },
 };
 
 export default function RootLayout({

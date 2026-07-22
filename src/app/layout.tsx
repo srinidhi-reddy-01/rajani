@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Inter, Playfair_Display } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -39,6 +41,8 @@ export default function RootLayout({
           </div>
         </header>
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

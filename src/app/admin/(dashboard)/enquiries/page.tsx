@@ -41,46 +41,53 @@ export default async function AdminEnquiriesPage({
       {enquiries.length === 0 ? (
         <p className="text-sm text-ink-muted">No enquiries yet.</p>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-card">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-border text-ink-muted">
-                <th className="px-4 py-3 font-medium">Vendor</th>
-                <th className="px-4 py-3 font-medium">Phone</th>
-                <th className="px-4 py-3 font-medium">Event</th>
-                <th className="px-4 py-3 font-medium">Date</th>
-                <th className="px-4 py-3 font-medium">Plates</th>
-                <th className="px-4 py-3 font-medium">Quoted</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {enquiries.map((enquiry) => (
-                <tr key={enquiry.id}>
-                  <td className="px-4 py-3 text-ink">{enquiry.vendors?.name ?? "—"}</td>
-                  <td className="px-4 py-3 text-ink-muted">{enquiry.user_phone}</td>
-                  <td className="px-4 py-3 text-ink-muted">{enquiry.event_type}</td>
-                  <td className="px-4 py-3 text-ink-muted">{enquiry.event_date}</td>
-                  <td className="px-4 py-3 text-ink-muted">{enquiry.plates}</td>
-                  <td className="px-4 py-3 font-medium text-gold-600">{formatInr(enquiry.quoted_pp)}</td>
-                  <td className="px-4 py-3">
-                    <form action={updateEnquiryStatus.bind(null, enquiry.id)} className="flex items-center gap-2">
-                      <select name="status" defaultValue={enquiry.status} className={inputClass}>
-                        {ENQUIRY_STATUSES.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </select>
-                      <button type="submit" className={secondaryButtonClass}>
-                        Save
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="flex flex-col gap-4">
+          {enquiries.map((enquiry) => {
+            const sel = enquiry.menu_selection;
+            return (
+              <div key={enquiry.id} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 shadow-card">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h2 className="font-medium text-ink">{enquiry.vendors?.name ?? "—"}</h2>
+                    <p className="text-sm text-ink-muted">{enquiry.user_phone}</p>
+                  </div>
+                  <form action={updateEnquiryStatus.bind(null, enquiry.id)} className="flex items-center gap-2">
+                    <select name="status" defaultValue={enquiry.status} className={inputClass}>
+                      {ENQUIRY_STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                    <button type="submit" className={secondaryButtonClass}>
+                      Save
+                    </button>
+                  </form>
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-4">
+                  <p><span className="text-ink-muted">Event:</span> {enquiry.event_type}</p>
+                  <p><span className="text-ink-muted">Date:</span> {enquiry.event_date}</p>
+                  <p><span className="text-ink-muted">Plates:</span> {enquiry.plates}</p>
+                  <p><span className="text-ink-muted">Budget:</span> {enquiry.budget_pp ? formatInr(enquiry.budget_pp) : "—"}</p>
+                  <p><span className="text-ink-muted">Cuisine:</span> {(sel.cuisines ?? []).length > 0 ? sel.cuisines.join(", ") : "—"}</p>
+                  <p><span className="text-ink-muted">Package:</span> {sel.package_name ?? "—"}</p>
+                  <p className="font-medium text-gold-600"><span className="font-normal text-ink-muted">Quoted:</span> {formatInr(enquiry.quoted_pp)}</p>
+                </div>
+
+                {(sel.selection ?? []).length > 0 && (
+                  <div className="flex flex-col gap-1 rounded-lg border border-border bg-ivory p-3 text-sm">
+                    <p className="font-medium text-ink">Chosen items</p>
+                    {sel.selection.map((s) => (
+                      <p key={s.category_id} className="text-ink-muted">
+                        <span className="text-ink">{s.category_name}:</span> {s.selected_item_names.join(", ") || "none picked"}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

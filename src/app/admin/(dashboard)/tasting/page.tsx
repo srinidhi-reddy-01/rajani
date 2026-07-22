@@ -1,5 +1,6 @@
 import { listTastingRequests } from "@/lib/admin/queries";
 import { updateTastingStatus } from "@/lib/admin/actions";
+import { formatInr } from "@/lib/pricing";
 
 const TASTING_STATUSES = ["new", "contacted", "completed", "cancelled"] as const;
 
@@ -40,42 +41,69 @@ export default async function AdminTastingPage({
       {requests.length === 0 ? (
         <p className="text-sm text-ink-muted">No tasting requests yet.</p>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-card">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-border text-ink-muted">
-                <th className="px-4 py-3 font-medium">Vendor</th>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Phone</th>
-                <th className="px-4 py-3 font-medium">Requested</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {requests.map((request) => (
-                <tr key={request.id}>
-                  <td className="px-4 py-3 text-ink">{request.vendors?.name ?? "—"}</td>
-                  <td className="px-4 py-3 text-ink-muted">{request.user_name ?? "—"}</td>
-                  <td className="px-4 py-3 text-ink-muted">{request.user_phone}</td>
-                  <td className="px-4 py-3 text-ink-muted">{new Date(request.created_at).toLocaleDateString("en-IN")}</td>
-                  <td className="px-4 py-3">
-                    <form action={updateTastingStatus.bind(null, request.id)} className="flex items-center gap-2">
-                      <select name="status" defaultValue={request.status} className={inputClass}>
-                        {TASTING_STATUSES.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
+        <div className="flex flex-col gap-4">
+          {requests.map((request) => {
+            const ctx = request.context;
+            return (
+              <div key={request.id} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 shadow-card">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h2 className="font-medium text-ink">{request.vendors?.name ?? "—"}</h2>
+                    <p className="text-sm text-ink-muted">
+                      {request.user_name ? `${request.user_name} · ` : ""}
+                      {request.user_phone}
+                    </p>
+                  </div>
+                  <form action={updateTastingStatus.bind(null, request.id)} className="flex items-center gap-2">
+                    <select name="status" defaultValue={request.status} className={inputClass}>
+                      {TASTING_STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                    <button type="submit" className={secondaryButtonClass}>
+                      Save
+                    </button>
+                  </form>
+                </div>
+
+                <p className="text-xs text-ink-muted">
+                  Requested {new Date(request.created_at).toLocaleDateString("en-IN")}
+                </p>
+
+                {ctx ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-4">
+                      <p><span className="text-ink-muted">Event:</span> {ctx.event_type || "—"}</p>
+                      <p><span className="text-ink-muted">Date:</span> {ctx.event_date || "—"}</p>
+                      <p><span className="text-ink-muted">Plates:</span> {ctx.plates}</p>
+                      <p><span className="text-ink-muted">Budget:</span> {ctx.budget_pp ? formatInr(ctx.budget_pp) : "—"}</p>
+                      <p><span className="text-ink-muted">Cuisine:</span> {(ctx.cuisines ?? []).length > 0 ? ctx.cuisines.join(", ") : "—"}</p>
+                      <p><span className="text-ink-muted">Package:</span> {ctx.package_name ?? "—"}</p>
+                      <p>
+                        <span className="text-ink-muted">Quoted:</span>{" "}
+                        {ctx.quoted_pp != null ? formatInr(ctx.quoted_pp) : "—"}
+                      </p>
+                    </div>
+
+                    {(ctx.selection ?? []).length > 0 && (
+                      <div className="flex flex-col gap-1 rounded-lg border border-border bg-ivory p-3 text-sm">
+                        <p className="font-medium text-ink">Chosen items</p>
+                        {ctx.selection.map((s) => (
+                          <p key={s.category_id} className="text-ink-muted">
+                            <span className="text-ink">{s.category_name}:</span> {s.selected_item_names.join(", ") || "none picked"}
+                          </p>
                         ))}
-                      </select>
-                      <button type="submit" className={secondaryButtonClass}>
-                        Save
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-ink-muted">No additional context captured.</p>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

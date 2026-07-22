@@ -7,6 +7,9 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 await page.goto(url, { waitUntil: "networkidle" });
 
+// Open the (now collapsed-by-default) optional menu selector first.
+await page.getByText("Choose menu items to get the exact quote").click();
+
 // Swap: deselect the currently-selected default in "Starters veg", pick "Veg Manchurian" instead.
 // (Dish names also appear in the read-only Menu list below, so scope to the selector's buttons.)
 await page.getByRole("button", { name: /Paneer Tikka/ }).click();

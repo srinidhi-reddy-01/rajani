@@ -42,12 +42,40 @@ export function VendorMatchCard({
               {vendor.gbp_rating_count != null && <span className="text-cream-50/70"> ({vendor.gbp_rating_count})</span>}
             </span>
           )}
+          {vendor.owner_photo_url && (
+            <Image
+              src={vendor.owner_photo_url}
+              alt=""
+              width={56}
+              height={56}
+              className="absolute -bottom-6 left-4 h-14 w-14 rounded-full border-4 border-surface object-cover shadow-card"
+            />
+          )}
         </div>
 
-        <div className="flex flex-col gap-3 p-5">
+        <div className={`flex flex-col gap-3 p-5 ${vendor.owner_photo_url ? "pt-9" : ""}`}>
           <div>
-            <h3 className="font-serif text-lg font-semibold text-ink group-hover:text-royal-700">{vendor.name}</h3>
-            {vendor.area && <p className="text-sm text-ink-muted">{vendor.area}</p>}
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-serif text-lg font-semibold text-ink group-hover:text-royal-700">{vendor.name}</h3>
+              {vendor.is_verified && (
+                <span
+                  title="Personally verified by the Rajani team"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[10px] text-cream-50"
+                  aria-label="Verified: personally verified by the Rajani team"
+                >
+                  ✓
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-x-2 text-sm text-ink-muted">
+              {vendor.area && <span>{vendor.area}</span>}
+              {vendor.events_completed > 0 && (
+                <span>
+                  {vendor.area && "· "}
+                  {vendor.events_completed} events completed
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-1.5">

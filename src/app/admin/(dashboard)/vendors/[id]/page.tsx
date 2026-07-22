@@ -258,7 +258,7 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs text-ink-muted">Suggestions:</span>
                   {suggestions.map((s) => (
-                    <form key={s} action={async () => addSuggestedMenuItem(vendor.id, category.id, s)}>
+                    <form key={s} action={addSuggestedMenuItem.bind(null, vendor.id, category.id, s)}>
                       <button
                         type="submit"
                         className="cursor-pointer rounded-full border border-gold-500 px-2.5 py-1 text-xs text-gold-600 transition hover:bg-gold-100"

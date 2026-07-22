@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const ratingText = vendor.gbp_rating != null ? `★ ${vendor.gbp_rating.toFixed(1)} Google rating · ` : "";
   const priceText = lowestPrice != null ? `Packages from ${formatInr(lowestPrice)}/plate` : "Real packages, real prices";
   const description = `${ratingText}${priceText}`;
-  const image = vendorCoverImage(vendor.id, vendor.cover_image_url);
+  const image = vendorCoverImage(vendor.id, vendor.cover_image_url ?? vendor.logo_url);
 
   return {
     title: `${vendor.name} — Rajani`,

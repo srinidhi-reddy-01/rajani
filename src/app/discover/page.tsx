@@ -2,6 +2,12 @@ import { getLiveVendorsWithPackages } from "@/lib/queries/discover";
 import { getCuisines, getEventTypes } from "@/lib/queries/lookups";
 import { DiscoveryClient } from "@/components/DiscoveryClient";
 
+// This page has no dynamic Next.js APIs, so it's statically prerendered - admin
+// server actions call revalidatePath("/discover") on every vendor mutation, but
+// data can also change outside admin actions (seed scripts, direct SQL). A short
+// ISR interval is the safety net for that case.
+export const revalidate = 60;
+
 export default async function DiscoverPage() {
   const [vendors, cuisines, eventTypes] = await Promise.all([
     getLiveVendorsWithPackages(),

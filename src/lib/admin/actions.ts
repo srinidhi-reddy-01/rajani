@@ -8,9 +8,15 @@ import { assertAdminSession } from "@/lib/admin/auth";
 import { ALL_VENDOR_STATUSES, STANDARD_MENU_CATEGORIES, computeGoLiveGate, getVendorDetail } from "@/lib/admin/queries";
 import type { Vendor } from "@/lib/types/database";
 
+// Called after every vendor-data mutation so admin edits (packages, menu, trust
+// signals, media) show up on the public site without waiting for a redeploy.
+// "/vendors/[slug]" with type "page" revalidates every vendor profile page that
+// dynamic route matches - we don't have the slug on hand at every call site.
 function revalidateVendor(vendorId: string): void {
   revalidatePath("/admin");
   revalidatePath(`/admin/vendors/${vendorId}`);
+  revalidatePath("/discover");
+  revalidatePath("/vendors/[slug]", "page");
 }
 
 function slugify(name: string): string {

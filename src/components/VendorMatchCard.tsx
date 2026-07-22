@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import type { MatchedVendor } from "@/lib/matching";
 import { formatInr, quotePerPlate } from "@/lib/pricing";
 import { vendorCoverImage } from "@/lib/images";
+import { VendorAvatar } from "@/components/VendorAvatar";
 
 export function VendorMatchCard({
   vendor,
@@ -42,18 +43,15 @@ export function VendorMatchCard({
               {vendor.gbp_rating_count != null && <span className="text-cream-50/70"> ({vendor.gbp_rating_count})</span>}
             </span>
           )}
-          {vendor.owner_photo_url && (
-            <Image
-              src={vendor.owner_photo_url}
-              alt=""
-              width={56}
-              height={56}
-              className="absolute -bottom-6 left-4 h-14 w-14 rounded-full border-4 border-surface object-cover shadow-card"
-            />
-          )}
+          <VendorAvatar
+            name={vendor.name}
+            ownerPhotoUrl={vendor.owner_photo_url}
+            logoUrl={vendor.logo_url}
+            className="absolute -bottom-6 left-4 h-14 w-14"
+          />
         </div>
 
-        <div className={`flex flex-col gap-3 p-5 ${vendor.owner_photo_url ? "pt-9" : ""}`}>
+        <div className="flex flex-col gap-3 p-5 pt-9">
           <div>
             <div className="flex items-center gap-1.5">
               <h3 className="font-serif text-lg font-semibold text-ink group-hover:text-royal-700">{vendor.name}</h3>

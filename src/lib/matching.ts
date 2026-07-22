@@ -15,6 +15,7 @@ export type DiscoverableVendor = Pick<
   | "cuisine_specialities"
   | "cover_image_url"
   | "owner_photo_url"
+  | "logo_url"
   | "events_completed"
   | "is_verified"
 > & {

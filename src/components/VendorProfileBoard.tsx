@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import type { VendorProfile } from "@/lib/queries/vendors";
+import type { PackageItemSelection } from "@/lib/types/database";
 import { formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
 import { submitEnquiry, submitTastingRequest } from "@/lib/consumer/actions";
 import { CtaModal } from "@/components/CtaModal";
 import { vendorCoverImage } from "@/lib/images";
+import { PackageSelector, isSelectionComplete, type SlotSelection } from "@/components/PackageSelector";
 
 type GuidedContext = {
   plates: number;
@@ -19,7 +21,7 @@ type GuidedContext = {
 };
 
 const ctaButtonClass =
-  "h-14 flex-1 cursor-pointer rounded-lg text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
+  "h-14 flex-1 cursor-pointer rounded-lg text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 disabled:cursor-not-allowed disabled:opacity-40";
 
 function AnimatedPrice({ amount, suffix }: { amount: number; suffix?: string }) {
   const rounded = Math.round(amount);
@@ -46,9 +48,30 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(
     vendor.packages.find((p) => p.is_default)?.id ?? vendor.packages[0]?.id ?? null
   );
+  const [slotSelection, setSlotSelection] = useState<SlotSelection>({});
   const [openModal, setOpenModal] = useState<"enquire" | "tasting" | null>(null);
 
+  const galleryPhotos = vendor.vendor_media.filter((m) => m.kind === "gallery");
+  const testimonials = vendor.vendor_media.filter((m) => m.kind === "testimonial");
+
   const selectedPackage = vendor.packages.find((p) => p.id === selectedPackageId) ?? null;
+  const hasSlots = (selectedPackage?.slots.length ?? 0) > 0;
+  const selectionComplete = !hasSlots || (selectedPackage ? isSelectionComplete(selectedPackage.slots, slotSelection) : false);
+
+  const itemSelection: PackageItemSelection[] = useMemo(() => {
+    if (!selectedPackage) return [];
+    return selectedPackage.slots.map((slot) => {
+      const selectedIds = slotSelection[slot.id] ?? [];
+      const selectedOptions = slot.options.filter((o) => selectedIds.includes(o.itemId));
+      return {
+        category_id: slot.categoryId,
+        category_name: slot.categoryName,
+        selections_count: slot.selectionsCount,
+        selected_item_ids: selectedOptions.map((o) => o.itemId),
+        selected_item_names: selectedOptions.map((o) => o.name),
+      };
+    });
+  }, [selectedPackage, slotSelection]);
 
   const ctaContext = {
     plates,
@@ -59,10 +82,11 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
     packageId: selectedPackage?.id ?? null,
     packageName: selectedPackage?.name ?? null,
     quotedPp: selectedPackage ? quotePerPlate(selectedPackage.base_price_pp, plates) : null,
+    selection: itemSelection,
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-8">
+    <div className="flex flex-col gap-8 pb-32">
       <div className="relative h-64 w-full sm:h-80">
         <Image
           src={vendorCoverImage(vendor.id, vendor.cover_image_url)}
@@ -114,9 +138,9 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
           ))}
         </div>
 
-        {vendor.vendor_media.length > 0 && (
+        {galleryPhotos.length > 0 && (
           <div className="flex gap-3 overflow-x-auto">
-            {vendor.vendor_media.map((m) => (
+            {galleryPhotos.map((m) => (
               <Image
                 key={m.id}
                 src={m.url}
@@ -127,6 +151,24 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
               />
             ))}
           </div>
+        )}
+
+        {testimonials.length > 0 && (
+          <section className="flex flex-col gap-3">
+            <h2 className="font-serif text-lg font-semibold text-royal-700">What hosts say</h2>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {testimonials.map((t) => (
+                <div
+                  key={t.id}
+                  className="w-56 shrink-0 rounded-2xl border border-border bg-surface p-2 shadow-card"
+                >
+                  <div className="relative h-72 w-full overflow-hidden rounded-xl">
+                    <Image src={t.url} alt="Host testimonial screenshot" fill sizes="224px" className="object-cover" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
 
         <label className="flex items-center gap-3 text-sm text-ink-muted">
@@ -192,6 +234,16 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
           <p className="text-xs text-ink-muted">{QUOTE_DISCLAIMER}</p>
         </section>
 
+        {selectedPackage && hasSlots && (
+          <section className="flex flex-col gap-4 rounded-2xl border border-royal-100 bg-royal-50/40 p-4 sm:p-6">
+            <div>
+              <h2 className="font-serif text-lg font-semibold text-royal-700">Choose menu items to get exact quote</h2>
+              <p className="text-sm text-ink-muted">Defaults are preselected — swap freely within each category.</p>
+            </div>
+            <PackageSelector key={selectedPackage.id} slots={selectedPackage.slots} onChange={setSlotSelection} />
+          </section>
+        )}
+
         <section className="flex flex-col gap-4">
           <h2 className="font-serif text-lg font-semibold text-royal-700">Menu</h2>
           {vendor.menu_categories.length === 0 ? (
@@ -228,14 +280,37 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         </section>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 p-4 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-4xl gap-3">
-          <button type="button" onClick={() => setOpenModal("tasting")} className={`${ctaButtonClass} border border-royal-700 text-royal-700 hover:bg-royal-100`}>
-            Get sample box
-          </button>
-          <button type="button" onClick={() => setOpenModal("enquire")} className={`${ctaButtonClass} bg-royal-700 text-cream-50 hover:bg-royal-800`}>
-            Enquire for booking
-          </button>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-4xl flex-col gap-2 p-4">
+          {selectedPackage && (
+            <div className="flex items-center justify-between text-xs text-ink-muted">
+              <span>
+                {hasSlots
+                  ? `${selectedPackage.name} — ${Object.values(slotSelection).reduce((n, ids) => n + ids.length, 0)} items selected`
+                  : selectedPackage.name}
+              </span>
+              <span className="font-semibold text-gold-600">
+                <AnimatedPrice amount={quotePerPlate(selectedPackage.base_price_pp, plates)} suffix="/plate" />
+              </span>
+            </div>
+          )}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setOpenModal("tasting")}
+              className={`${ctaButtonClass} border border-royal-700 text-royal-700 hover:bg-royal-100`}
+            >
+              Get sample box
+            </button>
+            <button
+              type="button"
+              disabled={!selectionComplete}
+              onClick={() => setOpenModal("enquire")}
+              className={`${ctaButtonClass} bg-royal-700 text-cream-50 hover:bg-royal-800`}
+            >
+              {hasSlots ? "Check availability" : "Enquire for booking"}
+            </button>
+          </div>
         </div>
       </div>
 

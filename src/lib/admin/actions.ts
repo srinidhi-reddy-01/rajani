@@ -223,6 +223,7 @@ export async function addMenuItem(vendorId: string, formData: FormData): Promise
     is_veg: formData.get("is_veg") === "on",
     meal_types: mealTypes.length > 0 ? mealTypes : ["lunch", "dinner"],
     base_price_pp: basePricePp,
+    image_url: String(formData.get("image_url") ?? "").trim() || null,
   });
   if (error) throw error;
 
@@ -250,7 +251,11 @@ export async function updateMenuItem(itemId: string, vendorId: string, formData:
 
   const { error } = await supabaseAdmin
     .from("menu_items")
-    .update({ base_price_pp: basePricePp, is_active: formData.get("is_active") === "on" })
+    .update({
+      base_price_pp: basePricePp,
+      is_active: formData.get("is_active") === "on",
+      image_url: String(formData.get("image_url") ?? "").trim() || null,
+    })
     .eq("id", itemId);
   if (error) throw error;
 
@@ -469,6 +474,10 @@ export async function deletePackage(packageId: string, vendorId: string): Promis
 
 // ---------- Package slots & slot items (category-rule packages) ----------
 
+// A new slot defaults to offering every active item in its category (task spec: "default:
+// all items in the category") - admin then removes specific items to restrict, via the
+// existing addPackageSlotItem/deletePackageSlotItem actions. The first `selectionsCount`
+// items (by name) are marked is_default so the consumer selector has something preselected.
 export async function addPackageSlot(packageId: string, vendorId: string, formData: FormData): Promise<void> {
   await assertAdminSession();
   const categoryId = String(formData.get("category_id") ?? "");
@@ -480,13 +489,36 @@ export async function addPackageSlot(packageId: string, vendorId: string, formDa
     .select("id", { count: "exact", head: true })
     .eq("package_id", packageId);
 
-  const { error } = await supabaseAdmin.from("package_slots").insert({
-    package_id: packageId,
-    category_id: categoryId,
-    selections_count: selectionsCount,
-    sort_order: count ?? 0,
-  });
+  const { data: slot, error } = await supabaseAdmin
+    .from("package_slots")
+    .insert({
+      package_id: packageId,
+      category_id: categoryId,
+      selections_count: selectionsCount,
+      sort_order: count ?? 0,
+    })
+    .select("id")
+    .single();
   if (error) throw error;
+
+  const { data: categoryItems, error: itemsError } = await supabaseAdmin
+    .from("menu_items")
+    .select("id")
+    .eq("category_id", categoryId)
+    .eq("is_active", true)
+    .order("name");
+  if (itemsError) throw itemsError;
+
+  if (categoryItems && categoryItems.length > 0) {
+    const { error: slotItemsError } = await supabaseAdmin.from("package_slot_items").insert(
+      categoryItems.map((item, i) => ({
+        slot_id: slot.id,
+        item_id: item.id,
+        is_default: i < selectionsCount,
+      }))
+    );
+    if (slotItemsError) throw slotItemsError;
+  }
 
   revalidateVendor(vendorId);
 }
@@ -592,7 +624,12 @@ export async function uploadVendorLogo(vendorId: string, _prevState: UploadState
   return { status: "success" };
 }
 
-export async function uploadVendorMedia(vendorId: string, _prevState: UploadState, formData: FormData): Promise<UploadState> {
+export async function uploadVendorMedia(
+  vendorId: string,
+  kind: "gallery" | "testimonial",
+  _prevState: UploadState,
+  formData: FormData
+): Promise<UploadState> {
   await assertAdminSession();
   const file = formData.get("media");
   if (!(file instanceof File) || file.size === 0) {
@@ -600,7 +637,7 @@ export async function uploadVendorMedia(vendorId: string, _prevState: UploadStat
   }
 
   const ext = file.name.split(".").pop() || "jpg";
-  const path = `${vendorId}/media-${randomUUID()}.${ext}`;
+  const path = `${vendorId}/${kind}-${randomUUID()}.${ext}`;
   const { error: uploadError } = await supabaseAdmin.storage
     .from("vendor-media")
     .upload(path, file, { contentType: file.type || "image/jpeg" });
@@ -608,7 +645,9 @@ export async function uploadVendorMedia(vendorId: string, _prevState: UploadStat
 
   const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
 
-  const { error } = await supabaseAdmin.from("vendor_media").insert({ vendor_id: vendorId, url: publicUrlData.publicUrl });
+  const { error } = await supabaseAdmin
+    .from("vendor_media")
+    .insert({ vendor_id: vendorId, url: publicUrlData.publicUrl, kind });
   if (error) throw error;
 
   revalidateVendor(vendorId);

@@ -108,14 +108,25 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         <p className="mt-2 text-xs text-ink-muted">Everything else (menu, media, description) is optional.</p>
       </section>
 
-      <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-card">
+      <section className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
         <h2 className="text-lg font-semibold text-royal-700">Showcase</h2>
         <LogoUploadForm action={uploadVendorLogo.bind(null, vendor.id)} currentUrl={vendor.logo_url} />
-        <MediaUploadForm
-          action={uploadVendorMedia.bind(null, vendor.id)}
-          deleteAction={deleteVendorMedia.bind(null, vendor.id)}
-          media={vendor.vendor_media}
-        />
+        <div className="flex flex-col gap-2">
+          <h3 className="text-sm font-medium text-ink">Gallery photos</h3>
+          <MediaUploadForm
+            action={uploadVendorMedia.bind(null, vendor.id, "gallery")}
+            deleteAction={deleteVendorMedia.bind(null, vendor.id)}
+            media={vendor.vendor_media.filter((m) => m.kind === "gallery")}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <h3 className="text-sm font-medium text-ink">Testimonials (WhatsApp screenshots)</h3>
+          <MediaUploadForm
+            action={uploadVendorMedia.bind(null, vendor.id, "testimonial")}
+            deleteAction={deleteVendorMedia.bind(null, vendor.id)}
+            media={vendor.vendor_media.filter((m) => m.kind === "testimonial")}
+          />
+        </div>
       </section>
 
       <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-card">
@@ -225,7 +236,7 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                       <span className="min-w-40 text-sm text-ink">
                         {item.name} <span className="text-xs text-ink-muted">({item.is_veg ? "veg" : "non-veg"})</span>
                       </span>
-                      <form action={updateMenuItem.bind(null, item.id, vendor.id)} className="flex items-center gap-3">
+                      <form action={updateMenuItem.bind(null, item.id, vendor.id)} className="flex flex-wrap items-center gap-3">
                         <label className="flex items-center gap-1 text-xs text-ink-muted">
                           ₹
                           <input
@@ -236,6 +247,13 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                             className="h-9 w-24 rounded-lg border border-border bg-surface px-2 text-sm"
                           />
                         </label>
+                        <input
+                          type="url"
+                          name="image_url"
+                          placeholder="Image URL (optional)"
+                          defaultValue={item.image_url ?? ""}
+                          className="h-9 w-48 rounded-lg border border-border bg-surface px-2 text-sm"
+                        />
                         <label className="flex items-center gap-1 text-xs text-ink-muted">
                           <input type="checkbox" name="is_active" defaultChecked={item.is_active} className="h-5 w-5" />
                           Active
@@ -279,6 +297,10 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                 <label className="flex flex-col gap-1 text-xs text-ink-muted">
                   ₹ / plate
                   <input type="number" step="0.01" name="base_price_pp" required className={`${inputClass} h-9 w-24`} />
+                </label>
+                <label className="flex flex-col gap-1 text-xs text-ink-muted">
+                  Image URL (optional)
+                  <input type="url" name="image_url" className={`${inputClass} h-9 w-48`} />
                 </label>
                 <label className="flex items-center gap-1 text-xs text-ink-muted">
                   <input type="checkbox" name="is_veg" defaultChecked className="h-5 w-5" />

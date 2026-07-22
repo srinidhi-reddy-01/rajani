@@ -52,6 +52,7 @@ export type MenuItem = {
   is_veg: boolean;
   meal_types: ("breakfast" | "lunch" | "dinner")[];
   base_price_pp: number;
+  image_url: string | null;
   is_active: boolean;
   created_at: string;
 };
@@ -95,8 +96,18 @@ export type VendorMedia = {
   id: string;
   vendor_id: string;
   url: string;
+  kind: "gallery" | "testimonial";
   event_date: string | null;
   created_at: string;
+};
+
+// The user's chosen items for one package_slot (category), captured at enquiry time.
+export type PackageItemSelection = {
+  category_id: string;
+  category_name: string;
+  selections_count: number;
+  selected_item_ids: string[];
+  selected_item_names: string[];
 };
 
 // What isn't already a dedicated enquiries column (plates/budget/date/event_type/quoted_pp are).
@@ -104,6 +115,7 @@ export type EnquirySelection = {
   cuisines: string[];
   package_id: string | null;
   package_name: string | null;
+  selection: PackageItemSelection[];
 };
 
 export type Enquiry = {
@@ -144,6 +156,7 @@ export type EnquiryContext = {
   package_id: string | null;
   package_name: string | null;
   quoted_pp: number | null;
+  selection: PackageItemSelection[];
 };
 
 // Minimal shape so the supabase-js client is typed; extend as more tables are queried.

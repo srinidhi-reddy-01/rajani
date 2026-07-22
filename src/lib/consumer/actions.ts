@@ -1,7 +1,7 @@
 "use server";
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import type { EnquirySelection } from "@/lib/types/database";
+import type { EnquirySelection, PackageItemSelection } from "@/lib/types/database";
 
 const PHONE_REGEX = /^[6-9]\d{9}$/;
 const MAX_ENQUIRIES_PER_PHONE_PER_DAY = 10;
@@ -16,6 +16,7 @@ export type CtaContext = {
   packageId: string | null;
   packageName: string | null;
   quotedPp: number | null;
+  selection: PackageItemSelection[];
 };
 
 export type CtaState = { status: "idle" | "success"; error?: string };
@@ -54,6 +55,7 @@ export async function submitEnquiry(
     cuisines: context.cuisines,
     package_id: context.packageId,
     package_name: context.packageName,
+    selection: context.selection,
   };
 
   const { error } = await supabaseAdmin.from("enquiries").insert({
@@ -97,6 +99,7 @@ export async function submitTastingRequest(
       package_id: context.packageId,
       package_name: context.packageName,
       quoted_pp: context.quotedPp,
+      selection: context.selection,
     },
   });
   if (error) throw error;

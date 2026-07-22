@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import type { MatchedVendor } from "@/lib/queries/discover";
+import type { MatchedVendor } from "@/lib/matching";
 import { formatInr, quotePerPlate } from "@/lib/pricing";
 import { vendorCoverImage } from "@/lib/images";
 

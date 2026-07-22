@@ -4,16 +4,16 @@ import { FadeIn } from "@/components/motion/FadeIn";
 
 const FEATURES = [
   {
-    title: "Tell us your event",
-    body: "Plates, cuisine, budget, date, and event type — five quick questions, no login.",
+    title: "Browse caterers instantly",
+    body: "See real packages and prices from Hyderabad caterers the moment you land — no forms first.",
   },
   {
-    title: "See matched caterers",
-    body: "Real packages and prices from Hyderabad caterers, ranked to your budget.",
+    title: "Filter as you go",
+    body: "Plates, budget, cuisine, event type — every filter is optional, and prices update live.",
   },
   {
     title: "Book directly",
-    body: "Enquire or request a sample box. Our team follows up — no middleman markup.",
+    body: "Check availability or request a sample box. Our team follows up — no middleman markup.",
   },
 ];
 
@@ -41,10 +41,10 @@ export default function Home() {
           </FadeIn>
           <FadeIn delay={0.16}>
             <Link
-              href="/find"
+              href="/discover"
               className="flex h-12 cursor-pointer items-center rounded-lg bg-gold-500 px-8 text-base font-medium text-charcoal-900 transition hover:bg-gold-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream-50"
             >
-              Find your caterer
+              Browse caterers
             </Link>
           </FadeIn>
         </div>

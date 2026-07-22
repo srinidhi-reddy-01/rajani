@@ -22,6 +22,9 @@ export type Vendor = {
   description: string | null;
   logo_url: string | null;
   cover_image_url: string | null;
+  owner_photo_url: string | null;
+  events_completed: number;
+  is_verified: boolean;
   is_demo: boolean;
   created_at: string;
   updated_at: string;
@@ -51,7 +54,7 @@ export type MenuItem = {
   name: string;
   is_veg: boolean;
   meal_types: ("breakfast" | "lunch" | "dinner")[];
-  base_price_pp: number;
+  base_price_pp: number | null;
   image_url: string | null;
   is_active: boolean;
   created_at: string;
@@ -159,6 +162,19 @@ export type EnquiryContext = {
   selection: PackageItemSelection[];
 };
 
+export type MatchRequest = {
+  id: string;
+  user_phone: string;
+  user_name: string | null;
+  event_type: string | null;
+  event_date: string | null;
+  plates: number | null;
+  budget_pp: number | null;
+  cuisines: string[];
+  status: "new" | "contacted" | "closed";
+  created_at: string;
+};
+
 // Minimal shape so the supabase-js client is typed; extend as more tables are queried.
 // `Relationships: []` on every table (and Views/Functions below) is required to satisfy
 // supabase-js's GenericSchema constraint - omitting them silently degrades insert/update
@@ -184,6 +200,7 @@ export type Database = {
       tasting_requests: Table<TastingRequest>;
       cuisines: Table<Cuisine>;
       event_types: Table<EventType>;
+      match_requests: Table<MatchRequest>;
       vendor_media: Table<VendorMedia>;
     };
     Views: Record<string, never>;

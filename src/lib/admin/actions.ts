@@ -207,12 +207,19 @@ export async function provisionStandardCategories(vendorId: string): Promise<voi
 
 const MEAL_TYPES = ["breakfast", "lunch", "dinner"] as const;
 
+// Price is optional - "priced later" is a real intermediate state while digitising a menu.
+function parseOptionalPrice(raw: FormDataEntryValue | null): number | null {
+  const trimmed = String(raw ?? "").trim();
+  if (!trimmed) return null;
+  const n = Number(trimmed);
+  return Number.isFinite(n) ? n : null;
+}
+
 export async function addMenuItem(vendorId: string, formData: FormData): Promise<void> {
   await assertAdminSession();
   const categoryId = String(formData.get("category_id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
-  const basePricePp = Number(formData.get("base_price_pp"));
-  if (!categoryId || !name || !Number.isFinite(basePricePp)) return;
+  if (!categoryId || !name) return;
 
   const mealTypes = MEAL_TYPES.filter((m) => formData.get(`meal_type_${m}`) === "on");
 
@@ -222,7 +229,7 @@ export async function addMenuItem(vendorId: string, formData: FormData): Promise
     name,
     is_veg: formData.get("is_veg") === "on",
     meal_types: mealTypes.length > 0 ? mealTypes : ["lunch", "dinner"],
-    base_price_pp: basePricePp,
+    base_price_pp: parseOptionalPrice(formData.get("base_price_pp")),
     image_url: String(formData.get("image_url") ?? "").trim() || null,
   });
   if (error) throw error;
@@ -238,7 +245,7 @@ export async function addSuggestedMenuItem(vendorId: string, categoryId: string,
     name,
     is_veg: true,
     meal_types: ["lunch", "dinner"],
-    base_price_pp: 0,
+    base_price_pp: null,
   });
   if (error) throw error;
   revalidateVendor(vendorId);
@@ -246,13 +253,11 @@ export async function addSuggestedMenuItem(vendorId: string, categoryId: string,
 
 export async function updateMenuItem(itemId: string, vendorId: string, formData: FormData): Promise<void> {
   await assertAdminSession();
-  const basePricePp = Number(formData.get("base_price_pp"));
-  if (!Number.isFinite(basePricePp)) return;
 
   const { error } = await supabaseAdmin
     .from("menu_items")
     .update({
-      base_price_pp: basePricePp,
+      base_price_pp: parseOptionalPrice(formData.get("base_price_pp")),
       is_active: formData.get("is_active") === "on",
       image_url: String(formData.get("image_url") ?? "").trim() || null,
     })

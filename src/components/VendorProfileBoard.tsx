@@ -119,7 +119,11 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
             )}
             <div>
               <h1 className="font-serif text-2xl font-semibold text-cream-50 sm:text-3xl">{vendor.name}</h1>
-              {vendor.area && <p className="text-sm text-cream-50/80">{vendor.area}</p>}
+              <p className="text-sm text-cream-50/80">
+                {vendor.area}
+                {vendor.area && vendor.established_year && " · "}
+                {vendor.established_year && `Serving since ${vendor.established_year}`}
+              </p>
             </div>
           </div>
           {vendor.gbp_rating != null && (
@@ -139,6 +143,14 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
               {tag}
             </span>
           ))}
+        </div>
+
+        <div className="flex items-center gap-2 rounded-xl border border-gold-500 bg-gold-100 px-4 py-3 text-sm text-ink">
+          <span aria-hidden>🎁</span>
+          <p>
+            <span className="font-semibold text-gold-600">Book through us and get ₹1000 cashback</span> after your
+            event. <span className="text-ink-muted">T&amp;C apply.</span>
+          </p>
         </div>
 
         {galleryPhotos.length > 0 && (

@@ -420,8 +420,7 @@ export async function importMenuCsv(
 export async function addPackage(vendorId: string, formData: FormData): Promise<void> {
   await assertAdminSession();
   const name = String(formData.get("name") ?? "").trim();
-  const basePricePp = Number(formData.get("base_price_pp"));
-  if (!name || !Number.isFinite(basePricePp)) return;
+  if (!name) return;
   const minPlatesRaw = formData.get("min_plates");
   const minPlates = minPlatesRaw ? Number(minPlatesRaw) : null;
 
@@ -429,7 +428,10 @@ export async function addPackage(vendorId: string, formData: FormData): Promise<
     vendor_id: vendorId,
     name,
     description: String(formData.get("description") ?? "").trim() || null,
-    base_price_pp: basePricePp,
+    // Optional at creation, same as a menu item's price - "priced later" is a real
+    // onboarding state (see 0012 migration). An unpriced package just won't render
+    // on the consumer site or count toward the go-live gate until it's priced.
+    base_price_pp: parseOptionalPrice(formData.get("base_price_pp")),
     min_plates: minPlates && minPlates > 0 ? minPlates : null,
     is_default: false,
     is_active: true,
@@ -441,15 +443,13 @@ export async function addPackage(vendorId: string, formData: FormData): Promise<
 
 export async function updatePackage(packageId: string, vendorId: string, formData: FormData): Promise<void> {
   await assertAdminSession();
-  const basePricePp = Number(formData.get("base_price_pp"));
-  if (!Number.isFinite(basePricePp)) return;
   const minPlatesRaw = formData.get("min_plates");
   const minPlates = minPlatesRaw ? Number(minPlatesRaw) : null;
 
   const { error } = await supabaseAdmin
     .from("packages")
     .update({
-      base_price_pp: basePricePp,
+      base_price_pp: parseOptionalPrice(formData.get("base_price_pp")),
       description: String(formData.get("description") ?? "").trim() || null,
       min_plates: minPlates && minPlates > 0 ? minPlates : null,
       is_active: formData.get("is_active") === "on",

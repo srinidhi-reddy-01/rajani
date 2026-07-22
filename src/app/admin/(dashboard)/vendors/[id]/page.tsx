@@ -96,7 +96,13 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
       <section className="rounded-2xl border border-border bg-surface p-5 shadow-card">
         <h2 className="mb-3 text-lg font-semibold text-royal-700">Go-live checklist</h2>
         <ul className="flex flex-col gap-1.5 text-sm">
-          {[{ label: "At least one active package", ok: vendor.packages.some((p) => p.is_active) }].map((check) => (
+          {[
+            { label: "At least one active package", ok: vendor.packages.some((p) => p.is_active) },
+            {
+              label: "At least one active package has a price",
+              ok: vendor.packages.some((p) => p.is_active && p.base_price_pp !== null),
+            },
+          ].map((check) => (
             <li key={check.label} className="flex items-center gap-2">
               <span className={check.ok ? "text-green-600" : "text-red-500"}>{check.ok ? "✓" : "✕"}</span>
               <span className={check.ok ? "text-ink" : "text-ink-muted"}>{check.label}</span>
@@ -351,6 +357,11 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
               <div className="flex items-center gap-2">
                 <h3 className="font-medium text-ink">{pkg.name}</h3>
                 {pkg.is_default && <span className="rounded-full bg-gold-100 px-2 py-0.5 text-xs text-gold-600">Default</span>}
+                {pkg.base_price_pp === null && (
+                  <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-600">
+                    Unpriced — won&apos;t show on the public site
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 {!pkg.is_default && (
@@ -375,7 +386,14 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
               </label>
               <label className="flex flex-col gap-1 text-xs text-ink-muted">
                 ₹ / plate at 500 plates
-                <input type="number" step="0.01" name="base_price_pp" defaultValue={pkg.base_price_pp} className={`${inputClass} h-9 w-32`} />
+                <input
+                  type="number"
+                  step="0.01"
+                  name="base_price_pp"
+                  defaultValue={pkg.base_price_pp ?? ""}
+                  placeholder="Not priced yet"
+                  className={`${inputClass} h-9 w-32`}
+                />
               </label>
               <label className="flex flex-col gap-1 text-xs text-ink-muted">
                 Min plates (optional)
@@ -503,8 +521,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
             <input type="text" name="description" className={inputClass} />
           </label>
           <label className="flex flex-col gap-1 text-sm text-ink-muted">
-            ₹ / plate at 500 plates
-            <input type="number" step="0.01" name="base_price_pp" required className={`${inputClass} w-40`} />
+            ₹ / plate at 500 plates (optional)
+            <input type="number" step="0.01" name="base_price_pp" placeholder="Not priced yet" className={`${inputClass} w-40`} />
           </label>
           <label className="flex flex-col gap-1 text-sm text-ink-muted">
             Min plates (optional)
@@ -516,7 +534,10 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         </form>
       </section>
 
-      <p className="text-xs text-ink-muted">Prices above are per plate at 500 plates.</p>
+      <p className="text-xs text-ink-muted">
+        Prices above are per plate at 500 plates. An unpriced package is saved but never shown to consumers, and doesn&apos;t
+        count toward the go-live requirement below.
+      </p>
     </div>
   );
 }

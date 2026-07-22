@@ -122,10 +122,18 @@ export async function getVendorDetail(id: string): Promise<VendorDetail | null> 
 
 export type GoLiveGate = { canGoLive: boolean; missing: string[] };
 
-// Only a package is compulsory to go live - menu items, media, and description are optional.
+// Only a package is compulsory to go live - menu items, media, and description are
+// optional. An active package with no price yet ("priced later" - see 0012
+// migration) doesn't count: it can't render on the consumer site, so it can't be
+// the thing that satisfies this gate either.
 export function computeGoLiveGate(vendor: { packages: Package[] }): GoLiveGate {
   const missing: string[] = [];
-  if (!vendor.packages.some((p) => p.is_active)) missing.push("at least one active package");
+  const activePackages = vendor.packages.filter((p) => p.is_active);
+  if (activePackages.length === 0) {
+    missing.push("at least one active package");
+  } else if (!activePackages.some((p) => p.base_price_pp !== null)) {
+    missing.push("Add a price to at least one package");
+  }
   return { canGoLive: missing.length === 0, missing };
 }
 

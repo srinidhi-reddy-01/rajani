@@ -1,7 +1,7 @@
 // Pure, client-safe vendor matching/ranking. No DB access - takes an already-fetched
 // vendor list so the discover page can recompute live as filters change, with zero
 // network round-trips per keystroke.
-import type { Package, Vendor } from "@/lib/types/database";
+import type { Package, PricedPackage, Vendor } from "@/lib/types/database";
 import { quotePerPlate } from "@/lib/pricing";
 
 export type DiscoverableVendor = Pick<
@@ -22,7 +22,7 @@ export type DiscoverableVendor = Pick<
   packages: Package[];
 };
 
-export type MatchedVendor = DiscoverableVendor & { lowestPackagePrice: number };
+export type MatchedVendor = Omit<DiscoverableVendor, "packages"> & { packages: PricedPackage[]; lowestPackagePrice: number };
 
 export type MatchCriteria = {
   plates: number;
@@ -41,7 +41,12 @@ const BUDGET_BAND_TOLERANCE = 0.1;
 export function matchVendors(vendors: DiscoverableVendor[], criteria: MatchCriteria): MatchResult {
   const candidates: MatchedVendor[] = vendors
     .map((v) => {
-      const activePackages = v.packages.filter((p) => p.is_active);
+      // Unpriced packages ("priced later" is a real onboarding state - see 0012
+      // migration) never render on the consumer site - a vendor with only unpriced
+      // packages simply has no candidates and drops out of discovery entirely.
+      const activePackages = v.packages.filter(
+        (p): p is Package & { base_price_pp: number } => p.is_active && p.base_price_pp !== null
+      );
       if (activePackages.length === 0) return null;
       const lowestPackagePrice = Math.min(...activePackages.map((p) => quotePerPlate(p.base_price_pp, criteria.plates)));
       return { ...v, packages: activePackages, lowestPackagePrice };

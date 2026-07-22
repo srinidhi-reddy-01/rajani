@@ -54,4 +54,4 @@ Default package: whichever mid-tier one Sri prices first (suggest Classic or Lux
 
 ## Launch note
 
-Only packages with a filled price get created. Recommended launch subset if pricing all 9 is tedious: Economy, Classic, Luxury, Wedding Delight — covers the price ladder.
+Create ALL 9 packages with price left empty (null) — Sri fills prices via the admin package editor afterwards. Unpriced packages must not render on the consumer site and must not satisfy the go-live checklist.

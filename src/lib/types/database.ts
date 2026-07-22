@@ -73,12 +73,19 @@ export type Package = {
   vendor_id: string;
   name: string;
   description: string | null;
-  base_price_pp: number;
+  // Nullable: "priced later" is a real onboarding state (see 0012 migration). Never
+  // rendered on the consumer site while null - see PricedPackage below.
+  base_price_pp: number | null;
   min_plates: number | null;
   is_default: boolean;
   is_active: boolean;
   created_at: string;
 };
+
+// A Package guaranteed to have a real price - the shape every consumer-facing query
+// filters down to, so quotePerPlate() and price arithmetic never has to handle null
+// at every call site.
+export type PricedPackage = Omit<Package, "base_price_pp"> & { base_price_pp: number };
 
 export type PackageSlot = {
   id: string;

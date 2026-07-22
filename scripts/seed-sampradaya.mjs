@@ -1,11 +1,13 @@
 // One-off seed for RS Sampradaya Caterers (onboarding/sampradaya.md). Extends the
-// seed-tawalogy.mjs pattern: service-role key, no migration, idempotent.
+// seed-tawalogy.mjs pattern: service-role key, no migration for the vendor data
+// itself, idempotent. Requires migration 0012 (packages.base_price_pp made
+// nullable) to already be applied - run `npx supabase db push` first.
 //
-// Profile + all categories/items are created every run. Packages are gated on
-// PACKAGE_SPEC[i].price !== null - every package in the brochure is still "TBD" as
-// of this file, so this run creates ZERO packages by design (see the printed
-// summary). Once Sri fills in a real ₹/plate figure, edit the `price` field below
-// and rerun; that package (and only that one) will be created/updated.
+// Profile, all categories/items, and ALL 9 packages are created every run, price
+// left null (PACKAGE_SPEC[i].price) wherever the brochure still says TBD. An
+// unpriced package never renders on the consumer site and never counts toward the
+// go-live gate (enforced platform-wide, not just by this script) - Sri fills in
+// prices via the admin package editor at his own pace, no rerun needed for that.
 //
 // Slot-rule caveats (documented so a reviewer can sanity-check before relying on
 // them): the brochure's "X/Y N" shorthand (e.g. "Sambar/Rasam 1") is modeled as a
@@ -366,14 +368,19 @@ const PACKAGE_SPEC = [
   },
 ];
 
-const pricedPackages = PACKAGE_SPEC.filter((p) => p.price !== null);
-
+// Launch note (updated): create ALL 9 packages now, price left null - Sri fills
+// prices via the admin package editor afterwards. requires the 0012 migration
+// (packages.base_price_pp made nullable) to already be applied.
 const existingPackages = mustSucceed(
   "fetch existing packages",
   await supabase.from("packages").select("id, name").eq("vendor_id", VENDOR_ID)
 );
 const packageIdByName = new Map(existingPackages.map((p) => [p.name, p.id]));
 
+// Default is only ever assigned to a PRICED package - an unpriced package can't
+// power the discovery-card instant quote. With every package still TBD, nothing
+// is marked default this run; rerun after pricing one and it'll be picked up here.
+const pricedPackages = PACKAGE_SPEC.filter((p) => p.price !== null);
 let defaultPackageName = null;
 if (pricedPackages.length > 0) {
   const suggested = pricedPackages.find((p) => p.suggestedDefault);
@@ -386,7 +393,7 @@ if (pricedPackages.length > 0) {
 }
 
 const packageSummaries = [];
-for (const spec of pricedPackages) {
+for (const spec of PACKAGE_SPEC) {
   let packageId = packageIdByName.get(spec.name);
   const packageFields = {
     vendor_id: VENDOR_ID,
@@ -434,11 +441,6 @@ for (const spec of pricedPackages) {
   packageSummaries.push({ name: spec.name, price: spec.price, minPlates: spec.minPlates, isDefault: spec.name === defaultPackageName, slots: slotSummaries });
 }
 
-// Also handle packages that WERE priced and created in a previous run but have
-// since been reverted to TBD in this file - none currently, but keeping the two
-// lists visible makes that state legible if it ever happens.
-const skippedPackages = PACKAGE_SPEC.filter((p) => p.price === null).map((p) => p.name);
-
 // ---------- Summary ----------
 
 console.log("\n=== Vendor fields set ===");
@@ -460,16 +462,12 @@ console.log(`Newly created this run — categories: ${categoriesCreated.length ?
 console.log(`Newly created this run — items: ${itemsCreated.length ? itemsCreated.length + " item(s)" : "(none, already existed)"}`);
 
 console.log("\n=== Packages ===");
-if (packageSummaries.length === 0) {
-  console.log("0 packages created — all 9 packages in onboarding/sampradaya.md are still priced TBD.");
-  console.log(`Skipped (TBD): ${skippedPackages.join(", ")}`);
-  console.log('Fill in a real "price" number in PACKAGE_SPEC (scripts/seed-sampradaya.mjs) for any package and rerun.');
-} else {
-  for (const pkg of packageSummaries) {
-    console.log(`\n${pkg.name}${pkg.isDefault ? " (DEFAULT)" : ""} — ₹${pkg.price}/plate, min ${pkg.minPlates} plates`);
-    for (const line of pkg.slots) console.log(`  - ${line}`);
-  }
-  if (skippedPackages.length > 0) {
-    console.log(`\nStill TBD, skipped: ${skippedPackages.join(", ")}`);
-  }
+console.log(`${packageSummaries.length} package(s) created/updated (all 9, price left null where still TBD)`);
+for (const pkg of packageSummaries) {
+  const priceLabel = pkg.price === null ? "TBD (unpriced — hidden from consumer site)" : `₹${pkg.price}/plate`;
+  console.log(`\n${pkg.name}${pkg.isDefault ? " (DEFAULT)" : ""} — ${priceLabel}, min ${pkg.minPlates} plates`);
+  for (const line of pkg.slots) console.log(`  - ${line}`);
+}
+if (defaultPackageName === null) {
+  console.log("\nNo default package set — none are priced yet. Once Classic or Luxury (or any package) gets a real price, rerun to auto-assign the default.");
 }

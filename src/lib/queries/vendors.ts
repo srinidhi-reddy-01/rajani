@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { supabase } from "@/lib/supabase/client";
-import type { MenuCategory, MenuItem, Package, PackageSlot, PackageSlotItem, Vendor, VendorMedia } from "@/lib/types/database";
+import type { MenuCategory, MenuItem, Package, PackageSlot, PackageSlotItem, PricedPackage, Vendor, VendorMedia } from "@/lib/types/database";
 
 export type SlotOption = {
   itemId: string;
@@ -18,7 +18,7 @@ export type SlotWithItems = {
   options: SlotOption[];
 };
 
-export type PackageWithSlots = Package & { slots: SlotWithItems[] };
+export type PackageWithSlots = PricedPackage & { slots: SlotWithItems[] };
 
 export type VendorProfile = Vendor & {
   packages: PackageWithSlots[];
@@ -59,8 +59,12 @@ export const getVendorProfile = cache(async (slug: string): Promise<VendorProfil
   const itemById = new Map(categoryList.flatMap((c) => c.menu_items.map((i) => [i.id, i] as const)));
   const categoryNameById = new Map(categoryList.map((c) => [c.id, c.name] as const));
 
+  // Unpriced packages ("priced later" is a real onboarding state - see 0012
+  // migration) never render on the consumer site, same as a null-priced menu item
+  // never shows a price - only here the whole package card is withheld, not just
+  // the number, since "Check availability" needs a real quote to show.
   const packages: PackageWithSlots[] = (vendor.packages ?? [])
-    .filter((p) => p.is_active)
+    .filter((p): p is typeof p & { base_price_pp: number } => p.is_active && p.base_price_pp !== null)
     .map((pkg) => ({
       ...pkg,
       slots: (pkg.package_slots ?? [])

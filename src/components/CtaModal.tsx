@@ -12,11 +12,13 @@ export function CtaModal({
   open,
   onClose,
   title,
+  description,
   action,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
+  description?: string;
   action: (prevState: CtaState, formData: FormData) => Promise<CtaState>;
 }) {
   const [state, formAction, pending] = useActionState<CtaState, FormData>(action, { status: "idle" });
@@ -63,6 +65,7 @@ export function CtaModal({
                 ×
               </button>
             </div>
+            {description && <p className="text-sm text-ink-muted">{description}</p>}
             <form action={formAction} className="flex flex-col gap-3">
               <label className="flex flex-col gap-1.5 text-sm text-ink-muted">
                 Phone number

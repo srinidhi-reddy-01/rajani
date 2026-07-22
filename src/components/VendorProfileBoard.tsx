@@ -327,6 +327,9 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
               </span>
             </div>
           )}
+          <p className="text-[11px] text-ink-muted">
+            Taste before you book — we arrange a sample tasting box from this caterer.
+          </p>
           <div className="flex gap-3">
             <button
               type="button"
@@ -356,6 +359,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         open={openModal === "tasting"}
         onClose={() => setOpenModal(null)}
         title="Get a sample box"
+        description="You request → our team coordinates with the caterer → the box reaches you."
         action={submitTastingRequest.bind(null, vendor.id, ctaContext)}
       />
     </div>

@@ -1,67 +1,96 @@
 # Rajani — Hyderabad Catering Marketplace
 
-Core promise: **real packages, real prices, no login required.** A guided 5-step flow
-captures what the user needs, then matches them to caterers whose packages fit their
-budget — never an empty screen. Every quote carries the disclaimer: *"Actual price may
-vary by 10–15% based on dish changes and plate-count updates. Please confirm with the
-caterer for final booking."*
+Core promise: **real packages, real prices, no login required.** Land on live-filtering
+discovery immediately — no interstitial form — and every filter is optional. Every quote
+carries the disclaimer: *"Actual price may vary by 10–15% based on dish changes and
+plate-count updates. Please confirm with the caterer for final booking."*
 
 ## Consumer flow
 
-1. **Landing page** explains what the site does and drives into the guided flow.
-2. **Guided flow (`/find`)**, one question per step: plates → preferred cuisine
-   (multi-select, from the `cuisines` table) → budget per plate → event date → event
-   type (from `event_types`). Anonymous — no login.
-3. **Matched discovery (`/discover`)**: live vendors ranked by their lowest active
-   package price against a ±10% budget band. In-band vendors show first; others show
-   below labeled "above"/"below your budget" — the page is never empty. Cuisine
-   preference is a soft ranking signal, not a hard filter (same never-empty-screen
-   reasoning). Sortable by price low-to-high. Cards show packages (name, price) only,
-   never loose menu items. Every rating is labeled "Google rating" explicitly.
-4. **Vendor profile**: Google rating, description/logo/media when the vendor has
-   them, packages as selectable cards, full dish-level menu (always visible, per
-   product rule below), sticky bottom bar with "Enquire for booking" and "Get sample
-   box" — always visible, never scrolls away.
+1. **Landing page** explains what the site does; its main CTA goes straight to
+   `/discover`. A "Too busy to browse?" section captures a `match_requests` row for
+   users who'd rather have the team match them manually.
+2. **Discovery (`/discover`)**: the live vendor list is fetched once, server-side;
+   all filtering, ranking, and price computation happens client-side
+   (`lib/matching.ts`, a pure function - no DB access), so prices recompute instantly
+   with zero network round-trips as filters change. Filters render as a horizontally
+   scrollable row of icon-led chips (plates stepper in 50s + direct typing, default
+   500; budget; event date, min today; best-match/price sort; event type; cuisine) -
+   every one optional. Live vendors rank by their lowest active package price against
+   a ±10% budget band: in-band first, others below labeled "above"/"below your
+   budget" - never an empty screen. Cuisine preference is a soft ranking signal, not
+   a hard filter, same reasoning. Cards show a circular owner photo overlapping the
+   cover image (when set), a green Verified badge (when personally vetted), events
+   completed, Google rating, locality, cuisine chips, and "Packages from ₹X/plate at
+   your Y plates" - never a loose dish price. A "Too busy to browse?" section repeats
+   at the bottom.
+3. **Vendor profile**: hero cover photo, "Serving since {year}", Google rating,
+   description, gallery, testimonials ("What hosts say" - admin-uploaded WhatsApp
+   screenshots), a ₹1000-cashback banner, packages as selectable cards (the only
+   place a price is public), and a full dish-name menu grouped by category with
+   veg/non-veg dots and optional images - **no dish prices**, ever, on the consumer
+   site. Sticky bottom bar: "Get sample box" (with a one-line explainer: "Taste
+   before you book...") and "Check availability" - always enabled, never blocked by
+   menu selection.
+4. **Optional menu customisation**: picking a package with category-rule slots
+   reveals a collapsed-by-default disclosure, "Choose menu items to get the exact
+   quote." Opening it shows one section per slot (category, "Pick N · M selected",
+   items as image+name cards with defaults preselected, freely swappable within the
+   category's limit) plus a live per-plate quote. This is a pure enhancement:
+   "Check availability" works identically with a package alone, a customised
+   selection, or no package at all. Whether the enquiry carries an itemised
+   selection depends on whether the user actually opened the disclosure, not just
+   whether one exists.
 5. **Capture**: both CTAs open a modal asking only for a phone number (10-digit
-   Indian format). Enquire inserts into `enquiries` with the full guided-flow context
-   (plates/cuisines/budget/date/event type/selected package/quote); sample box inserts
-   the same context into `tasting_requests.context` (jsonb). Max 10 enquiries per
-   phone per day, enforced server-side.
+   Indian format), ending "Thank you, our team will get in touch with you for the
+   next steps." Check availability inserts into `enquiries` with the full context
+   (plates/cuisines/budget/date/event type/selected package/itemised selection if
+   any/quote); sample box inserts the same shape into `tasting_requests.context`
+   (jsonb). Max 10 enquiries per phone per day, enforced server-side.
 
 ## Vendor flow
 
-- Go-live gate: **at least one active package.** Everything else — menu items, media,
-  description, pricing tiers (deprecated) — is optional. An unmet gate shows exactly
-  what's missing.
-- Packages are built two ways, on the same package: by category rule (slots like "any
-  2 from Starters") or by picking exact dishes directly. Optional `min_plates`.
+- Go-live gate: **at least one active package.** Everything else is optional. An
+  unmet gate shows exactly what's missing.
+- Packages are built two ways, on the same package: by category rule (a slot per
+  category with a pick count - new slots default to offering every active item in
+  that category, admin removes some to restrict) or by picking exact dishes directly.
+  Optional `min_plates`. Veg/non-veg split categories ("Starters veg" / "Starters
+  non-veg") are the intended pattern for mixed menus.
 - Menu: 14 standard categories can be one-click provisioned per vendor, with common
-  Telugu wedding/party dish suggestions per category (one-click add, price set after).
-  Bulk CSV import (`category, dish_name, price_pp`) creates categories + dishes in one
-  upload with row-level error reporting.
+  Telugu wedding/party dish suggestions per category (one-click add at no price -
+  "priced later" is a real state; `base_price_pp` is nullable). Bulk CSV import
+  (`category, dish_name, price_pp`) with row-level error reporting. Dishes may
+  optionally carry an `image_url`, shown in the package selector and the profile's
+  Menu section - never a price, on the consumer side.
 - Cuisine and event specialities are multi-select (max 2) from shared lookup tables
   (`cuisines`, `event_types`); admins can add new options inline.
-- Showcase: optional description, logo, and media images (Supabase Storage,
-  `vendor-media` bucket, public read) — shown on the profile when present.
+- Showcase: description, logo, **owner photo** (shown circular, overlapping the
+  cover image on cards), **events completed**, **verified** (a manual admin toggle -
+  "personally vetted by the Rajani team," never automatic or self-reported), and
+  media images (Supabase Storage, `vendor-media` bucket, public read) - split into
+  gallery photos and testimonial (WhatsApp screenshot) uploads via a `kind` column.
 
 ## Admin flow
 
 - Pipeline: any vendor, filterable by status, searchable by name/area. Status is a
-  free dropdown — any transition, forward or backward (going *to* `live` still runs
+  free dropdown - any transition, forward or backward (going *to* `live` still runs
   the go-live gate). Delete vendor with a confirmation dialog.
-- Vendor pipeline still tracks a loose sourced → contacted → onboarding → priced →
-  live progression, but nothing enforces the order anymore.
-- Enquiry inbox and tasting-request list, both with admin-editable status.
-- 6 demo vendors (`is_demo = true`) exist for showcasing the product; flagged with a
-  "Demo" badge in admin only (never on the public site — the consumer queries don't
+- Enquiry inbox, tasting-request list, and **match-request list** - all three show
+  their full captured context (event, date, plates, budget, cuisine, package,
+  itemised selection if any) as detail cards, not a narrow table.
+- Demo vendors (`is_demo = true`) exist for showcasing the product - flagged with a
+  "Demo" badge in admin only (never on the public site - the consumer queries don't
   even select `is_demo`), with a one-click "delete all demo vendors" action.
-- No validation score, no orders-completed display.
+- No validation score, no orders-completed *ranking* (events-completed is a display
+  count, not a sort factor).
 
 ## Pricing
 
 `packages.base_price_pp` and `menu_items.base_price_pp` are prices **per plate at 500
-plates** — the admin panel says so everywhere a price is entered. `pricing_tiers` is
-deprecated; the table exists but no application code reads it.
+plates** - the admin panel says so everywhere a price is entered, and dish price is
+optional (nullable) while a package's is required. `pricing_tiers` is deprecated; the
+table exists but no application code reads it.
 
 Every user-facing price is computed from the baseline via a single platform-wide
 multiplier, `getPlateMultiplier(plates)` in `lib/pricing.ts`:
@@ -73,20 +102,39 @@ multiplier, `getPlateMultiplier(plates)` in `lib/pricing.ts`:
 - Below 100 plates, clamp at +10%. Above 1000 plates, clamp at −10%.
 - Reference points: 300 plates ≈ +5%, 750 plates ≈ −5%.
 
-Used everywhere a price renders: discovery cards, vendor profiles, package/dish
-prices, and the quote stored on an enquiry/tasting request. Unit tested at 50, 100,
-300, 500, 750, 1000, and 1500 plates (`lib/pricing.test.ts`, `npm test`).
+Used everywhere a price renders: discovery cards, vendor profiles, package prices,
+and the quote stored on an enquiry/tasting request. Unit tested at 50, 100, 300, 500,
+750, 1000, and 1500 plates (`lib/pricing.test.ts`, `npm test`).
 
 ## Decisions locked
 
-Instant quotes with 10–15% disclaimer; budget-band matching with soft cuisine
-ranking, never an empty results screen; 10 enquiries/day cap; package-required
-go-live gate; anonymous browse + phone-gated capture; demo vendors admin-only and
-bulk-deletable; service-role key server-side only, never in consumer paths.
+Packages are the only public price - dish prices never render on the consumer site.
+"Check availability" is the CTA name everywhere, always enabled regardless of menu
+customisation. Budget-band matching with soft cuisine ranking, never an empty results
+screen. 10 enquiries/day cap. Package-required go-live gate. Anonymous browse +
+phone-gated capture. `is_verified` is a manual, admin-only signal. Demo vendors
+admin-only and bulk-deletable. Service-role key server-side only, never in consumer
+paths.
+
+## Parked concepts
+
+Noted for later, not built:
+
+- **Referral incentives** - inviting other hosts/vendors for a reward. No mechanism
+  designed yet.
+- **Cashback mechanics** - the ₹1000 cashback banner on vendor profiles is currently
+  marketing copy only; there's no automated payout, eligibility check, or tracking
+  behind it. Needs a manual process (or a future `cashback_claims` table) before it's
+  a real offer rather than a promise.
+- **Chef-at-home vertical** - a separate booking flow for in-home private chefs
+  (smaller scale than event catering), similar in spirit to ChefKart's model. Would
+  likely need its own vendor type, pricing unit (per-meal/per-person vs. per-plate at
+  500), and probably a separate discovery surface rather than folding into the
+  existing caterer matching.
 
 ## Out of scope until told otherwise
 
 Canonical/standardised cross-vendor dish database, menu-first search, payments,
-vendor validation scores, orders-completed counts, media-freshness enforcement,
+vendor validation scores as a ranking factor, media-freshness enforcement,
 serviceability filters as a user-facing constraint, OTP verification on phone
 capture, vendor-side accept/decline logistics beyond status fields.

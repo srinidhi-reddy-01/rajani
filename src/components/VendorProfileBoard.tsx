@@ -257,7 +257,16 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
                   <h3 className="font-medium text-ink">{category.name}</h3>
                   <ul className="divide-y divide-border rounded-2xl border border-border bg-surface shadow-card">
                     {activeItems.map((item) => (
-                      <li key={item.id} className="flex min-h-11 items-center justify-between gap-4 px-4 py-2.5">
+                      <li key={item.id} className="flex min-h-11 items-center gap-3 px-4 py-2.5">
+                        {item.image_url && (
+                          <Image
+                            src={item.image_url}
+                            alt=""
+                            width={36}
+                            height={36}
+                            className="h-9 w-9 shrink-0 rounded-lg object-cover"
+                          />
+                        )}
                         <span className="flex items-center gap-2 text-sm text-ink">
                           <span
                             className={`inline-block h-2.5 w-2.5 shrink-0 rounded-sm border ${
@@ -266,9 +275,6 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
                             aria-label={item.is_veg ? "Veg" : "Non-veg"}
                           />
                           {item.name}
-                        </span>
-                        <span className="whitespace-nowrap text-sm font-medium text-gold-600">
-                          <AnimatedPrice amount={quotePerPlate(item.base_price_pp, plates)} />
                         </span>
                       </li>
                     ))}

@@ -118,6 +118,8 @@ export async function updateVendorProfile(vendorId: string, formData: FormData):
       area: String(formData.get("area") ?? "").trim() || null,
       established_year: formData.get("established_year") ? Number(formData.get("established_year")) : null,
       description: String(formData.get("description") ?? "").trim() || null,
+      events_completed: formData.get("events_completed") ? Number(formData.get("events_completed")) : 0,
+      is_verified: formData.get("is_verified") === "on",
       serviceable_everywhere: formData.get("serviceable_everywhere") === "on",
       pricing_model: String(formData.get("pricing_model") ?? "flexible") as "final" | "flexible",
     })
@@ -624,6 +626,36 @@ export async function uploadVendorLogo(vendorId: string, _prevState: UploadState
 
   const { error } = await supabaseAdmin.from("vendors").update({ logo_url: publicUrlData.publicUrl }).eq("id", vendorId);
   if (error) throw error;
+
+  revalidateVendor(vendorId);
+  return { status: "success" };
+}
+
+export async function uploadVendorOwnerPhoto(
+  vendorId: string,
+  _prevState: UploadState,
+  formData: FormData
+): Promise<UploadState> {
+  await assertAdminSession();
+  const file = formData.get("owner_photo");
+  if (!(file instanceof File) || file.size === 0) {
+    return { status: "idle", error: "Choose an image file." };
+  }
+
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${vendorId}/owner-${randomUUID()}.${ext}`;
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from("vendor-media")
+    .upload(path, file, { contentType: file.type || "image/jpeg" });
+  if (uploadError) return { status: "idle", error: uploadError.message };
+
+  const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
+
+  const { error: updateError } = await supabaseAdmin
+    .from("vendors")
+    .update({ owner_photo_url: publicUrlData.publicUrl })
+    .eq("id", vendorId);
+  if (updateError) throw updateError;
 
   revalidateVendor(vendorId);
   return { status: "success" };

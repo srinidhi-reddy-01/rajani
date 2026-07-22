@@ -28,6 +28,7 @@ import {
   updateVendorEventTypes,
   updateVendorProfile,
   uploadVendorLogo,
+  uploadVendorOwnerPhoto,
   uploadVendorMedia,
 } from "@/lib/admin/actions";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
@@ -111,6 +112,14 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
       <section className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
         <h2 className="text-lg font-semibold text-royal-700">Showcase</h2>
         <LogoUploadForm action={uploadVendorLogo.bind(null, vendor.id)} currentUrl={vendor.logo_url} />
+        <LogoUploadForm
+          action={uploadVendorOwnerPhoto.bind(null, vendor.id)}
+          currentUrl={vendor.owner_photo_url}
+          fieldName="owner_photo"
+          label="owner photo"
+          alt="Owner photo"
+          circular
+        />
         <div className="flex flex-col gap-2">
           <h3 className="text-sm font-medium text-ink">Gallery photos</h3>
           <MediaUploadForm
@@ -157,6 +166,10 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
             <textarea name="description" defaultValue={vendor.description ?? ""} rows={3} className={`${inputClass} h-auto py-2`} />
           </label>
           <label className="flex flex-col gap-1 text-sm text-ink-muted">
+            Events completed
+            <input type="number" min={0} name="events_completed" defaultValue={vendor.events_completed} className={inputClass} />
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-ink-muted">
             Pricing model
             <select name="pricing_model" defaultValue={vendor.pricing_model} className={inputClass}>
               <option value="flexible">flexible</option>
@@ -166,6 +179,10 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
           <label className="flex items-center gap-2 self-end text-sm text-ink-muted">
             <input type="checkbox" name="serviceable_everywhere" defaultChecked={vendor.serviceable_everywhere} className="h-5 w-5" />
             Serviceable everywhere
+          </label>
+          <label className="flex items-center gap-2 self-end text-sm text-ink-muted">
+            <input type="checkbox" name="is_verified" defaultChecked={vendor.is_verified} className="h-5 w-5" />
+            Verified (personally vetted only)
           </label>
           <div className="sm:col-span-2">
             <button type="submit" className={primaryButtonClass}>
@@ -243,8 +260,9 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                             type="number"
                             step="0.01"
                             name="base_price_pp"
-                            defaultValue={item.base_price_pp}
-                            className="h-9 w-24 rounded-lg border border-border bg-surface px-2 text-sm"
+                            placeholder="Not priced yet"
+                            defaultValue={item.base_price_pp ?? ""}
+                            className="h-9 w-32 rounded-lg border border-border bg-surface px-2 text-sm"
                           />
                         </label>
                         <input
@@ -295,8 +313,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                   <input type="text" name="name" required className={`${inputClass} h-9 w-40`} />
                 </label>
                 <label className="flex flex-col gap-1 text-xs text-ink-muted">
-                  ₹ / plate
-                  <input type="number" step="0.01" name="base_price_pp" required className={`${inputClass} h-9 w-24`} />
+                  ₹ / plate (optional)
+                  <input type="number" step="0.01" name="base_price_pp" className={`${inputClass} h-9 w-24`} />
                 </label>
                 <label className="flex flex-col gap-1 text-xs text-ink-muted">
                   Image URL (optional)

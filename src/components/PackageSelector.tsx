@@ -35,13 +35,23 @@ export function PackageSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selection]);
 
+  // Users should never need to manually unselect before picking something else:
+  // a pick-1 slot behaves like a radio button (clicking a new item replaces the
+  // current one), and a pick-N slot at capacity auto-drops the oldest selection
+  // (FIFO) to make room for the new one.
   function toggle(slotId: string, itemId: string, max: number) {
     setSelection((prev) => {
       const current = prev[slotId] ?? [];
       if (current.includes(itemId)) {
+        if (max === 1) return prev; // radio: clicking the already-selected item is a no-op
         return { ...prev, [slotId]: current.filter((id) => id !== itemId) };
       }
-      if (current.length >= max) return prev;
+      if (max === 1) {
+        return { ...prev, [slotId]: [itemId] };
+      }
+      if (current.length >= max) {
+        return { ...prev, [slotId]: [...current.slice(1), itemId] };
+      }
       return { ...prev, [slotId]: [...current, itemId] };
     });
   }
@@ -65,16 +75,14 @@ export function PackageSelector({
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {slot.options.map((option) => {
                 const selected = picked.includes(option.itemId);
-                const disabled = !selected && picked.length >= slot.selectionsCount;
                 return (
                   <motion.button
                     key={option.itemId}
                     type="button"
                     whileTap={{ scale: 0.97 }}
                     aria-pressed={selected}
-                    disabled={disabled}
                     onClick={() => toggle(slot.id, option.itemId, slot.selectionsCount)}
-                    className={`flex min-h-11 cursor-pointer flex-col overflow-hidden rounded-xl border text-left transition disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
+                    className={`flex min-h-11 cursor-pointer flex-col overflow-hidden rounded-xl border text-left transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
                       selected ? "border-royal-600 bg-royal-50 ring-2 ring-royal-100" : "border-border bg-surface hover:border-gold-500"
                     }`}
                   >

@@ -49,7 +49,6 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
     vendor.packages.find((p) => p.is_default)?.id ?? vendor.packages[0]?.id ?? null
   );
   const [slotSelection, setSlotSelection] = useState<SlotSelection>({});
-  const [menuSelectorOpen, setMenuSelectorOpen] = useState(false);
   const [openModal, setOpenModal] = useState<"enquire" | "tasting" | null>(null);
 
   const galleryPhotos = vendor.vendor_media.filter((m) => m.kind === "gallery");
@@ -58,11 +57,12 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
   const selectedPackage = vendor.packages.find((p) => p.id === selectedPackageId) ?? null;
   const hasSlots = (selectedPackage?.slots.length ?? 0) > 0;
 
-  // Menu customisation is entirely optional and never blocks "Check availability" (#3):
-  // if the user never opened the selector, the enquiry carries the package alone -
-  // opening it and engaging with the (preselected) defaults is what counts as "customised".
+  // Menu customisation is entirely optional and never blocks "Check availability" (#3).
+  // The chooser renders expanded by default (no collapse toggle), so whenever a
+  // package has slots the enquiry carries the itemised selection - preselected
+  // defaults if the user never touched it, their own picks if they did.
   const itemSelection: PackageItemSelection[] = useMemo(() => {
-    if (!selectedPackage || !menuSelectorOpen) return [];
+    if (!selectedPackage || !hasSlots) return [];
     return selectedPackage.slots.map((slot) => {
       const selectedIds = slotSelection[slot.id] ?? [];
       const selectedOptions = slot.options.filter((o) => selectedIds.includes(o.itemId));
@@ -74,7 +74,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         selected_item_names: selectedOptions.map((o) => o.name),
       };
     });
-  }, [selectedPackage, slotSelection, menuSelectorOpen]);
+  }, [selectedPackage, hasSlots, slotSelection]);
 
   const ctaContext = {
     plates,
@@ -253,66 +253,13 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
 
         {selectedPackage && hasSlots && (
           <section className="flex flex-col gap-4 rounded-2xl border border-royal-100 bg-royal-50/40 p-4 sm:p-6">
-            <button
-              type="button"
-              onClick={() => setMenuSelectorOpen((v) => !v)}
-              className="flex cursor-pointer items-center justify-between gap-2 text-left"
-            >
-              <div>
-                <h2 className="font-serif text-lg font-semibold text-royal-700">Choose menu items to get the exact quote</h2>
-                <p className="text-sm text-ink-muted">Optional — availability works with just the package above.</p>
-              </div>
-              <span className="shrink-0 text-royal-700">{menuSelectorOpen ? "−" : "+"}</span>
-            </button>
-            {menuSelectorOpen && (
-              <>
-                <p className="text-sm text-ink-muted">Defaults are preselected — swap freely within each category.</p>
-                <PackageSelector key={selectedPackage.id} slots={selectedPackage.slots} onChange={setSlotSelection} />
-              </>
-            )}
+            <div>
+              <h2 className="font-serif text-lg font-semibold text-royal-700">Choose menu items to get the exact quote</h2>
+              <p className="text-sm text-ink-muted">Optional — availability works with just the package above. Defaults are preselected.</p>
+            </div>
+            <PackageSelector key={selectedPackage.id} slots={selectedPackage.slots} onChange={setSlotSelection} />
           </section>
         )}
-
-        <section className="flex flex-col gap-4">
-          <h2 className="font-serif text-lg font-semibold text-royal-700">Menu</h2>
-          {vendor.menu_categories.length === 0 ? (
-            <p className="text-sm text-ink-muted">No menu published yet.</p>
-          ) : (
-            vendor.menu_categories.map((category) => {
-              const activeItems = category.menu_items.filter((item) => item.is_active);
-              if (activeItems.length === 0) return null;
-              return (
-                <div key={category.id} className="flex flex-col gap-2">
-                  <h3 className="font-medium text-ink">{category.name}</h3>
-                  <ul className="divide-y divide-border rounded-2xl border border-border bg-surface shadow-card">
-                    {activeItems.map((item) => (
-                      <li key={item.id} className="flex min-h-11 items-center gap-3 px-4 py-2.5">
-                        {item.image_url && (
-                          <Image
-                            src={item.image_url}
-                            alt=""
-                            width={36}
-                            height={36}
-                            className="h-9 w-9 shrink-0 rounded-lg object-cover"
-                          />
-                        )}
-                        <span className="flex items-center gap-2 text-sm text-ink">
-                          <span
-                            className={`inline-block h-2.5 w-2.5 shrink-0 rounded-sm border ${
-                              item.is_veg ? "border-green-600 bg-green-500" : "border-red-600 bg-red-500"
-                            }`}
-                            aria-label={item.is_veg ? "Veg" : "Non-veg"}
-                          />
-                          {item.name}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })
-          )}
-        </section>
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 backdrop-blur">
@@ -320,7 +267,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
           {selectedPackage && (
             <div className="flex items-center justify-between text-xs text-ink-muted">
               <span>
-                {menuSelectorOpen
+                {hasSlots
                   ? `${selectedPackage.name} — ${Object.values(slotSelection).reduce((n, ids) => n + ids.length, 0)} items selected`
                   : selectedPackage.name}
               </span>

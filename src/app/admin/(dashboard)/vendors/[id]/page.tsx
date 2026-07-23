@@ -242,18 +242,25 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
           const suggestions = (DISH_SUGGESTIONS[category.name] ?? []).filter(
             (s) => !category.menu_items.some((i) => i.name === s)
           );
+          const itemCount = category.menu_items.length;
           return (
-            <div key={category.id} className="flex flex-col gap-3 border-t border-border pt-4 first:border-t-0 first:pt-0">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium text-ink">{category.name}</h3>
-                <form action={deleteMenuCategory.bind(null, category.id, vendor.id)}>
-                  <button type="submit" className={dangerButtonClass}>
-                    Delete category (and its items)
-                  </button>
-                </form>
-              </div>
+            <details key={category.id} className="group rounded-2xl border border-border">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
+                <span className="font-medium text-ink">
+                  {category.name} <span className="font-normal text-ink-muted">({itemCount} item{itemCount === 1 ? "" : "s"})</span>
+                </span>
+                <span className="shrink-0 text-ink-muted transition-transform duration-200 ease-out group-open:rotate-180">▾</span>
+              </summary>
+              <div className="flex flex-col gap-3 border-t border-border p-4">
+                <div className="flex justify-end">
+                  <form action={deleteMenuCategory.bind(null, category.id, vendor.id)}>
+                    <button type="submit" className={dangerButtonClass}>
+                      Delete category (and its items)
+                    </button>
+                  </form>
+                </div>
 
-              {category.menu_items.length > 0 && (
+                {category.menu_items.length > 0 && (
                 <ul className="flex flex-col gap-2">
                   {category.menu_items.map((item) => (
                     <li key={item.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border px-3 py-2">
@@ -335,7 +342,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                   Add item
                 </button>
               </form>
-            </div>
+              </div>
+            </details>
           );
         })}
 
@@ -353,18 +361,25 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
       <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-5 shadow-card">
         <h2 className="text-lg font-semibold tracking-tight text-ink">Packages</h2>
         {vendor.packages.map((pkg) => (
-          <div key={pkg.id} className="flex flex-col gap-3 border-t border-border pt-4 first:border-t-0 first:pt-0">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium text-ink">{pkg.name}</h3>
+          <details key={pkg.id} className="group rounded-2xl border border-border">
+            <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="font-medium text-ink">{pkg.name}</span>
+                <span className="text-sm text-ink-muted">
+                  {pkg.base_price_pp === null ? "Unpriced" : `₹${pkg.base_price_pp}/plate`}
+                </span>
                 {pkg.is_default && <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">Default</span>}
                 {pkg.base_price_pp === null && (
                   <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-600">
                     Unpriced — won&apos;t show on the public site
                   </span>
                 )}
-              </div>
-              <div className="flex items-center gap-2">
+              </span>
+              <span className="shrink-0 text-ink-muted transition-transform duration-200 ease-out group-open:rotate-180">▾</span>
+            </summary>
+
+            <div className="flex flex-col gap-3 border-t border-border p-4">
+              <div className="flex items-center justify-end gap-2">
                 {!pkg.is_default && (
                   <form action={setDefaultPackage.bind(null, pkg.id, vendor.id)}>
                     <button type="submit" className={secondaryButtonClass}>
@@ -378,7 +393,6 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                   </button>
                 </form>
               </div>
-            </div>
 
             <form action={updatePackage.bind(null, pkg.id, vendor.id)} className="flex flex-wrap items-end gap-3">
               <label className="flex flex-col gap-1 text-xs text-ink-muted">
@@ -513,7 +527,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                 </form>
               </details>
             )}
-          </div>
+            </div>
+          </details>
         ))}
 
         <form action={addPackage.bind(null, vendor.id)} className="flex flex-wrap items-end gap-3 border-t border-border pt-4">

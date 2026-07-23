@@ -131,7 +131,7 @@ export default async function Home() {
         ))}
       </section>
 
-      <section className="mx-auto w-full max-w-2xl px-4 pb-16">
+      <section className="mx-auto w-full max-w-2xl px-4 pb-20 pt-4">
         <MatchMeForm cuisines={cuisines} eventTypes={eventTypes} />
       </section>
     </main>

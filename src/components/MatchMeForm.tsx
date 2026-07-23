@@ -23,16 +23,16 @@ export function MatchMeForm({ cuisines, eventTypes }: { cuisines: Cuisine[]; eve
 
   if (state.status === "success") {
     return (
-      <div className="rounded-2xl border border-border bg-surface p-6 text-center shadow-card">
+      <div className="rounded-3xl border border-gold-500/50 bg-gold-100 p-6 text-center shadow-card sm:p-10">
         <p className="text-sm text-ink">Thank you, our team will get in touch with you for the next steps.</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6 shadow-card sm:p-8">
-      <div>
-        <h2 className="font-serif text-xl font-semibold text-royal-700">Too busy to browse?</h2>
+    <div className="flex flex-col gap-5 rounded-3xl border border-gold-500/50 bg-gold-100 p-6 shadow-card sm:p-10">
+      <div className="flex flex-col gap-1 text-center sm:text-left">
+        <h2 className="font-serif text-2xl font-semibold text-royal-800 sm:text-3xl">Too busy to browse?</h2>
         <p className="text-sm text-ink-muted">Tell us what you need — our team will match you with the right caterers.</p>
       </div>
       <form action={formAction} className="flex flex-col gap-4">

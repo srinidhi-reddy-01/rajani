@@ -177,7 +177,9 @@ export function DiscoveryClient({
         {QUOTE_DISCLAIMER}
       </p>
 
-      <MatchMeForm cuisines={cuisines} eventTypes={eventTypes} />
+      <div className="mt-6 border-t border-border pt-10">
+        <MatchMeForm cuisines={cuisines} eventTypes={eventTypes} />
+      </div>
     </div>
   );
 }

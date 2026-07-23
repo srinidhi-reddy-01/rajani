@@ -146,25 +146,27 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         </div>
 
         <div className="flex items-center gap-2 rounded-xl border border-gold-500 bg-gold-100 px-4 py-3 text-sm text-ink">
-          <span aria-hidden>🎁</span>
           <p>
-            <span className="font-semibold text-gold-600">Book through us and get ₹1000 cashback</span> after your
-            event. <span className="text-ink-muted">T&amp;C apply.</span>
+            <span className="font-semibold text-gold-600">Book through us and get ₹1000 off your booking value</span>{" "}
+            after your event. <span className="text-ink-muted">T&amp;C apply.</span>
           </p>
         </div>
 
         {galleryPhotos.length > 0 && (
-          <div className="flex gap-3 overflow-x-auto">
-            {galleryPhotos.map((m) => (
-              <Image
-                key={m.id}
-                src={m.url}
-                alt={`${vendor.name} photo`}
-                width={200}
-                height={150}
-                className="h-36 w-48 shrink-0 rounded-2xl border border-border object-cover"
-              />
-            ))}
+          <div className="flex flex-col gap-3">
+            <h2 className="font-serif text-lg font-semibold text-royal-700">Presentation</h2>
+            <div className="flex gap-3 overflow-x-auto">
+              {galleryPhotos.map((m) => (
+                <Image
+                  key={m.id}
+                  src={m.url}
+                  alt={`${vendor.name} photo`}
+                  width={200}
+                  height={150}
+                  className="h-36 w-48 shrink-0 rounded-2xl border border-border object-cover"
+                />
+              ))}
+            </div>
           </div>
         )}
 
@@ -328,7 +330,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
             </div>
           )}
           <p className="text-[11px] text-ink-muted">
-            Taste before you book — we arrange a sample tasting box from this caterer.
+            Don&apos;t book blind — order a sample tasting box and taste the menu before you decide.
           </p>
           <div className="flex gap-3">
             <button
@@ -353,13 +355,14 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         open={openModal === "enquire"}
         onClose={() => setOpenModal(null)}
         title="Check availability"
+        description="Every booking includes a dedicated event manager on the day — so you can enjoy the event, not manage it."
         action={submitEnquiry.bind(null, vendor.id, ctaContext)}
       />
       <CtaModal
         open={openModal === "tasting"}
         onClose={() => setOpenModal(null)}
         title="Get a sample box"
-        description="You request → our team coordinates with the caterer → the box reaches you."
+        description="Don't book blind — taste the actual menu before you decide. You request, our team coordinates with the caterer, and the box reaches you."
         action={submitTastingRequest.bind(null, vendor.id, ctaContext)}
       />
     </div>

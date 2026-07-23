@@ -1,8 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FadeIn } from "@/components/motion/FadeIn";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { MatchMeForm } from "@/components/MatchMeForm";
+import { WorryCard } from "@/components/WorryCard";
 import { getCuisines, getEventTypes } from "@/lib/queries/lookups";
+import { PresentationIcon, PriceTagIcon, TasteIcon } from "@/components/icons/ValuePropIcons";
 
 const FEATURES = [
   {
@@ -18,6 +21,27 @@ const FEATURES = [
     body: "Check availability or request a sample box. Our team follows up — no middleman markup.",
   },
 ];
+
+const WORRIES = [
+  {
+    title: "Taste",
+    icon: <TasteIcon className="h-7 w-7" />,
+    accent: "gold",
+    body: "Don't book blind. Order a sample tasting box from any caterer and taste the actual menu before you decide.",
+  },
+  {
+    title: "Presentation",
+    icon: <PresentationIcon className="h-7 w-7" />,
+    accent: "royal",
+    body: "See real photos from real events — plating, buffet counters and live stations from each caterer's recent functions.",
+  },
+  {
+    title: "Trust in price",
+    icon: <PriceTagIcon className="h-7 w-7" />,
+    accent: "green",
+    body: "Transparent per-plate prices, upfront. Quotes adjust instantly to your plate count — no phone calls, no haggling, no surprises.",
+  },
+] as const;
 
 export default async function Home() {
   const [cuisines, eventTypes] = await Promise.all([getCuisines(), getEventTypes()]);
@@ -52,6 +76,48 @@ export default async function Home() {
             </Link>
           </FadeIn>
         </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-5xl px-4 py-20 sm:py-28">
+        <ScrollReveal>
+          <h2 className="text-balance text-center font-serif text-3xl font-semibold text-charcoal-900 sm:text-4xl">
+            Every host worries about three things
+          </h2>
+        </ScrollReveal>
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {WORRIES.map((w, i) => (
+            <ScrollReveal key={w.title} delay={i * 0.08}>
+              <WorryCard title={w.title} body={w.body} icon={w.icon} accent={w.accent} />
+            </ScrollReveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden px-4 py-20 text-center sm:py-28">
+        <Image
+          src="https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=1600&q=75&auto=format&fit=crop"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900 via-charcoal-900/85 to-charcoal-900/55" />
+        <ScrollReveal className="relative mx-auto flex max-w-xl flex-col items-center gap-4">
+          <h2 className="text-balance font-serif text-3xl font-semibold text-cream-50 sm:text-4xl">
+            You enjoy the event. We&apos;ll handle the food.
+          </h2>
+          <p className="text-base text-cream-50/85 sm:text-lg">
+            Spend the day with your loved ones, not chasing the caterer. Every Rajani booking comes with a
+            dedicated event manager for the day — and ₹1000 off your booking value.
+          </p>
+          <p className="text-xs text-cream-50/60">T&amp;C apply.</p>
+          <Link
+            href="/discover"
+            className="mt-2 flex h-12 cursor-pointer items-center rounded-lg bg-gold-500 px-8 text-base font-medium text-charcoal-900 transition hover:bg-gold-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream-50"
+          >
+            Find your caterer
+          </Link>
+        </ScrollReveal>
       </section>
 
       <section className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-8 px-4 py-16 sm:grid-cols-3">

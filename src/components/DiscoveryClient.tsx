@@ -6,6 +6,7 @@ import type { DiscoverableVendor } from "@/lib/matching";
 import { matchVendors } from "@/lib/matching";
 import { VendorMatchCard } from "@/components/VendorMatchCard";
 import { MatchMeForm } from "@/components/MatchMeForm";
+import { MultiSelectDropdown } from "@/components/MultiSelectDropdown";
 import { QUOTE_DISCLAIMER, formatInr } from "@/lib/pricing";
 
 const PLATE_STEP = 50;
@@ -33,7 +34,7 @@ export function DiscoveryClient({
   const [plates, setPlates] = useState(500);
   const [budgetPp, setBudgetPp] = useState<number | "">("");
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
-  const [eventType, setEventType] = useState("");
+  const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [eventDate, setEventDate] = useState("");
   const [sort, setSort] = useState<"match" | "price">("match");
 
@@ -48,16 +49,12 @@ export function DiscoveryClient({
     [vendors, plates, selectedCuisines, budgetPp, sort]
   );
 
-  function toggleCuisine(name: string) {
-    setSelectedCuisines((prev) => (prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]));
-  }
-
   const contextQuery = new URLSearchParams({
     plates: String(plates),
     ...(selectedCuisines.length > 0 ? { cuisines: selectedCuisines.join(",") } : {}),
     ...(budgetPp !== "" ? { budget: String(budgetPp) } : {}),
     ...(eventDate ? { date: eventDate } : {}),
-    ...(eventType ? { eventType } : {}),
+    ...(selectedEventTypes.length > 0 ? { eventType: selectedEventTypes.join(", ") } : {}),
   }).toString();
 
   return (
@@ -65,6 +62,11 @@ export function DiscoveryClient({
       <div>
         <h1 className="font-serif text-2xl font-semibold text-royal-700">Caterers matched for you</h1>
         <p className="text-sm text-ink-muted">All filters are optional — adjust anything to see prices update live.</p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <MultiSelectDropdown label="Event type" options={eventTypes} selected={selectedEventTypes} onChange={setSelectedEventTypes} className="w-44" />
+        <MultiSelectDropdown label="Cuisine" options={cuisines} selected={selectedCuisines} onChange={setSelectedCuisines} className="w-44" />
       </div>
 
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
@@ -140,30 +142,6 @@ export function DiscoveryClient({
         >
           <span aria-hidden>↕️</span> Price: low to high
         </button>
-
-        {eventTypes.map((et) => (
-          <button
-            key={et.id}
-            type="button"
-            onClick={() => setEventType((prev) => (prev === et.name ? "" : et.name))}
-            aria-pressed={eventType === et.name}
-            className={`${chipBase} ${eventType === et.name ? chipActive : chipInactive}`}
-          >
-            <span aria-hidden>🎉</span> {et.name}
-          </button>
-        ))}
-
-        {cuisines.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            onClick={() => toggleCuisine(c.name)}
-            aria-pressed={selectedCuisines.includes(c.name)}
-            className={`${chipBase} ${selectedCuisines.includes(c.name) ? chipActive : chipInactive}`}
-          >
-            <span aria-hidden>🍛</span> {c.name}
-          </button>
-        ))}
       </div>
 
       {matched.length === 0 && others.length === 0 ? (

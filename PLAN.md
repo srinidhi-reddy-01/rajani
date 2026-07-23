@@ -8,39 +8,51 @@ plate-count updates. Please confirm with the caterer for final booking."*
 ## Consumer flow
 
 1. **Landing page** explains what the site does; its main CTA goes straight to
-   `/discover`. A "Too busy to browse?" section captures a `match_requests` row for
-   users who'd rather have the team match them manually.
+   `/discover`. Below the hero, a three-card "Every host worries about three
+   things" section (Taste / Presentation / Trust in price) and a full-width
+   emotional band lead into the existing feature grid. A visually distinct
+   "Too busy to browse?" band (contrasting fill, its own heading, clearly broken
+   out from the surrounding content) captures a `match_requests` row for users
+   who'd rather have the team match them manually; event type and cuisine there
+   are plain single-select dropdowns.
 2. **Discovery (`/discover`)**: the live vendor list is fetched once, server-side;
    all filtering, ranking, and price computation happens client-side
    (`lib/matching.ts`, a pure function - no DB access), so prices recompute instantly
-   with zero network round-trips as filters change. Filters render as a horizontally
-   scrollable row of icon-led chips (plates stepper in 50s + direct typing, default
-   500; budget; event date, min today; best-match/price sort; event type; cuisine) -
-   every one optional. Live vendors rank by their lowest active package price against
-   a ±10% budget band: in-band first, others below labeled "above"/"below your
-   budget" - never an empty screen. Cuisine preference is a soft ranking signal, not
-   a hard filter, same reasoning. Cards show a circular owner photo overlapping the
-   cover image (when set), a green Verified badge (when personally vetted), events
-   completed, Google rating, locality, cuisine chips, and "Packages from ₹X/plate at
-   your Y plates" - never a loose dish price. A "Too busy to browse?" section repeats
-   at the bottom.
+   with zero network round-trips as filters change. Event type and cuisine are
+   multi-select dropdowns (a combobox with checkboxes and a compact "N selected"
+   summary, `MultiSelectDropdown`), kept out of the horizontally-scrolling chip
+   row so their popovers aren't clipped. Plates stepper (50s + direct typing,
+   default 500), budget, event date, and sort stay as icon-led chips in that row.
+   Every filter is optional. Live vendors rank by their lowest active package
+   price against a ±10% budget band: in-band first, others below labeled
+   "above"/"below your budget" - never an empty screen. Cuisine preference is a
+   soft ranking signal, not a hard filter, same reasoning. Cards show a circular
+   owner photo overlapping the cover image (falls back to the vendor's logo, then
+   a gradient initials badge - never an empty box), a green Verified badge (when
+   personally vetted), events completed, Google rating, locality, cuisine chips,
+   and "Packages from ₹X/plate at your Y plates" - never a loose dish price. The
+   same distinct "Too busy to browse?" band repeats at the bottom.
 3. **Vendor profile**: hero cover photo, "Serving since {year}", Google rating,
-   description, gallery, testimonials ("What hosts say" - admin-uploaded WhatsApp
-   screenshots), a ₹1000-cashback banner, packages as selectable cards (the only
-   place a price is public), and a full dish-name menu grouped by category with
-   veg/non-veg dots and optional images - **no dish prices**, ever, on the consumer
-   site. Sticky bottom bar: "Get sample box" (with a one-line explainer: "Taste
-   before you book...") and "Check availability" - always enabled, never blocked by
-   menu selection.
-4. **Optional menu customisation**: picking a package with category-rule slots
-   reveals a collapsed-by-default disclosure, "Choose menu items to get the exact
-   quote." Opening it shows one section per slot (category, "Pick N · M selected",
-   items as image+name cards with defaults preselected, freely swappable within the
-   category's limit) plus a live per-plate quote. This is a pure enhancement:
-   "Check availability" works identically with a package alone, a customised
-   selection, or no package at all. Whether the enquiry carries an itemised
-   selection depends on whether the user actually opened the disclosure, not just
-   whether one exists.
+   description, gallery ("Presentation"), testimonials ("What hosts say" -
+   admin-uploaded WhatsApp screenshots), a ₹1000-off-your-booking-value banner,
+   and packages as selectable cards (the only place a price is public). There is
+   no standalone dish-name "Menu" section - the package selector (see below) is
+   the only menu representation on the page, and it never shows a price. Sticky
+   bottom bar: "Get sample box" (with a one-line explainer echoing the Taste
+   pillar) and "Check availability" (its modal mentions the dedicated event
+   manager) - always enabled, never blocked by menu selection.
+4. **Menu customisation**: picking a package with category-rule slots shows
+   "Choose menu items to get the exact quote" **expanded by default** - there is
+   no collapse toggle. One section per slot (category, "Pick N · M selected",
+   items as image+name cards with defaults preselected) plus a live per-plate
+   quote. Users never need to manually unselect before picking something else: a
+   pick-1 slot swaps like a radio button, and a pick-N slot at capacity drops the
+   oldest pick (FIFO) to make room for the new one, with a brief transition. This
+   is a pure enhancement: "Check availability" works identically with a package
+   alone, a customised selection, or no package at all. Because the chooser is
+   always expanded, the enquiry always carries the itemised selection whenever
+   the package has slots - defaults if the user never touched anything, their
+   own picks if they did.
 5. **Capture**: both CTAs open a modal asking only for a phone number (10-digit
    Indian format), ending "Thank you, our team will get in touch with you for the
    next steps." Check availability inserts into `enquiries` with the full context
@@ -56,13 +68,16 @@ plate-count updates. Please confirm with the caterer for final booking."*
   category with a pick count - new slots default to offering every active item in
   that category, admin removes some to restrict) or by picking exact dishes directly.
   Optional `min_plates`. Veg/non-veg split categories ("Starters veg" / "Starters
-  non-veg") are the intended pattern for mixed menus.
+  non-veg") are the intended pattern for mixed menus. In the admin editor, each
+  menu category and each package is its own collapsed-by-default accordion row
+  (name + item count, or name + price + status badges) - keeps a vendor with a
+  large menu or several multi-slot packages from turning into one very long page.
 - Menu: 14 standard categories can be one-click provisioned per vendor, with common
   Telugu wedding/party dish suggestions per category (one-click add at no price -
   "priced later" is a real state; `base_price_pp` is nullable). Bulk CSV import
   (`category, dish_name, price_pp`) with row-level error reporting. Dishes may
-  optionally carry an `image_url`, shown in the package selector and the profile's
-  Menu section - never a price, on the consumer side.
+  optionally carry an `image_url`, shown in the package selector - never a price,
+  on the consumer side.
 - Cuisine and event specialities are multi-select (max 2) from shared lookup tables
   (`cuisines`, `event_types`); admins can add new options inline.
 - Showcase: description, logo, **owner photo** (shown circular, overlapping the
@@ -114,7 +129,9 @@ customisation. Budget-band matching with soft cuisine ranking, never an empty re
 screen. 10 enquiries/day cap. Package-required go-live gate. Anonymous browse +
 phone-gated capture. `is_verified` is a manual, admin-only signal. Demo vendors
 admin-only and bulk-deletable. Service-role key server-side only, never in consumer
-paths.
+paths. Apple-inspired visual language: system font stack (no serif), one restrained
+accent color reserved for prices and primary CTAs, everything else neutral - see
+CLAUDE.md's Design system section before touching any styling.
 
 ## Parked concepts
 

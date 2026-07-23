@@ -35,7 +35,7 @@ export function VendorAvatar({
   }
   return (
     <div
-      className={`flex items-center justify-center rounded-full border-4 border-surface bg-royal-600 text-sm font-semibold text-cream-50 shadow-card ${className}`}
+      className={`flex items-center justify-center rounded-full border-4 border-surface bg-gradient-to-br from-royal-600 to-royal-800 text-sm font-semibold text-cream-50 shadow-card ${className}`}
       aria-hidden
     >
       {initialsOf(name)}

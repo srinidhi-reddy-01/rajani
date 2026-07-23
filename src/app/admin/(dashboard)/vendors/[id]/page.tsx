@@ -38,13 +38,13 @@ import { MediaUploadForm } from "@/components/MediaUploadForm";
 import { CsvImportForm } from "@/components/CsvImportForm";
 
 const inputClass =
-  "h-11 rounded-lg border border-border bg-surface px-3 text-sm text-ink focus:border-royal-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-100";
+  "h-11 rounded-lg border border-border bg-surface px-3 text-sm text-ink transition-colors duration-200 ease-out focus:border-royal-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-100";
 const primaryButtonClass =
-  "h-11 cursor-pointer rounded-lg bg-royal-700 px-4 text-sm font-medium text-white transition hover:bg-royal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
+  "h-11 cursor-pointer rounded-lg bg-royal-700 px-4 text-sm font-medium text-white transition-colors duration-200 ease-out hover:bg-royal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
 const secondaryButtonClass =
-  "h-9 cursor-pointer rounded-lg border border-border px-3 text-xs font-medium text-ink transition hover:border-gold-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
+  "h-9 cursor-pointer rounded-lg border border-border px-3 text-xs font-medium text-ink transition-colors duration-200 ease-out hover:border-royal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
 const dangerButtonClass =
-  "h-9 cursor-pointer rounded-lg border border-red-200 px-3 text-xs font-medium text-red-600 transition hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500";
+  "h-9 cursor-pointer rounded-lg border border-red-200 px-3 text-xs font-medium text-red-600 transition-colors duration-200 ease-out hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500";
 
 export default async function AdminVendorEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -58,14 +58,14 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
   return (
     <div className="flex flex-col gap-10">
       <div>
-        <Link href="/admin" className="text-sm text-ink-muted hover:text-royal-700">
+        <Link href="/admin" className="text-sm text-ink-muted transition-colors duration-200 ease-out hover:text-ink">
           ← Back to pipeline
         </Link>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold text-royal-700">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
             {vendor.name}
             {vendor.is_demo && (
-              <span className="ml-2 rounded-full bg-gold-100 px-1.5 py-0.5 align-middle text-[10px] font-medium uppercase text-gold-600">
+              <span className="ml-2 rounded-full bg-neutral-100 px-1.5 py-0.5 align-middle text-[10px] font-medium uppercase text-neutral-600">
                 Demo
               </span>
             )}
@@ -93,8 +93,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         </div>
       </div>
 
-      <section className="rounded-2xl border border-border bg-surface p-5 shadow-card">
-        <h2 className="mb-3 text-lg font-semibold text-royal-700">Go-live checklist</h2>
+      <section className="rounded-3xl border border-border bg-surface p-5 shadow-card">
+        <h2 className="mb-3 text-lg font-semibold tracking-tight text-ink">Go-live checklist</h2>
         <ul className="flex flex-col gap-1.5 text-sm">
           {[
             { label: "At least one active package", ok: vendor.packages.some((p) => p.is_active) },
@@ -115,12 +115,13 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         <p className="mt-2 text-xs text-ink-muted">Everything else (menu, media, description) is optional.</p>
       </section>
 
-      <section className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
-        <h2 className="text-lg font-semibold text-royal-700">Showcase</h2>
-        <LogoUploadForm action={uploadVendorLogo.bind(null, vendor.id)} currentUrl={vendor.logo_url} />
+      <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-5 shadow-card">
+        <h2 className="text-lg font-semibold tracking-tight text-ink">Showcase</h2>
+        <LogoUploadForm action={uploadVendorLogo.bind(null, vendor.id)} currentUrl={vendor.logo_url} vendorName={vendor.name} />
         <LogoUploadForm
           action={uploadVendorOwnerPhoto.bind(null, vendor.id)}
           currentUrl={vendor.owner_photo_url}
+          vendorName={vendor.name}
           fieldName="owner_photo"
           label="owner photo"
           alt="Owner photo"
@@ -144,8 +145,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         </div>
       </section>
 
-      <section className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-card">
-        <h2 className="text-lg font-semibold text-royal-700">Profile</h2>
+      <section className="flex flex-col gap-4 rounded-3xl border border-border bg-surface p-5 shadow-card">
+        <h2 className="text-lg font-semibold tracking-tight text-ink">Profile</h2>
         <form action={updateVendorProfile.bind(null, vendor.id)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1 text-sm text-ink-muted">
             Name
@@ -219,9 +220,9 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         </div>
       </section>
 
-      <section className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
+      <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-5 shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-royal-700">Menu</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-ink">Menu</h2>
           {vendor.menu_categories.length === 0 && (
             <form action={provisionStandardCategories.bind(null, vendor.id)}>
               <button type="submit" className={secondaryButtonClass}>
@@ -303,7 +304,7 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                     <form key={s} action={addSuggestedMenuItem.bind(null, vendor.id, category.id, s)}>
                       <button
                         type="submit"
-                        className="cursor-pointer rounded-full border border-gold-500 px-2.5 py-1 text-xs text-gold-600 transition hover:bg-gold-100"
+                        className="cursor-pointer rounded-full border border-gold-500 px-2.5 py-1 text-xs text-gold-600 transition-colors duration-200 ease-out hover:bg-gold-100"
                       >
                         + {s}
                       </button>
@@ -349,14 +350,14 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         </form>
       </section>
 
-      <section className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
-        <h2 className="text-lg font-semibold text-royal-700">Packages</h2>
+      <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-5 shadow-card">
+        <h2 className="text-lg font-semibold tracking-tight text-ink">Packages</h2>
         {vendor.packages.map((pkg) => (
           <div key={pkg.id} className="flex flex-col gap-3 border-t border-border pt-4 first:border-t-0 first:pt-0">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <h3 className="font-medium text-ink">{pkg.name}</h3>
-                {pkg.is_default && <span className="rounded-full bg-gold-100 px-2 py-0.5 text-xs text-gold-600">Default</span>}
+                {pkg.is_default && <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">Default</span>}
                 {pkg.base_price_pp === null && (
                   <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-600">
                     Unpriced — won&apos;t show on the public site
@@ -431,11 +432,15 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                     {slotItems.length > 0 && (
                       <ul className="mt-2 flex flex-wrap gap-2">
                         {slotItems.map((si) => (
-                          <li key={si.id} className="flex items-center gap-1.5 rounded-full bg-royal-100 px-2 py-0.5 text-xs text-royal-700">
+                          <li key={si.id} className="flex items-center gap-1.5 rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">
                             {si.item?.name}
-                            {si.is_default && <span className="text-gold-600">★</span>}
+                            {si.is_default && <span className="text-ink-muted">★</span>}
                             <form action={deletePackageSlotItem.bind(null, si.id, vendor.id)}>
-                              <button type="submit" aria-label={`Remove ${si.item?.name}`} className="cursor-pointer text-royal-700 hover:text-red-600">
+                              <button
+                                type="submit"
+                                aria-label={`Remove ${si.item?.name}`}
+                                className="cursor-pointer text-neutral-600 transition-colors duration-200 ease-out hover:text-red-600"
+                              >
                                 ×
                               </button>
                             </form>

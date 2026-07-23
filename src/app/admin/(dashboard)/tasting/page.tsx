@@ -7,7 +7,7 @@ const TASTING_STATUSES = ["new", "contacted", "completed", "cancelled"] as const
 const inputClass =
   "h-9 rounded-lg border border-border bg-surface px-2 text-sm text-ink focus:border-royal-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-100";
 const secondaryButtonClass =
-  "h-9 cursor-pointer rounded-lg border border-border px-3 text-xs font-medium text-ink transition hover:border-gold-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
+  "h-9 cursor-pointer rounded-lg border border-border px-3 text-xs font-medium text-ink transition-colors duration-200 ease-out hover:border-royal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
 
 export default async function AdminTastingPage({
   searchParams,
@@ -19,7 +19,7 @@ export default async function AdminTastingPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold text-royal-700">Tasting requests</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">Tasting requests</h1>
 
       <form method="get" className="flex items-end gap-3">
         <label className="flex flex-col gap-1 text-sm text-ink-muted">
@@ -45,7 +45,7 @@ export default async function AdminTastingPage({
           {requests.map((request) => {
             const ctx = request.context;
             return (
-              <div key={request.id} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 shadow-card">
+              <div key={request.id} className="flex flex-col gap-3 rounded-3xl border border-border bg-surface p-5 shadow-card">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h2 className="font-medium text-ink">{request.vendors?.name ?? "—"}</h2>

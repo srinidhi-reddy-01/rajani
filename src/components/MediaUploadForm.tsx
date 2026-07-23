@@ -27,7 +27,7 @@ export function MediaUploadForm({
                 type="button"
                 onClick={() => deleteAction(m.id)}
                 aria-label="Remove image"
-                className="absolute right-1 top-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/60 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                className="absolute right-1 top-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-black/60 text-xs text-white opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100"
               >
                 ×
               </button>
@@ -40,7 +40,7 @@ export function MediaUploadForm({
         <button
           type="submit"
           disabled={pending}
-          className="h-9 cursor-pointer rounded-lg border border-royal-600 px-3 text-xs font-medium text-royal-700 transition hover:bg-royal-100 disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-9 cursor-pointer rounded-lg border border-royal-600 px-3 text-xs font-medium text-royal-700 transition-colors duration-200 ease-out hover:bg-royal-100 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending ? "Uploading..." : "Add photo"}
         </button>

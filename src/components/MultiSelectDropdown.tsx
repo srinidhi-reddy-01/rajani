@@ -47,8 +47,8 @@ export function MultiSelectDropdown({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`flex h-11 w-full items-center justify-between gap-2 whitespace-nowrap rounded-lg border px-4 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
-          selected.length > 0 ? "border-royal-600 bg-royal-50 text-royal-700" : "border-border bg-surface text-ink hover:border-gold-500"
+        className={`flex h-11 w-full items-center justify-between gap-2 whitespace-nowrap rounded-lg border px-4 text-sm font-medium transition-colors duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
+          selected.length > 0 ? "border-royal-600 bg-royal-50 text-royal-700" : "border-border bg-surface text-ink hover:border-royal-600"
         }`}
       >
         <span className="truncate">{buttonText}</span>
@@ -61,7 +61,7 @@ export function MultiSelectDropdown({
         <div
           role="listbox"
           aria-multiselectable="true"
-          className="absolute left-0 top-[calc(100%+6px)] z-30 w-64 max-w-[80vw] rounded-xl border border-border bg-surface p-2 shadow-card-hover"
+          className="absolute left-0 top-[calc(100%+6px)] z-30 w-64 max-w-[80vw] rounded-2xl border border-border bg-surface p-2 shadow-elevated"
         >
           <div className="flex max-h-64 flex-col gap-0.5 overflow-y-auto">
             {options.map((o) => {
@@ -69,7 +69,7 @@ export function MultiSelectDropdown({
               return (
                 <label
                   key={o.id}
-                  className="flex min-h-10 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-ink transition hover:bg-royal-50"
+                  className="flex min-h-10 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-ink transition-colors duration-200 ease-out hover:bg-ivory"
                 >
                   <input
                     type="checkbox"
@@ -86,7 +86,7 @@ export function MultiSelectDropdown({
             <button
               type="button"
               onClick={() => onChange([])}
-              className="mt-1 w-full cursor-pointer rounded-lg px-2.5 py-2 text-left text-xs font-medium text-ink-muted transition hover:bg-royal-50 hover:text-ink"
+              className="mt-1 w-full cursor-pointer rounded-lg px-2.5 py-2 text-left text-xs font-medium text-ink-muted transition-colors duration-200 ease-out hover:bg-ivory hover:text-ink"
             >
               Clear
             </button>

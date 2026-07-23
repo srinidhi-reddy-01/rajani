@@ -1,33 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf6ee;
-  --foreground: #241b2f;
+  --background: #f5f5f7;
+  --foreground: #1d1d1f;
 
-  /* Design system — deep charcoal/aubergine dark surfaces, ivory content areas, gold
-     accent used sparingly (prices, ratings, dividers). No pure black or pure white
-     anywhere: charcoal-900 stands in for black, cream-50 for white-on-dark text. */
-  --color-royal-50: #f4f1fb;
-  --color-royal-100: #ede7f9;
-  --color-royal-600: #5b249b;
-  --color-royal-700: #4c1d95;
-  --color-royal-800: #3b1673;
+  /* Apple-inspired design system — one restrained accent (a refined blue) used only
+     for prices and primary actions; everything else is neutral. Hierarchy comes from
+     size/weight/spacing, not color. "royal" and "gold" are the same accent family
+     (kept as two token names purely so every existing className below didn't need a
+     rename) - a price (gold-*) and a primary CTA (royal-*) now render identically. */
+  --color-royal-50: #eaf2fe;
+  --color-royal-100: #d7e8fd;
+  --color-royal-600: #0071e3;
+  --color-royal-700: #0058b4;
+  --color-royal-800: #003f82;
 
-  --color-gold-100: #f7efd3;
-  --color-gold-500: #c9a227;
-  --color-gold-600: #a9860f;
+  --color-gold-100: #d7e8fd;
+  --color-gold-500: #0071e3;
+  --color-gold-600: #0058b4;
 
-  --color-charcoal-900: #1c1420;
-  --color-charcoal-800: #2a1f2e;
-  --color-charcoal-700: #392c3f;
-  --color-cream-50: #f3ead9;
+  --color-charcoal-900: #1d1d1f;
+  --color-charcoal-800: #2c2c2e;
+  --color-charcoal-700: #3a3a3c;
+  --color-cream-50: #f5f5f7;
 
-  --color-ivory: #faf6ee;
-  --color-surface: #fffdf9;
+  --color-ivory: #f5f5f7;
+  --color-surface: #ffffff;
 
-  --color-ink: #241b2f;
-  --color-ink-muted: #6b6572;
-  --color-border: #e7e1db;
+  --color-ink: #1d1d1f;
+  --color-ink-muted: #6e6e73;
+  --color-border: #d6d6d9;
 }
 
 @theme inline {
@@ -39,8 +41,9 @@
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-serif: var(--font-serif);
+  /* System font stack first (native SF Pro on Apple devices), Inter as the web
+     fallback everywhere else - no serif anywhere. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", var(--font-inter), Inter, sans-serif;
 
   --color-royal-50: var(--color-royal-50);
   --color-royal-100: var(--color-royal-100);
@@ -64,9 +67,11 @@
   --color-ink-muted: var(--color-ink-muted);
   --color-border: var(--color-border);
 
-  --shadow-card: 0 1px 2px rgba(28, 20, 32, 0.04), 0 4px 16px rgba(28, 20, 32, 0.06);
-  --shadow-card-hover: 0 2px 4px rgba(28, 20, 32, 0.06), 0 12px 28px rgba(28, 20, 32, 0.12);
-  --shadow-elevated: 0 8px 16px rgba(28, 20, 32, 0.12), 0 24px 48px rgba(28, 20, 32, 0.18);
+  /* Very soft, neutral shadows - larger blur, lower opacity than a typical card
+     shadow, no color tint. */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover: 0 2px 6px rgba(0, 0, 0, 0.04), 0 16px 40px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 8px 16px rgba(0, 0, 0, 0.06), 0 32px 64px rgba(0, 0, 0, 0.1);
 }
 
 body {

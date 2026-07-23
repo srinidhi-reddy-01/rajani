@@ -9,7 +9,7 @@ const inputClass =
   "h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm text-ink focus:border-royal-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-100";
 const selectClass = `${inputClass} appearance-none`;
 const primaryButtonClass =
-  "h-12 cursor-pointer rounded-lg bg-royal-700 px-6 text-sm font-medium text-cream-50 transition hover:bg-royal-800 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
+  "h-12 cursor-pointer rounded-lg bg-royal-700 px-6 text-sm font-medium text-cream-50 transition-colors duration-200 ease-out hover:bg-royal-800 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
 
 function todayIso(): string {
   const d = new Date();
@@ -32,7 +32,7 @@ export function MatchMeForm({ cuisines, eventTypes }: { cuisines: Cuisine[]; eve
   return (
     <div className="flex flex-col gap-5 rounded-3xl border border-gold-500/50 bg-gold-100 p-6 shadow-card sm:p-10">
       <div className="flex flex-col gap-1 text-center sm:text-left">
-        <h2 className="font-serif text-2xl font-semibold text-royal-800 sm:text-3xl">Too busy to browse?</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-royal-800 sm:text-3xl">Too busy to browse?</h2>
         <p className="text-sm text-ink-muted">Tell us what you need — our team will match you with the right caterers.</p>
       </div>
       <form action={formAction} className="flex flex-col gap-4">

@@ -21,7 +21,7 @@ type GuidedContext = {
 };
 
 const ctaButtonClass =
-  "h-14 flex-1 cursor-pointer rounded-lg text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 disabled:cursor-not-allowed disabled:opacity-40";
+  "h-14 flex-1 cursor-pointer rounded-xl text-sm font-medium transition-colors duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 disabled:cursor-not-allowed disabled:opacity-40";
 
 function AnimatedPrice({ amount, suffix }: { amount: number; suffix?: string }) {
   const rounded = Math.round(amount);
@@ -102,7 +102,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900 via-charcoal-900/50 to-transparent" />
         <Link
           href="/discover"
-          className="absolute left-4 top-4 rounded-full bg-charcoal-900/60 px-3 py-1.5 text-sm text-cream-50 backdrop-blur-sm transition hover:bg-charcoal-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream-50"
+          className="absolute left-4 top-4 rounded-full bg-charcoal-900/60 px-3 py-1.5 text-sm text-cream-50 backdrop-blur-sm transition-colors duration-200 ease-out hover:bg-charcoal-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream-50"
         >
           ← Back
         </Link>
@@ -114,11 +114,11 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
                 alt={`${vendor.name} logo`}
                 width={48}
                 height={48}
-                className="h-12 w-12 rounded-lg border border-cream-50/30 object-cover"
+                className="h-12 w-12 rounded-xl border border-cream-50/30 object-cover"
               />
             )}
             <div>
-              <h1 className="font-serif text-2xl font-semibold text-cream-50 sm:text-3xl">{vendor.name}</h1>
+              <h1 className="text-3xl font-semibold tracking-tight text-cream-50 sm:text-4xl">{vendor.name}</h1>
               <p className="text-sm text-cream-50/80">
                 {vendor.area}
                 {vendor.area && vendor.established_year && " · "}
@@ -139,13 +139,13 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         {vendor.description && <p className="text-sm text-ink">{vendor.description}</p>}
         <div className="flex flex-wrap gap-1.5">
           {[...vendor.cuisine_specialities, ...vendor.event_specialities].map((tag) => (
-            <span key={tag} className="rounded-full bg-royal-100 px-2 py-0.5 text-xs text-royal-700">
+            <span key={tag} className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">
               {tag}
             </span>
           ))}
         </div>
 
-        <div className="flex items-center gap-2 rounded-xl border border-gold-500 bg-gold-100 px-4 py-3 text-sm text-ink">
+        <div className="flex items-center gap-2 rounded-2xl border border-gold-500/40 bg-gold-100 px-4 py-3 text-sm text-ink">
           <p>
             <span className="font-semibold text-gold-600">Book through us and get ₹1000 off your booking value</span>{" "}
             after your event. <span className="text-ink-muted">T&amp;C apply.</span>
@@ -154,7 +154,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
 
         {galleryPhotos.length > 0 && (
           <div className="flex flex-col gap-3">
-            <h2 className="font-serif text-lg font-semibold text-royal-700">Presentation</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-ink">Presentation</h2>
             <div className="flex gap-3 overflow-x-auto">
               {galleryPhotos.map((m) => (
                 <Image
@@ -163,7 +163,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
                   alt={`${vendor.name} photo`}
                   width={200}
                   height={150}
-                  className="h-36 w-48 shrink-0 rounded-2xl border border-border object-cover"
+                  className="h-36 w-48 shrink-0 rounded-3xl border border-border object-cover"
                 />
               ))}
             </div>
@@ -172,14 +172,14 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
 
         {testimonials.length > 0 && (
           <section className="flex flex-col gap-3">
-            <h2 className="font-serif text-lg font-semibold text-royal-700">What hosts say</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-ink">What hosts say</h2>
             <div className="flex gap-4 overflow-x-auto pb-2">
               {testimonials.map((t) => (
                 <div
                   key={t.id}
-                  className="w-56 shrink-0 rounded-2xl border border-border bg-surface p-2 shadow-card"
+                  className="w-56 shrink-0 rounded-3xl border border-border bg-surface p-2 shadow-card"
                 >
-                  <div className="relative h-72 w-full overflow-hidden rounded-xl">
+                  <div className="relative h-72 w-full overflow-hidden rounded-2xl">
                     <Image src={t.url} alt="Host testimonial screenshot" fill sizes="224px" className="object-cover" />
                   </div>
                 </div>
@@ -203,7 +203,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         </label>
 
         <section className="flex flex-col gap-4">
-          <h2 className="font-serif text-lg font-semibold text-royal-700">Packages</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-ink">Packages</h2>
           {vendor.packages.length === 0 ? (
             <p className="text-sm text-ink-muted">No packages published yet.</p>
           ) : (
@@ -215,20 +215,20 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
                     key={pkg.id}
                     type="button"
                     whileHover={{ y: -3 }}
-                    transition={{ duration: 0.15 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
                     aria-pressed={selected}
                     onClick={() => setSelectedPackageId(pkg.id)}
-                    className={`flex min-h-11 cursor-pointer flex-col gap-1 rounded-2xl border p-4 text-left shadow-card transition-shadow duration-150 hover:shadow-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
+                    className={`flex min-h-11 cursor-pointer flex-col gap-1 rounded-3xl border p-4 text-left shadow-card transition-shadow duration-200 ease-out hover:shadow-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
                       selected
                         ? "border-royal-600 bg-royal-50 ring-2 ring-royal-100"
-                        : "border-border bg-surface hover:border-gold-500"
+                        : "border-border bg-surface hover:border-royal-600"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <h3 className="font-medium text-ink">{pkg.name}</h3>
                       <div className="flex items-center gap-1.5">
                         {pkg.is_default && (
-                          <span className="rounded-full bg-gold-100 px-2 py-0.5 text-xs text-gold-600">Default</span>
+                          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">Default</span>
                         )}
                         {selected && (
                           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-royal-600 text-xs text-cream-50">
@@ -252,9 +252,9 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
         </section>
 
         {selectedPackage && hasSlots && (
-          <section className="flex flex-col gap-4 rounded-2xl border border-royal-100 bg-royal-50/40 p-4 sm:p-6">
+          <section className="flex flex-col gap-4 rounded-3xl border border-border bg-ivory p-4 sm:p-6">
             <div>
-              <h2 className="font-serif text-lg font-semibold text-royal-700">Choose menu items to get the exact quote</h2>
+              <h2 className="text-lg font-semibold tracking-tight text-ink">Choose menu items to get the exact quote</h2>
               <p className="text-sm text-ink-muted">Optional — availability works with just the package above. Defaults are preselected.</p>
             </div>
             <PackageSelector key={selectedPackage.id} slots={selectedPackage.slots} onChange={setSlotSelection} />
@@ -283,7 +283,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
             <button
               type="button"
               onClick={() => setOpenModal("tasting")}
-              className={`${ctaButtonClass} border border-royal-700 text-royal-700 hover:bg-royal-100`}
+              className={`${ctaButtonClass} border border-border text-ink hover:bg-ivory`}
             >
               Get sample box
             </button>

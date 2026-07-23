@@ -19,7 +19,7 @@ export function CsvImportForm({
         <button
           type="submit"
           disabled={pending}
-          className="h-9 cursor-pointer rounded-lg border border-royal-600 px-3 text-xs font-medium text-royal-700 transition hover:bg-royal-100 disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-9 cursor-pointer rounded-lg border border-royal-600 px-3 text-xs font-medium text-royal-700 transition-colors duration-200 ease-out hover:bg-royal-100 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending ? "Importing..." : "Import CSV"}
         </button>

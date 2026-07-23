@@ -82,8 +82,8 @@ export function PackageSelector({
                     whileTap={{ scale: 0.97 }}
                     aria-pressed={selected}
                     onClick={() => toggle(slot.id, option.itemId, slot.selectionsCount)}
-                    className={`flex min-h-11 cursor-pointer flex-col overflow-hidden rounded-xl border text-left transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
-                      selected ? "border-royal-600 bg-royal-50 ring-2 ring-royal-100" : "border-border bg-surface hover:border-gold-500"
+                    className={`flex min-h-11 cursor-pointer flex-col overflow-hidden rounded-2xl border text-left transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
+                      selected ? "border-royal-600 bg-royal-50 ring-2 ring-royal-100" : "border-border bg-surface hover:border-royal-600"
                     }`}
                   >
                     {option.imageUrl && (

@@ -13,7 +13,7 @@ const PLATE_STEP = 50;
 const MIN_PLATES = 50;
 
 const chipBase =
-  "flex h-11 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
+  "flex h-11 shrink-0 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
 const chipInactive = "border-border bg-surface text-ink hover:border-gold-500";
 const chipActive = "border-royal-600 bg-royal-700 text-cream-50";
 
@@ -60,8 +60,8 @@ export function DiscoveryClient({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="font-serif text-2xl font-semibold text-royal-700">Caterers matched for you</h1>
-        <p className="text-sm text-ink-muted">All filters are optional — adjust anything to see prices update live.</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-ink">Caterers matched for you</h1>
+        <p className="mt-1 text-sm text-ink-muted">All filters are optional — adjust anything to see prices update live.</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -71,7 +71,6 @@ export function DiscoveryClient({
 
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
         <div className={`${chipBase} ${chipInactive} gap-2`}>
-          <span aria-hidden>🍽️</span>
           <button
             type="button"
             aria-label="Decrease plates"
@@ -116,7 +115,6 @@ export function DiscoveryClient({
         </label>
 
         <label className={`${chipBase} ${chipInactive}`}>
-          <span aria-hidden>📅</span>
           <input
             type="date"
             min={todayIso()}
@@ -132,7 +130,7 @@ export function DiscoveryClient({
           aria-pressed={sort === "match"}
           className={`${chipBase} ${sort === "match" ? chipActive : chipInactive}`}
         >
-          <span aria-hidden>✨</span> Best match
+          Best match
         </button>
         <button
           type="button"
@@ -140,7 +138,7 @@ export function DiscoveryClient({
           aria-pressed={sort === "price"}
           className={`${chipBase} ${sort === "price" ? chipActive : chipInactive}`}
         >
-          <span aria-hidden>↕️</span> Price: low to high
+          Price: low to high
         </button>
       </div>
 

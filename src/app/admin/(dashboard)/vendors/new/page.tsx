@@ -7,17 +7,17 @@ import { createVendor } from "@/lib/admin/actions";
 const inputClass =
   "h-11 rounded-lg border border-border bg-surface px-3 text-sm text-ink focus:border-royal-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-royal-100";
 const primaryButtonClass =
-  "h-11 cursor-pointer rounded-lg bg-royal-700 px-4 text-sm font-medium text-white transition hover:bg-royal-800 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
+  "h-11 cursor-pointer rounded-lg bg-royal-700 px-4 text-sm font-medium text-white transition-colors duration-200 ease-out hover:bg-royal-800 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600";
 
 export default function NewVendorPage() {
   const [state, formAction, pending] = useActionState(createVendor, { status: "idle" as const });
 
   return (
     <div className="flex flex-col gap-6">
-      <Link href="/admin" className="text-sm text-ink-muted hover:text-royal-700">
+      <Link href="/admin" className="text-sm text-ink-muted transition-colors duration-200 ease-out hover:text-ink">
         ← Back to pipeline
       </Link>
-      <h1 className="text-2xl font-semibold text-royal-700">New vendor</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-ink">New vendor</h1>
       <form action={formAction} className="flex max-w-md flex-col gap-4">
         <label className="flex flex-col gap-1 text-sm text-ink-muted">
           Name

@@ -40,8 +40,8 @@ export function SpecialitySelector({
             return (
               <label
                 key={opt.id}
-                className={`flex h-9 cursor-pointer items-center rounded-full border px-3 text-xs transition ${
-                  isChecked ? "border-royal-600 bg-royal-700 text-white" : "border-border bg-surface text-ink hover:border-gold-500"
+                className={`flex h-9 cursor-pointer items-center rounded-full border px-3 text-xs transition-colors duration-200 ease-out ${
+                  isChecked ? "border-royal-600 bg-royal-700 text-white" : "border-border bg-surface text-ink hover:border-royal-600"
                 } ${disabled ? "cursor-not-allowed opacity-40 hover:border-border" : ""}`}
               >
                 <input
@@ -60,7 +60,7 @@ export function SpecialitySelector({
         </div>
         <button
           type="submit"
-          className="h-9 w-fit cursor-pointer rounded-lg border border-royal-600 px-3 text-xs font-medium text-royal-700 transition hover:bg-royal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+          className="h-9 w-fit cursor-pointer rounded-lg border border-royal-600 px-3 text-xs font-medium text-royal-700 transition-colors duration-200 ease-out hover:bg-royal-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
         >
           Save
         </button>
@@ -76,7 +76,7 @@ export function SpecialitySelector({
         </label>
         <button
           type="submit"
-          className="h-9 cursor-pointer rounded-lg border border-border px-3 text-xs font-medium text-ink transition hover:border-gold-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+          className="h-9 cursor-pointer rounded-lg border border-border px-3 text-xs font-medium text-ink transition-colors duration-200 ease-out hover:border-royal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
         >
           Add
         </button>

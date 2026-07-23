@@ -4,9 +4,17 @@ import { useActionState } from "react";
 import Image from "next/image";
 import type { UploadState } from "@/lib/admin/actions";
 
+function initialsOf(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
 export function LogoUploadForm({
   action,
   currentUrl,
+  vendorName,
   fieldName = "logo",
   label = "logo",
   alt = "Vendor logo",
@@ -14,6 +22,7 @@ export function LogoUploadForm({
 }: {
   action: (prevState: UploadState, formData: FormData) => Promise<UploadState>;
   currentUrl: string | null;
+  vendorName: string;
   fieldName?: string;
   label?: string;
   alt?: string;
@@ -28,8 +37,11 @@ export function LogoUploadForm({
         {currentUrl ? (
           <Image src={currentUrl} alt={alt} width={64} height={64} className={`h-16 w-16 ${shape} border border-border object-cover`} />
         ) : (
-          <div className={`flex h-16 w-16 items-center justify-center ${shape} border border-dashed border-border text-xs text-ink-muted`}>
-            No {label}
+          <div
+            className={`flex h-16 w-16 items-center justify-center ${shape} bg-gradient-to-br from-royal-600 to-royal-800 text-sm font-semibold text-cream-50`}
+            aria-hidden
+          >
+            {initialsOf(vendorName)}
           </div>
         )}
         <form action={formAction} className="flex items-end gap-2">

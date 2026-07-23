@@ -4,7 +4,7 @@ import { isAdminSessionValid } from "@/lib/admin/auth";
 import { logoutAction } from "@/lib/admin/auth-actions";
 
 const navLinkClass =
-  "rounded-sm text-royal-100 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  "rounded-sm text-cream-50/70 transition-colors duration-200 ease-out hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   if (!(await isAdminSessionValid())) {
@@ -13,10 +13,10 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
 
   return (
     <div className="flex min-h-screen flex-col bg-ivory">
-      <header className="bg-royal-700">
+      <header className="bg-charcoal-900">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-3">
           <div className="flex flex-wrap items-center gap-6">
-            <span className="text-lg font-semibold text-white">Catering Admin</span>
+            <span className="text-lg font-semibold tracking-tight text-white">Catering Admin</span>
             <nav className="flex items-center gap-4 text-sm">
               <Link href="/admin" className={navLinkClass}>
                 Pipeline

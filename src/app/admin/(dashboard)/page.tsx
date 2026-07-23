@@ -6,11 +6,15 @@ import { StatusSelect } from "@/components/StatusSelect";
 
 const PAGE_SIZE = 25;
 
+// Status badges are functional/semantic, not brand ornamentation, so they keep a
+// distinguishing palette instead of collapsing to the one restrained accent - an
+// admin scanning the pipeline needs contacted/onboarding/priced to read as
+// different states, not identical badges.
 const STATUS_STYLES: Record<VendorPipelineRow["status"], string> = {
   sourced: "bg-neutral-100 text-neutral-600",
-  contacted: "bg-royal-100 text-royal-700",
+  contacted: "bg-neutral-200 text-neutral-700",
   onboarding: "bg-royal-100 text-royal-700",
-  priced: "bg-gold-100 text-gold-600",
+  priced: "bg-amber-100 text-amber-700",
   live: "bg-green-100 text-green-700",
   paused: "bg-neutral-100 text-neutral-500",
 };
@@ -39,19 +43,19 @@ export default async function AdminPipelinePage({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-royal-700">Vendor pipeline</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">Vendor pipeline</h1>
         <div className="flex items-center gap-3">
           <p className="text-sm text-ink-muted">{total} vendors</p>
           <Link
             href="/admin/vendors/new"
-            className="h-9 flex items-center rounded-lg bg-royal-700 px-3 text-xs font-medium text-white transition hover:bg-royal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+            className="h-9 flex items-center rounded-lg bg-royal-700 px-3 text-xs font-medium text-white transition-colors duration-200 ease-out hover:bg-royal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
           >
             + New vendor
           </Link>
           <form action={deleteAllDemoVendors}>
             <ConfirmSubmitButton
               confirmMessage="Delete all demo vendors? This cannot be undone."
-              className="h-9 cursor-pointer rounded-lg border border-red-200 px-3 text-xs font-medium text-red-600 transition hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+              className="h-9 cursor-pointer rounded-lg border border-red-200 px-3 text-xs font-medium text-red-600 transition-colors duration-200 ease-out hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
             >
               Delete all demo vendors
             </ConfirmSubmitButton>
@@ -60,7 +64,7 @@ export default async function AdminPipelinePage({
       </div>
 
       {blocked && (
-        <div className="rounded-xl border border-gold-500 bg-gold-100 px-4 py-3 text-sm text-ink">
+        <div className="rounded-2xl border border-gold-500/40 bg-gold-100 px-4 py-3 text-sm text-ink">
           Can&apos;t mark <span className="font-semibold">{blocked}</span> as live — missing {missing}.
         </div>
       )}
@@ -92,13 +96,13 @@ export default async function AdminPipelinePage({
         </label>
         <button
           type="submit"
-          className="h-11 cursor-pointer rounded-lg bg-royal-700 px-4 text-sm font-medium text-white transition hover:bg-royal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+          className="h-11 cursor-pointer rounded-lg bg-royal-700 px-4 text-sm font-medium text-white transition-colors duration-200 ease-out hover:bg-royal-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
         >
           Filter
         </button>
       </form>
 
-      <div className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-card">
+      <div className="overflow-x-auto rounded-3xl border border-border bg-surface shadow-card">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-border text-ink-muted">
@@ -120,7 +124,7 @@ export default async function AdminPipelinePage({
                     {vendor.name}
                   </Link>
                   {vendor.is_demo && (
-                    <span className="ml-2 rounded-full bg-gold-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-gold-600">
+                    <span className="ml-2 rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium uppercase text-neutral-600">
                       Demo
                     </span>
                   )}
@@ -152,7 +156,7 @@ export default async function AdminPipelinePage({
                     <form action={deleteVendor.bind(null, vendor.id, returnTo)}>
                       <ConfirmSubmitButton
                         confirmMessage={`Delete ${vendor.name}? This cannot be undone.`}
-                        className="h-9 cursor-pointer rounded-lg border border-red-200 px-2 text-xs font-medium text-red-600 transition hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+                        className="h-9 cursor-pointer rounded-lg border border-red-200 px-2 text-xs font-medium text-red-600 transition-colors duration-200 ease-out hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
                       >
                         Delete
                       </ConfirmSubmitButton>
@@ -173,7 +177,7 @@ export default async function AdminPipelinePage({
           {page > 1 && (
             <Link
               href={`/admin${buildQuery({ status, q, page: String(page - 1) })}`}
-              className="rounded-lg border border-border px-3 py-1.5 hover:border-gold-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+              className="rounded-lg border border-border px-3 py-1.5 transition-colors duration-200 ease-out hover:border-royal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
             >
               Previous
             </Link>
@@ -181,7 +185,7 @@ export default async function AdminPipelinePage({
           {page < totalPages && (
             <Link
               href={`/admin${buildQuery({ status, q, page: String(page + 1) })}`}
-              className="rounded-lg border border-border px-3 py-1.5 hover:border-gold-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+              className="rounded-lg border border-border px-3 py-1.5 transition-colors duration-200 ease-out hover:border-royal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
             >
               Next
             </Link>

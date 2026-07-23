@@ -16,21 +16,21 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(160deg, #1c1420 0%, #2a1f2e 100%)",
+          background: "linear-gradient(160deg, #1d1d1f 0%, #2c2c2e 100%)",
         }}
       >
         <div
           style={{
             fontSize: 140,
-            fontFamily: "serif",
+            fontFamily: "sans-serif",
             fontWeight: 700,
-            color: "#f3ead9",
-            letterSpacing: -2,
+            color: "#f5f5f7",
+            letterSpacing: -4,
           }}
         >
           Rajani
         </div>
-        <div style={{ fontSize: 32, color: "#c9a227", marginTop: 16 }}>
+        <div style={{ fontSize: 32, color: "#0071e3", marginTop: 16 }}>
           Hyderabad caterers, real prices upfront
         </div>
       </div>

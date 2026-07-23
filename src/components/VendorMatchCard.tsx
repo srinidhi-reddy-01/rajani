@@ -27,7 +27,7 @@ export function VendorMatchCard({
     <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.18, ease: "easeOut" }}>
       <Link
         href={href}
-        className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-card transition-shadow duration-200 hover:shadow-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+        className="group flex cursor-pointer flex-col overflow-hidden rounded-3xl border border-border bg-surface shadow-card transition-shadow duration-200 hover:shadow-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
       >
         <div className="relative h-40 w-full">
           <Image
@@ -54,7 +54,7 @@ export function VendorMatchCard({
         <div className="flex flex-col gap-3 p-5 pt-9">
           <div>
             <div className="flex items-center gap-1.5">
-              <h3 className="font-serif text-lg font-semibold text-ink group-hover:text-royal-700">{vendor.name}</h3>
+              <h3 className="text-lg font-semibold tracking-tight text-ink">{vendor.name}</h3>
               {vendor.is_verified && (
                 <span
                   title="Personally verified by the Rajani team"
@@ -78,18 +78,18 @@ export function VendorMatchCard({
 
           <div className="flex flex-wrap gap-1.5">
             {vendor.cuisine_specialities.map((tag) => (
-              <span key={tag} className="rounded-full bg-royal-100 px-2 py-0.5 text-xs text-royal-700">
+              <span key={tag} className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">
                 {tag}
               </span>
             ))}
             {budgetLabel && (
-              <span className="rounded-full bg-gold-100 px-2 py-0.5 text-xs text-gold-600">
+              <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">
                 {budgetLabel === "above" ? "Above your budget" : "Below your budget"}
               </span>
             )}
           </div>
 
-          <p className="border-t border-gold-100 pt-3 text-base font-semibold text-gold-600">
+          <p className="border-t border-border pt-3 text-base font-semibold text-gold-600">
             Packages from {formatInr(fromPrice)}/plate <span className="font-normal text-ink-muted">at your {plates} plates</span>
           </p>
         </div>

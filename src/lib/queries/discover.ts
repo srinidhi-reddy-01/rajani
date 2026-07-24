@@ -10,7 +10,7 @@ export async function getLiveVendorsWithPackages(): Promise<DiscoverableVendor[]
   const { data, error } = await supabase
     .from("vendors")
     .select(
-      "id, name, slug, area, gbp_rating, gbp_rating_count, cuisine_specialities, cover_image_url, owner_photo_url, logo_url, events_completed, is_verified, packages(*)"
+      "id, name, slug, area, gbp_rating, gbp_rating_count, cuisine_specialities, event_specialities, cover_image_url, owner_photo_url, logo_url, events_completed, is_verified, packages(*)"
     )
     .eq("status", "live")
     .returns<VendorWithPackagesRow[]>();

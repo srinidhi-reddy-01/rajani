@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Cuisine, EventType } from "@/lib/types/database";
-import type { DiscoverableVendor } from "@/lib/matching";
+import type { DiscoverableVendor, MatchedVendor } from "@/lib/matching";
 import { matchVendors } from "@/lib/matching";
 import { VendorMatchCard } from "@/components/VendorMatchCard";
 import { MatchMeForm } from "@/components/MatchMeForm";
@@ -20,6 +20,49 @@ const chipActive = "border-royal-600 bg-royal-700 text-cream-50";
 function todayIso(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// Renders a vendor grid that's already sorted matches-first (see matchVendors);
+// when a cuisine/event-type filter is active and the group actually contains a
+// mix, splits it visually at the true->false boundary with a quiet divider -
+// the non-matching vendors are never hidden, just deprioritised.
+function VendorFilterGroup({
+  vendors,
+  plates,
+  contextQuery,
+  hasSoftFilter,
+}: {
+  vendors: (MatchedVendor & { budgetLabel?: "above" | "below" })[];
+  plates: number;
+  contextQuery: string;
+  hasSoftFilter: boolean;
+}) {
+  const primary = hasSoftFilter ? vendors.filter((v) => v.matchesFilters) : vendors;
+  const secondary = hasSoftFilter ? vendors.filter((v) => !v.matchesFilters) : [];
+
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {primary.map((vendor) => (
+          <VendorMatchCard key={vendor.id} vendor={vendor} plates={plates} budgetLabel={vendor.budgetLabel} contextQuery={contextQuery} />
+        ))}
+      </div>
+      {secondary.length > 0 && (
+        <>
+          <div className="flex items-center gap-3 text-xs text-ink-muted">
+            <span className="h-px flex-1 bg-border" />
+            Also available
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {secondary.map((vendor) => (
+              <VendorMatchCard key={vendor.id} vendor={vendor} plates={plates} budgetLabel={vendor.budgetLabel} contextQuery={contextQuery} />
+            ))}
+          </div>
+        </>
+      )}
+    </>
+  );
 }
 
 export function DiscoveryClient({
@@ -43,10 +86,11 @@ export function DiscoveryClient({
       matchVendors(vendors, {
         plates,
         cuisines: selectedCuisines,
+        eventTypes: selectedEventTypes,
         budgetPp: budgetPp === "" ? null : budgetPp,
         sort,
       }),
-    [vendors, plates, selectedCuisines, budgetPp, sort]
+    [vendors, plates, selectedCuisines, selectedEventTypes, budgetPp, sort]
   );
 
   const contextQuery = new URLSearchParams({
@@ -57,6 +101,17 @@ export function DiscoveryClient({
     ...(selectedEventTypes.length > 0 ? { eventType: selectedEventTypes.join(", ") } : {}),
   }).toString();
 
+  const hasSoftFilter = selectedCuisines.length > 0 || selectedEventTypes.length > 0;
+  const hasActiveFilters = hasSoftFilter || budgetPp !== "" || eventDate !== "" || sort !== "match";
+
+  function clearAllFilters() {
+    setSelectedCuisines([]);
+    setSelectedEventTypes([]);
+    setBudgetPp("");
+    setEventDate("");
+    setSort("match");
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -64,9 +119,18 @@ export function DiscoveryClient({
         <p className="mt-1 text-sm text-ink-muted">All filters are optional — adjust anything to see prices update live.</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <MultiSelectDropdown label="Event type" options={eventTypes} selected={selectedEventTypes} onChange={setSelectedEventTypes} className="w-44" />
         <MultiSelectDropdown label="Cuisine" options={cuisines} selected={selectedCuisines} onChange={setSelectedCuisines} className="w-44" />
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearAllFilters}
+            className="h-11 cursor-pointer rounded-lg px-3 text-sm font-medium text-ink-muted underline-offset-2 transition-colors duration-200 ease-out hover:text-ink hover:underline"
+          >
+            Clear all filters
+          </button>
+        )}
       </div>
 
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
@@ -149,22 +213,14 @@ export function DiscoveryClient({
           {matched.length > 0 && (
             <section className="flex flex-col gap-4">
               {budgetPp !== "" && sort === "match" && <h2 className="text-sm font-medium text-ink-muted">Within your budget</h2>}
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {matched.map((vendor) => (
-                  <VendorMatchCard key={vendor.id} vendor={vendor} plates={plates} contextQuery={contextQuery} />
-                ))}
-              </div>
+              <VendorFilterGroup vendors={matched} plates={plates} contextQuery={contextQuery} hasSoftFilter={hasSoftFilter} />
             </section>
           )}
 
           {others.length > 0 && (
             <section className="flex flex-col gap-4">
               <h2 className="text-sm font-medium text-ink-muted">More options</h2>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {others.map((vendor) => (
-                  <VendorMatchCard key={vendor.id} vendor={vendor} plates={plates} budgetLabel={vendor.budgetLabel} contextQuery={contextQuery} />
-                ))}
-              </div>
+              <VendorFilterGroup vendors={others} plates={plates} contextQuery={contextQuery} hasSoftFilter={hasSoftFilter} />
             </section>
           )}
         </>

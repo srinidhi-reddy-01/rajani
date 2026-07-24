@@ -13,6 +13,7 @@ export type DiscoverableVendor = Pick<
   | "gbp_rating"
   | "gbp_rating_count"
   | "cuisine_specialities"
+  | "event_specialities"
   | "cover_image_url"
   | "owner_photo_url"
   | "logo_url"
@@ -22,11 +23,20 @@ export type DiscoverableVendor = Pick<
   packages: Package[];
 };
 
-export type MatchedVendor = Omit<DiscoverableVendor, "packages"> & { packages: PricedPackage[]; lowestPackagePrice: number };
+export type MatchedVendor = Omit<DiscoverableVendor, "packages"> & {
+  packages: PricedPackage[];
+  lowestPackagePrice: number;
+  // Whether this vendor satisfies at least one active soft filter (cuisine or
+  // event type). Always true when no soft filter is selected. Vendors are always
+  // sorted with matches first within whichever list they land in, so the UI can
+  // find the flip from true->false to place an "Also available" divider.
+  matchesFilters: boolean;
+};
 
 export type MatchCriteria = {
   plates: number;
   cuisines?: string[];
+  eventTypes?: string[];
   budgetPp?: number | null;
   sort?: "match" | "price";
 };
@@ -38,7 +48,25 @@ export type MatchResult = {
 
 const BUDGET_BAND_TOLERANCE = 0.1;
 
+// Soft filter, not a hard one: most caterers can serve any event, so a vendor
+// that doesn't declare the selected cuisine/event type still shows - it just
+// ranks below the ones that do, under a divider. Matches on cuisine OR event
+// type (whichever filters are active), never both required at once.
+function matchesSoftFilters(
+  v: Pick<DiscoverableVendor, "cuisine_specialities" | "event_specialities">,
+  selectedCuisines: string[],
+  selectedEventTypes: string[]
+): boolean {
+  if (selectedCuisines.length === 0 && selectedEventTypes.length === 0) return true;
+  const cuisineMatch = selectedCuisines.length > 0 && v.cuisine_specialities.some((c) => selectedCuisines.includes(c));
+  const eventMatch = selectedEventTypes.length > 0 && v.event_specialities.some((e) => selectedEventTypes.includes(e));
+  return cuisineMatch || eventMatch;
+}
+
 export function matchVendors(vendors: DiscoverableVendor[], criteria: MatchCriteria): MatchResult {
+  const selectedCuisines = criteria.cuisines ?? [];
+  const selectedEventTypes = criteria.eventTypes ?? [];
+
   const candidates: MatchedVendor[] = vendors
     .map((v) => {
       // Unpriced packages ("priced later" is a real onboarding state - see 0012
@@ -49,25 +77,29 @@ export function matchVendors(vendors: DiscoverableVendor[], criteria: MatchCrite
       );
       if (activePackages.length === 0) return null;
       const lowestPackagePrice = Math.min(...activePackages.map((p) => quotePerPlate(p.base_price_pp, criteria.plates)));
-      return { ...v, packages: activePackages, lowestPackagePrice };
+      return {
+        ...v,
+        packages: activePackages,
+        lowestPackagePrice,
+        matchesFilters: matchesSoftFilters(v, selectedCuisines, selectedEventTypes),
+      };
     })
     .filter((v): v is MatchedVendor => v !== null);
 
-  const selectedCuisines = criteria.cuisines ?? [];
-  const matchesCuisine = (v: MatchedVendor): boolean =>
-    selectedCuisines.length === 0 || v.cuisine_specialities.some((c) => selectedCuisines.includes(c));
-
-  const byCuisineThenPrice = (a: MatchedVendor, b: MatchedVendor): number => {
-    const cuisineDelta = Number(matchesCuisine(b)) - Number(matchesCuisine(a));
-    return cuisineDelta !== 0 ? cuisineDelta : a.lowestPackagePrice - b.lowestPackagePrice;
+  const byFilterMatchThenPrice = (a: MatchedVendor, b: MatchedVendor): number => {
+    const filterDelta = Number(b.matchesFilters) - Number(a.matchesFilters);
+    return filterDelta !== 0 ? filterDelta : a.lowestPackagePrice - b.lowestPackagePrice;
   };
 
+  // "Price: low to high" is an explicit user override of ranking - it still
+  // respects the soft filter (matches first) but ignores the budget band
+  // grouping entirely, unlike "match" mode below.
   if (criteria.sort === "price") {
-    return { matched: [...candidates].sort((a, b) => a.lowestPackagePrice - b.lowestPackagePrice), others: [] };
+    return { matched: [...candidates].sort(byFilterMatchThenPrice), others: [] };
   }
 
   if (!criteria.budgetPp) {
-    return { matched: [...candidates].sort(byCuisineThenPrice), others: [] };
+    return { matched: [...candidates].sort(byFilterMatchThenPrice), others: [] };
   }
 
   const bandMin = criteria.budgetPp * (1 - BUDGET_BAND_TOLERANCE);
@@ -84,8 +116,8 @@ export function matchVendors(vendors: DiscoverableVendor[], criteria: MatchCrite
     }
   }
 
-  matched.sort(byCuisineThenPrice);
-  others.sort(byCuisineThenPrice);
+  matched.sort(byFilterMatchThenPrice);
+  others.sort(byFilterMatchThenPrice);
 
   return { matched, others };
 }

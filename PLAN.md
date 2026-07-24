@@ -25,13 +25,18 @@ plate-count updates. Please confirm with the caterer for final booking."*
    default 500), budget, event date, and sort stay as icon-led chips in that row.
    Every filter is optional. Live vendors rank by their lowest active package
    price against a ±10% budget band: in-band first, others below labeled
-   "above"/"below your budget" - never an empty screen. Cuisine preference is a
-   soft ranking signal, not a hard filter, same reasoning. Cards show a circular
-   owner photo overlapping the cover image (falls back to the vendor's logo, then
-   a gradient initials badge - never an empty box), a green Verified badge (when
-   personally vetted), events completed, Google rating, locality, cuisine chips,
-   and "Packages from ₹X/plate at your Y plates" - never a loose dish price. The
-   same distinct "Too busy to browse?" band repeats at the bottom.
+   "above"/"below your budget" - never an empty screen. Cuisine and event-type
+   preference are soft ranking signals, not hard filters, same reasoning: a
+   vendor matching neither still shows, just below a subtle "Also available"
+   divider within whichever budget group it landed in (matches on cuisine OR
+   event type, not both required). A "Clear all filters" link appears once any
+   filter (cuisine, event type, budget, date, or sort) is active. Cards show a
+   circular owner photo overlapping the cover image (falls back to the vendor's
+   logo, then a gradient initials badge - never an empty box), a green Verified
+   badge (when personally vetted), events completed, Google rating, locality,
+   cuisine chips, and "Packages from ₹X/plate at your Y plates" - never a loose
+   dish price. The same distinct "Too busy to browse?" band repeats at the
+   bottom.
 3. **Vendor profile**: hero cover photo, "Serving since {year}", Google rating,
    description, gallery ("Presentation"), testimonials ("What hosts say" -
    admin-uploaded WhatsApp screenshots), a ₹1000-off-your-booking-value banner,

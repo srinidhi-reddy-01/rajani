@@ -20,17 +20,17 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rajani.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Rajani — Hyderabad caterers, real prices upfront",
+  title: "Āgata — Hyderabad caterers, real prices upfront",
   description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
   openGraph: {
-    title: "Rajani — Hyderabad caterers, real prices upfront",
+    title: "Āgata — Hyderabad caterers, real prices upfront",
     description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
-    siteName: "Rajani",
+    siteName: "Āgata",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rajani — Hyderabad caterers, real prices upfront",
+    title: "Āgata — Hyderabad caterers, real prices upfront",
     description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
   },
 };
@@ -49,7 +49,7 @@ export default function RootLayout({
               href="/"
               className="rounded-sm text-xl font-semibold tracking-tight text-charcoal-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
             >
-              Rajani
+              Āgata
             </Link>
           </div>
         </header>

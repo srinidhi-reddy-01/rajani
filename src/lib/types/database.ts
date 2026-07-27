@@ -182,6 +182,12 @@ export type MatchRequest = {
   created_at: string;
 };
 
+export type SiteSettings = {
+  id: number;
+  fallback_cover_image_url: string | null;
+  updated_at: string;
+};
+
 // Minimal shape so the supabase-js client is typed; extend as more tables are queried.
 // `Relationships: []` on every table (and Views/Functions below) is required to satisfy
 // supabase-js's GenericSchema constraint - omitting them silently degrades insert/update
@@ -209,6 +215,7 @@ export type Database = {
       event_types: Table<EventType>;
       match_requests: Table<MatchRequest>;
       vendor_media: Table<VendorMedia>;
+      site_settings: Table<SiteSettings>;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

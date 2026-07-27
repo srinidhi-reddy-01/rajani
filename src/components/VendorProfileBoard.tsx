@@ -43,7 +43,15 @@ function AnimatedPrice({ amount, suffix }: { amount: number; suffix?: string }) 
   );
 }
 
-export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorProfile; guidedContext: GuidedContext }) {
+export function VendorProfileBoard({
+  vendor,
+  guidedContext,
+  fallbackCoverImageUrl,
+}: {
+  vendor: VendorProfile;
+  guidedContext: GuidedContext;
+  fallbackCoverImageUrl: string | null;
+}) {
   const [plates, setPlates] = useState(guidedContext.plates);
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(
     vendor.packages.find((p) => p.is_default)?.id ?? vendor.packages[0]?.id ?? null
@@ -92,7 +100,7 @@ export function VendorProfileBoard({ vendor, guidedContext }: { vendor: VendorPr
     <div className="flex flex-col gap-8 pb-32">
       <div className="relative h-64 w-full sm:h-80">
         <Image
-          src={vendorCoverImage(vendor.id, vendor.cover_image_url)}
+          src={vendorCoverImage(vendor.id, vendor.cover_image_url, fallbackCoverImageUrl)}
           alt=""
           fill
           priority

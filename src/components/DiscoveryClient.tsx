@@ -31,11 +31,13 @@ function VendorFilterGroup({
   plates,
   contextQuery,
   hasSoftFilter,
+  fallbackCoverImageUrl,
 }: {
   vendors: (MatchedVendor & { budgetLabel?: "above" | "below" })[];
   plates: number;
   contextQuery: string;
   hasSoftFilter: boolean;
+  fallbackCoverImageUrl: string | null;
 }) {
   const primary = hasSoftFilter ? vendors.filter((v) => v.matchesFilters) : vendors;
   const secondary = hasSoftFilter ? vendors.filter((v) => !v.matchesFilters) : [];
@@ -44,7 +46,14 @@ function VendorFilterGroup({
     <>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {primary.map((vendor) => (
-          <VendorMatchCard key={vendor.id} vendor={vendor} plates={plates} budgetLabel={vendor.budgetLabel} contextQuery={contextQuery} />
+          <VendorMatchCard
+            key={vendor.id}
+            vendor={vendor}
+            plates={plates}
+            budgetLabel={vendor.budgetLabel}
+            contextQuery={contextQuery}
+            fallbackCoverImageUrl={fallbackCoverImageUrl}
+          />
         ))}
       </div>
       {secondary.length > 0 && (
@@ -56,7 +65,14 @@ function VendorFilterGroup({
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {secondary.map((vendor) => (
-              <VendorMatchCard key={vendor.id} vendor={vendor} plates={plates} budgetLabel={vendor.budgetLabel} contextQuery={contextQuery} />
+              <VendorMatchCard
+                key={vendor.id}
+                vendor={vendor}
+                plates={plates}
+                budgetLabel={vendor.budgetLabel}
+                contextQuery={contextQuery}
+                fallbackCoverImageUrl={fallbackCoverImageUrl}
+              />
             ))}
           </div>
         </>
@@ -69,10 +85,12 @@ export function DiscoveryClient({
   vendors,
   cuisines,
   eventTypes,
+  fallbackCoverImageUrl,
 }: {
   vendors: DiscoverableVendor[];
   cuisines: Cuisine[];
   eventTypes: EventType[];
+  fallbackCoverImageUrl: string | null;
 }) {
   const [plates, setPlates] = useState(500);
   const [budgetPp, setBudgetPp] = useState<number | "">("");
@@ -213,14 +231,26 @@ export function DiscoveryClient({
           {matched.length > 0 && (
             <section className="flex flex-col gap-4">
               {budgetPp !== "" && sort === "match" && <h2 className="text-sm font-medium text-ink-muted">Within your budget</h2>}
-              <VendorFilterGroup vendors={matched} plates={plates} contextQuery={contextQuery} hasSoftFilter={hasSoftFilter} />
+              <VendorFilterGroup
+                vendors={matched}
+                plates={plates}
+                contextQuery={contextQuery}
+                hasSoftFilter={hasSoftFilter}
+                fallbackCoverImageUrl={fallbackCoverImageUrl}
+              />
             </section>
           )}
 
           {others.length > 0 && (
             <section className="flex flex-col gap-4">
               <h2 className="text-sm font-medium text-ink-muted">More options</h2>
-              <VendorFilterGroup vendors={others} plates={plates} contextQuery={contextQuery} hasSoftFilter={hasSoftFilter} />
+              <VendorFilterGroup
+                vendors={others}
+                plates={plates}
+                contextQuery={contextQuery}
+                hasSoftFilter={hasSoftFilter}
+                fallbackCoverImageUrl={fallbackCoverImageUrl}
+              />
             </section>
           )}
         </>

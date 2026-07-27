@@ -20,7 +20,10 @@ function hashString(input: string): number {
   return Math.abs(hash);
 }
 
-export function vendorCoverImage(vendorId: string, coverImageUrl: string | null): string {
+// `siteFallbackUrl` is the admin-configured override (site_settings.fallback_cover_image_url);
+// when set it replaces the curated Unsplash pool entirely rather than being added to it.
+export function vendorCoverImage(vendorId: string, coverImageUrl: string | null, siteFallbackUrl?: string | null): string {
   if (coverImageUrl) return coverImageUrl;
+  if (siteFallbackUrl) return siteFallbackUrl;
   return FALLBACK_FOOD_IMAGES[hashString(vendorId) % FALLBACK_FOOD_IMAGES.length];
 }

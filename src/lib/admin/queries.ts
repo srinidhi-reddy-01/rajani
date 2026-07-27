@@ -10,6 +10,7 @@ import type {
   Package,
   PackageSlot,
   PackageSlotItem,
+  SiteSettings,
   TastingRequest,
   Vendor,
   VendorMedia,
@@ -181,4 +182,10 @@ export async function listMatchRequests(status?: string): Promise<MatchRequest[]
   const { data, error } = await query.returns<MatchRequest[]>();
   if (error) throw error;
   return data ?? [];
+}
+
+export async function getSiteSettings(): Promise<SiteSettings> {
+  const { data, error } = await supabaseAdmin.from("site_settings").select("*").eq("id", 1).single();
+  if (error) throw error;
+  return data;
 }

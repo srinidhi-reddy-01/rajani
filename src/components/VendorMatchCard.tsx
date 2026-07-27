@@ -13,11 +13,13 @@ export function VendorMatchCard({
   plates,
   budgetLabel,
   contextQuery,
+  fallbackCoverImageUrl,
 }: {
   vendor: MatchedVendor;
   plates: number;
   budgetLabel?: "above" | "below";
   contextQuery?: string;
+  fallbackCoverImageUrl?: string | null;
 }) {
   const cheapestPackage = [...vendor.packages].sort((a, b) => a.base_price_pp - b.base_price_pp)[0];
   const fromPrice = quotePerPlate(cheapestPackage.base_price_pp, plates);
@@ -31,7 +33,7 @@ export function VendorMatchCard({
       >
         <div className="relative h-40 w-full">
           <Image
-            src={vendorCoverImage(vendor.id, vendor.cover_image_url)}
+            src={vendorCoverImage(vendor.id, vendor.cover_image_url, fallbackCoverImageUrl)}
             alt=""
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
@@ -57,9 +59,9 @@ export function VendorMatchCard({
               <h3 className="text-lg font-semibold tracking-tight text-ink">{vendor.name}</h3>
               {vendor.is_verified && (
                 <span
-                  title="Personally verified by the Rajani team"
+                  title="Personally verified by the Āgata team"
                   className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[10px] text-cream-50"
-                  aria-label="Verified: personally verified by the Rajani team"
+                  aria-label="Verified: personally verified by the Āgata team"
                 >
                   ✓
                 </span>

@@ -177,6 +177,30 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
             <input type="number" min={0} name="events_completed" defaultValue={vendor.events_completed} className={inputClass} />
           </label>
           <label className="flex flex-col gap-1 text-sm text-ink-muted">
+            Google rating (0–5)
+            <input
+              type="number"
+              min={0}
+              max={5}
+              step="0.1"
+              name="gbp_rating"
+              placeholder="Not set"
+              defaultValue={vendor.gbp_rating ?? ""}
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-ink-muted">
+            Google rating count
+            <input
+              type="number"
+              min={0}
+              name="gbp_rating_count"
+              placeholder="Not set"
+              defaultValue={vendor.gbp_rating_count ?? ""}
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-ink-muted">
             Pricing model
             <select name="pricing_model" defaultValue={vendor.pricing_model} className={inputClass}>
               <option value="flexible">flexible</option>

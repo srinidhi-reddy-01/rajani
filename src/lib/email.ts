@@ -5,7 +5,7 @@ import { formatInr } from "@/lib/pricing";
 import type { PackageItemSelection } from "@/lib/types/database";
 
 const NOTIFY_TO = "kallusrinidhireddy@gmail.com";
-const FROM = "Rajani <onboarding@resend.dev>";
+const FROM = "Āgata <onboarding@resend.dev>";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 

@@ -125,6 +125,8 @@ export async function updateVendorProfile(vendorId: string, formData: FormData):
       established_year: formData.get("established_year") ? Number(formData.get("established_year")) : null,
       description: String(formData.get("description") ?? "").trim() || null,
       events_completed: formData.get("events_completed") ? Number(formData.get("events_completed")) : 0,
+      gbp_rating: formData.get("gbp_rating") ? Number(formData.get("gbp_rating")) : null,
+      gbp_rating_count: formData.get("gbp_rating_count") ? Number(formData.get("gbp_rating_count")) : null,
       is_verified: formData.get("is_verified") === "on",
       serviceable_everywhere: formData.get("serviceable_everywhere") === "on",
       pricing_model: String(formData.get("pricing_model") ?? "flexible") as "final" | "flexible",
@@ -752,4 +754,45 @@ export async function updateMatchRequestStatus(matchRequestId: string, formData:
   if (error) throw error;
 
   revalidatePath("/admin/match-requests");
+}
+
+// ---------- Site settings ----------
+
+function revalidateSiteSettings(): void {
+  revalidatePath("/admin/settings");
+  revalidatePath("/discover");
+  revalidatePath("/vendors/[slug]", "page");
+}
+
+export async function uploadFallbackCoverImage(_prevState: UploadState, formData: FormData): Promise<UploadState> {
+  await assertAdminSession();
+  const file = formData.get("fallback_image");
+  if (!(file instanceof File) || file.size === 0) {
+    return { status: "idle", error: "Choose an image file." };
+  }
+
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `site/fallback-cover-${randomUUID()}.${ext}`;
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from("vendor-media")
+    .upload(path, file, { contentType: file.type || "image/jpeg" });
+  if (uploadError) return { status: "idle", error: uploadError.message };
+
+  const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
+
+  const { error } = await supabaseAdmin
+    .from("site_settings")
+    .update({ fallback_cover_image_url: publicUrlData.publicUrl })
+    .eq("id", 1);
+  if (error) throw error;
+
+  revalidateSiteSettings();
+  return { status: "success" };
+}
+
+export async function clearFallbackCoverImage(): Promise<void> {
+  await assertAdminSession();
+  const { error } = await supabaseAdmin.from("site_settings").update({ fallback_cover_image_url: null }).eq("id", 1);
+  if (error) throw error;
+  revalidateSiteSettings();
 }

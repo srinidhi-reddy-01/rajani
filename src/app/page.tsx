@@ -57,7 +57,7 @@ export default async function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900 via-charcoal-900/80 to-charcoal-900/40" />
         <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-6">
           <FadeIn>
-            <h1 className="text-5xl font-semibold tracking-tight text-cream-50 sm:text-6xl">Rajani</h1>
+            <h1 className="text-5xl font-semibold tracking-tight text-cream-50 sm:text-6xl">Āgata</h1>
           </FadeIn>
           <FadeIn delay={0.08}>
             <p className="text-lg text-cream-50/80">
@@ -104,7 +104,7 @@ export default async function Home() {
             You enjoy the event. We&apos;ll handle the food.
           </h2>
           <p className="text-base text-cream-50/85 sm:text-lg">
-            Spend the day with your loved ones, not chasing the caterer. Every Rajani booking comes with a
+            Spend the day with your loved ones, not chasing the caterer. Every Āgata booking comes with a
             dedicated event manager for the day — and ₹1000 off your booking value.
           </p>
           <p className="text-xs text-cream-50/60">T&amp;C apply.</p>

@@ -28,7 +28,7 @@ export default async function Image() {
             letterSpacing: -4,
           }}
         >
-          Rajani
+          Āgata
         </div>
         <div style={{ fontSize: 32, color: "#0071e3", marginTop: 16 }}>
           Hyderabad caterers, real prices upfront

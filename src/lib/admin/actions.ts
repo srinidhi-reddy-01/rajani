@@ -646,6 +646,29 @@ export async function uploadVendorLogo(vendorId: string, _prevState: UploadState
   return { status: "success" };
 }
 
+export async function uploadVendorCoverImage(vendorId: string, _prevState: UploadState, formData: FormData): Promise<UploadState> {
+  await assertAdminSession();
+  const file = formData.get("cover_image");
+  if (!(file instanceof File) || file.size === 0) {
+    return { status: "idle", error: "Choose an image file." };
+  }
+
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${vendorId}/cover-${randomUUID()}.${ext}`;
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from("vendor-media")
+    .upload(path, file, { contentType: file.type || "image/jpeg" });
+  if (uploadError) return { status: "idle", error: uploadError.message };
+
+  const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
+
+  const { error } = await supabaseAdmin.from("vendors").update({ cover_image_url: publicUrlData.publicUrl }).eq("id", vendorId);
+  if (error) throw error;
+
+  revalidateVendor(vendorId);
+  return { status: "success" };
+}
+
 export async function uploadVendorOwnerPhoto(
   vendorId: string,
   _prevState: UploadState,

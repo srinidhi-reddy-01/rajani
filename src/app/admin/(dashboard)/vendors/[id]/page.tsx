@@ -27,6 +27,7 @@ import {
   updateVendorCuisines,
   updateVendorEventTypes,
   updateVendorProfile,
+  uploadVendorCoverImage,
   uploadVendorLogo,
   uploadVendorOwnerPhoto,
   uploadVendorMedia,
@@ -117,6 +118,17 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
 
       <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-5 shadow-card">
         <h2 className="text-lg font-semibold tracking-tight text-ink">Showcase</h2>
+        <LogoUploadForm
+          action={uploadVendorCoverImage.bind(null, vendor.id)}
+          currentUrl={vendor.cover_image_url}
+          vendorName={vendor.name}
+          fieldName="cover_image"
+          label="cover image"
+          alt="Cover image"
+        />
+        <p className="-mt-4 text-xs text-ink-muted">
+          Shown on discovery cards and the profile header. Leave unset to use the site-wide fallback (see Settings).
+        </p>
         <LogoUploadForm action={uploadVendorLogo.bind(null, vendor.id)} currentUrl={vendor.logo_url} vendorName={vendor.name} />
         <LogoUploadForm
           action={uploadVendorOwnerPhoto.bind(null, vendor.id)}

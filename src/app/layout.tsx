@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { getHomeContent } from "@/lib/queries/settings";
 import "./globals.css";
 
 // Web fallback only - the Apple-inspired font stack (see globals.css --font-sans)
@@ -18,28 +19,27 @@ const inter = Inter({
 // fallback keeps OG/Twitter URLs valid in the meantime.
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rajani.vercel.app";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: "Āgata — Hyderabad caterers, real prices upfront",
-  description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
-  openGraph: {
-    title: "Āgata — Hyderabad caterers, real prices upfront",
-    description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
-    siteName: "Āgata",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Āgata — Hyderabad caterers, real prices upfront",
-    description: "Find a Hyderabad caterer matched to your event, with real packages and prices.",
-  },
-};
+// Dynamic (was a static `const metadata`) so the admin-editable brand name (settings.home_content)
+// reaches the page title/OG/Twitter tags, not just the visible header link.
+export async function generateMetadata(): Promise<Metadata> {
+  const { brandName } = await getHomeContent();
+  const title = `${brandName} — Hyderabad caterers, real prices upfront`;
+  const description = "Find a Hyderabad caterer matched to your event, with real packages and prices.";
+  return {
+    metadataBase: new URL(siteUrl),
+    title,
+    description,
+    openGraph: { title, description, siteName: brandName, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { brandName } = await getHomeContent();
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-ivory font-sans text-ink">
@@ -49,7 +49,7 @@ export default function RootLayout({
               href="/"
               className="rounded-sm text-xl font-semibold tracking-tight text-charcoal-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
             >
-              Āgata
+              {brandName}
             </Link>
           </div>
         </header>

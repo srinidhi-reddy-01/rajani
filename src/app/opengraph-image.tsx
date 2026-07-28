@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { getHomeContent } from "@/lib/queries/settings";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -6,6 +7,7 @@ export const contentType = "image/png";
 // Default OG image for every non-vendor page (#19). Vendor pages override this with
 // their own cover photo via generateMetadata (see vendors/[slug]/page.tsx, #12).
 export default async function Image() {
+  const { brandName } = await getHomeContent();
   return new ImageResponse(
     (
       <div
@@ -28,7 +30,7 @@ export default async function Image() {
             letterSpacing: -4,
           }}
         >
-          Āgata
+          {brandName}
         </div>
         <div style={{ fontSize: 32, color: "#0071e3", marginTop: 16 }}>
           Hyderabad caterers, real prices upfront

@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { assertAdminSession } from "@/lib/admin/auth";
 import { ALL_VENDOR_STATUSES, STANDARD_MENU_CATEGORIES, computeGoLiveGate, getVendorDetail } from "@/lib/admin/queries";
-import type { Vendor } from "@/lib/types/database";
+import type { HomeContent, Vendor } from "@/lib/types/database";
 
 // Called after every vendor-data mutation so admin edits (packages, menu, trust
 // signals, media) show up on the public site without waiting for a redeploy.
@@ -767,8 +767,43 @@ export async function updateMatchRequestStatus(matchRequestId: string, formData:
 
 function revalidateSiteSettings(): void {
   revalidatePath("/admin/settings");
+  revalidatePath("/");
   revalidatePath("/discover");
   revalidatePath("/vendors/[slug]", "page");
+}
+
+function field(formData: FormData, name: string): string {
+  return String(formData.get(name) ?? "").trim();
+}
+
+export async function updateHomeContent(formData: FormData): Promise<void> {
+  await assertAdminSession();
+
+  const homeContent: HomeContent = {
+    brandName: field(formData, "brandName"),
+    heroSubtitle: field(formData, "heroSubtitle"),
+    heroCtaLabel: field(formData, "heroCtaLabel"),
+    worriesHeading: field(formData, "worriesHeading"),
+    worries: [
+      { title: field(formData, "worry0_title"), body: field(formData, "worry0_body") },
+      { title: field(formData, "worry1_title"), body: field(formData, "worry1_body") },
+      { title: field(formData, "worry2_title"), body: field(formData, "worry2_body") },
+    ],
+    section2Heading: field(formData, "section2Heading"),
+    section2Body: field(formData, "section2Body"),
+    section2Tc: field(formData, "section2Tc"),
+    section2CtaLabel: field(formData, "section2CtaLabel"),
+    features: [
+      { title: field(formData, "feature0_title"), body: field(formData, "feature0_body") },
+      { title: field(formData, "feature1_title"), body: field(formData, "feature1_body") },
+      { title: field(formData, "feature2_title"), body: field(formData, "feature2_body") },
+    ],
+  };
+
+  const { error } = await supabaseAdmin.from("site_settings").update({ home_content: homeContent }).eq("id", 1);
+  if (error) throw error;
+
+  revalidateSiteSettings();
 }
 
 export async function uploadFallbackCoverImage(_prevState: UploadState, formData: FormData): Promise<UploadState> {

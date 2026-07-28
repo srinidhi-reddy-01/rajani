@@ -184,9 +184,28 @@ export type MatchRequest = {
   created_at: string;
 };
 
+export type HomeContentBlock = { title: string; body: string };
+
+// Admin-editable home page copy (see 0015 migration). Free text throughout - e.g.
+// section2Body isn't templated with brandName or the live discount percent, an admin
+// just types the sentence they want.
+export type HomeContent = {
+  brandName: string;
+  heroSubtitle: string;
+  heroCtaLabel: string;
+  worriesHeading: string;
+  worries: [HomeContentBlock, HomeContentBlock, HomeContentBlock];
+  section2Heading: string;
+  section2Body: string;
+  section2Tc: string;
+  section2CtaLabel: string;
+  features: [HomeContentBlock, HomeContentBlock, HomeContentBlock];
+};
+
 export type SiteSettings = {
   id: number;
   fallback_cover_image_url: string | null;
+  home_content: HomeContent;
   updated_at: string;
 };
 

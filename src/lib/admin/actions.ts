@@ -229,7 +229,11 @@ export async function addMenuItem(vendorId: string, formData: FormData): Promise
   await assertAdminSession();
   const categoryId = String(formData.get("category_id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
-  if (!categoryId || !name) return;
+  const isVegChoice = formData.get("is_veg");
+  // Veg/non-veg is required - the radio has no default, so a direct POST that skips
+  // it (bypassing the form's own `required`) is rejected rather than silently
+  // defaulting to veg, same as the missing-name/-category guard above.
+  if (!categoryId || !name || (isVegChoice !== "veg" && isVegChoice !== "non_veg")) return;
 
   const mealTypes = MEAL_TYPES.filter((m) => formData.get(`meal_type_${m}`) === "on");
 
@@ -237,7 +241,7 @@ export async function addMenuItem(vendorId: string, formData: FormData): Promise
     vendor_id: vendorId,
     category_id: categoryId,
     name,
-    is_veg: formData.get("is_veg") === "on",
+    is_veg: isVegChoice === "veg",
     meal_types: mealTypes.length > 0 ? mealTypes : ["lunch", "dinner"],
     base_price_pp: parseOptionalPrice(formData.get("base_price_pp")),
     image_url: String(formData.get("image_url") ?? "").trim() || null,
@@ -263,6 +267,8 @@ export async function addSuggestedMenuItem(vendorId: string, categoryId: string,
 
 export async function updateMenuItem(itemId: string, vendorId: string, formData: FormData): Promise<void> {
   await assertAdminSession();
+  const isVegChoice = formData.get("is_veg");
+  if (isVegChoice !== "veg" && isVegChoice !== "non_veg") return;
 
   const { error } = await supabaseAdmin
     .from("menu_items")
@@ -270,6 +276,7 @@ export async function updateMenuItem(itemId: string, vendorId: string, formData:
       base_price_pp: parseOptionalPrice(formData.get("base_price_pp")),
       is_active: formData.get("is_active") === "on",
       image_url: String(formData.get("image_url") ?? "").trim() || null,
+      is_veg: isVegChoice === "veg",
     })
     .eq("id", itemId);
   if (error) throw error;

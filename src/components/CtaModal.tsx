@@ -68,6 +68,10 @@ export function CtaModal({
             {description && <p className="text-sm text-ink-muted">{description}</p>}
             <form action={formAction} className="flex flex-col gap-3">
               <label className="flex flex-col gap-1.5 text-sm text-ink-muted">
+                Name
+                <input type="text" name="name" placeholder="Your name" required className={inputClass} />
+              </label>
+              <label className="flex flex-col gap-1.5 text-sm text-ink-muted">
                 Phone number
                 <input
                   type="tel"

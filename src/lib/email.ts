@@ -68,6 +68,7 @@ async function safely(work: () => Promise<void>): Promise<void> {
 
 export async function notifyNewEnquiry(params: {
   vendorId: string;
+  name: string;
   phone: string;
   plates: number;
   eventDate: string;
@@ -76,6 +77,7 @@ export async function notifyNewEnquiry(params: {
   cuisines: string[];
   packageName: string | null;
   quotedPp: number | null;
+  discountedTotal: number | null;
   selection: PackageItemSelection[];
 }): Promise<void> {
   await safely(async () => {
@@ -84,6 +86,7 @@ export async function notifyNewEnquiry(params: {
     const html = wrapTable(
       [
         row("Vendor", escapeHtml(vendorName)),
+        row("Name", escapeHtml(params.name)),
         phoneRow(params.phone),
         row("Event type", escapeHtml(params.eventType)),
         row("Event date", escapeHtml(params.eventDate)),
@@ -92,6 +95,7 @@ export async function notifyNewEnquiry(params: {
         row("Cuisines", params.cuisines.join(", ")),
         row("Package", params.packageName ? escapeHtml(params.packageName) : null),
         row("Quoted price", params.quotedPp ? `${formatInr(params.quotedPp)}/plate` : null),
+        row("Discounted total shown to user", params.discountedTotal ? formatInr(params.discountedTotal) : null),
         selectionHtml(params.selection),
       ].join("")
     );
@@ -101,6 +105,7 @@ export async function notifyNewEnquiry(params: {
 
 export async function notifyNewTastingRequest(params: {
   vendorId: string;
+  name: string;
   phone: string;
   plates: number;
   eventDate: string;
@@ -109,6 +114,7 @@ export async function notifyNewTastingRequest(params: {
   cuisines: string[];
   packageName: string | null;
   quotedPp: number | null;
+  discountedTotal: number | null;
   selection: PackageItemSelection[];
 }): Promise<void> {
   await safely(async () => {
@@ -117,6 +123,7 @@ export async function notifyNewTastingRequest(params: {
     const html = wrapTable(
       [
         row("Vendor", escapeHtml(vendorName)),
+        row("Name", escapeHtml(params.name)),
         phoneRow(params.phone),
         row("Event type", escapeHtml(params.eventType)),
         row("Event date", escapeHtml(params.eventDate)),
@@ -125,6 +132,7 @@ export async function notifyNewTastingRequest(params: {
         row("Cuisines", params.cuisines.join(", ")),
         row("Package", params.packageName ? escapeHtml(params.packageName) : null),
         row("Quoted price", params.quotedPp ? `${formatInr(params.quotedPp)}/plate` : null),
+        row("Discounted total shown to user", params.discountedTotal ? formatInr(params.discountedTotal) : null),
         selectionHtml(params.selection),
       ].join("")
     );

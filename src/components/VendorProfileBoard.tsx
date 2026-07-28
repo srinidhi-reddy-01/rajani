@@ -6,7 +6,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import type { VendorProfile } from "@/lib/queries/vendors";
 import type { PackageItemSelection } from "@/lib/types/database";
-import { formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
+import { computeDiscountedTotal, DISCOUNT_PERCENT, formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
 import { submitEnquiry, submitTastingRequest } from "@/lib/consumer/actions";
 import { CtaModal } from "@/components/CtaModal";
 import { vendorCoverImage } from "@/lib/images";
@@ -65,6 +65,11 @@ export function VendorProfileBoard({
   const selectedPackage = vendor.packages.find((p) => p.id === selectedPackageId) ?? null;
   const hasSlots = (selectedPackage?.slots.length ?? 0) > 0;
 
+  // Recomputes live off `plates` and `selectedPackage` - subtotal is the plate-count-adjusted
+  // per-plate rate times the plate count, and the platform discount is a flat % off that.
+  const subtotal = selectedPackage ? quotePerPlate(selectedPackage.base_price_pp, plates) * plates : 0;
+  const { discount, total: discountedTotal } = computeDiscountedTotal(subtotal);
+
   // Menu customisation is entirely optional and never blocks "Check availability" (#3).
   // The chooser renders expanded by default (no collapse toggle), so whenever a
   // package has slots the enquiry carries the itemised selection - preselected
@@ -93,6 +98,7 @@ export function VendorProfileBoard({
     packageId: selectedPackage?.id ?? null,
     packageName: selectedPackage?.name ?? null,
     quotedPp: selectedPackage ? quotePerPlate(selectedPackage.base_price_pp, plates) : null,
+    discountedTotal: selectedPackage ? discountedTotal : null,
     selection: itemSelection,
   };
 
@@ -155,8 +161,8 @@ export function VendorProfileBoard({
 
         <div className="flex items-center gap-2 rounded-2xl border border-gold-500/40 bg-gold-100 px-4 py-3 text-sm text-ink">
           <p>
-            <span className="font-semibold text-gold-600">Book through us and get ₹1000 off your booking value</span>{" "}
-            after your event. <span className="text-ink-muted">T&amp;C apply.</span>
+            <span className="font-semibold text-gold-600">Book through us and get {Math.round(DISCOUNT_PERCENT * 100)}% off your booking value</span>{" "}
+            <span className="text-ink-muted">T&amp;C apply.</span>
           </p>
         </div>
 
@@ -273,15 +279,28 @@ export function VendorProfileBoard({
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-2 p-4">
           {selectedPackage && (
-            <div className="flex items-center justify-between text-xs text-ink-muted">
-              <span>
-                {hasSlots
-                  ? `${selectedPackage.name} — ${Object.values(slotSelection).reduce((n, ids) => n + ids.length, 0)} items selected`
-                  : selectedPackage.name}
-              </span>
-              <span className="font-semibold text-gold-600">
-                <AnimatedPrice amount={quotePerPlate(selectedPackage.base_price_pp, plates)} suffix="/plate" />
-              </span>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between text-xs text-ink-muted">
+                <span>
+                  {hasSlots
+                    ? `${selectedPackage.name} — ${Object.values(slotSelection).reduce((n, ids) => n + ids.length, 0)} items selected`
+                    : selectedPackage.name}
+                </span>
+                <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-700">
+                  {Math.round(DISCOUNT_PERCENT * 100)}% OFF
+                </span>
+              </div>
+              <div className="flex flex-wrap items-baseline gap-x-2">
+                <span className="text-sm text-ink-muted line-through">
+                  <AnimatedPrice amount={subtotal} />
+                </span>
+                <span className="text-lg font-semibold text-gold-600">
+                  You pay <AnimatedPrice amount={discountedTotal} />
+                </span>
+                <span className="text-xs text-ink-muted">
+                  (save <AnimatedPrice amount={discount} />)
+                </span>
+              </div>
             </div>
           )}
           <p className="text-[11px] text-ink-muted">

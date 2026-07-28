@@ -17,6 +17,10 @@ export type CtaContext = {
   packageId: string | null;
   packageName: string | null;
   quotedPp: number | null;
+  // Post-discount total (subtotal * (1 - DISCOUNT_PERCENT)) exactly as displayed on the
+  // pricing card at submit time - captured so the price that drove the lead is the price
+  // on record, not recomputed later from quotedPp alone.
+  discountedTotal: number | null;
   selection: PackageItemSelection[];
 };
 
@@ -35,6 +39,10 @@ export async function submitEnquiry(
   _prevState: CtaState,
   formData: FormData
 ): Promise<CtaState> {
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) {
+    return { status: "idle", error: "Enter your name." };
+  }
   const phone = String(formData.get("phone") ?? "").trim();
   if (!PHONE_REGEX.test(phone)) {
     return { status: "idle", error: "Enter a valid 10-digit Indian mobile number." };
@@ -65,6 +73,7 @@ export async function submitEnquiry(
   const { error } = await supabaseAdmin.from("enquiries").insert({
     vendor_id: vendorId,
     user_phone: phone,
+    user_name: name,
     // The guided flow no longer collects meal_type; dinner is the common case for
     // Hyderabad wedding/event catering and the column has no default to fall back on.
     event_type: eventType,
@@ -74,11 +83,13 @@ export async function submitEnquiry(
     budget_pp: context.budgetPp,
     menu_selection: selection,
     quoted_pp: context.quotedPp ?? 0,
+    discounted_total: context.discountedTotal,
   });
   if (error) throw error;
 
   await notifyNewEnquiry({
     vendorId,
+    name,
     phone,
     plates,
     eventDate,
@@ -87,6 +98,7 @@ export async function submitEnquiry(
     cuisines: context.cuisines,
     packageName: context.packageName,
     quotedPp: context.quotedPp,
+    discountedTotal: context.discountedTotal,
     selection: context.selection,
   });
 
@@ -142,6 +154,10 @@ export async function submitTastingRequest(
   _prevState: CtaState,
   formData: FormData
 ): Promise<CtaState> {
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) {
+    return { status: "idle", error: "Enter your name." };
+  }
   const phone = String(formData.get("phone") ?? "").trim();
   if (!PHONE_REGEX.test(phone)) {
     return { status: "idle", error: "Enter a valid 10-digit Indian mobile number." };
@@ -150,6 +166,7 @@ export async function submitTastingRequest(
   const { error } = await supabaseAdmin.from("tasting_requests").insert({
     vendor_id: vendorId,
     user_phone: phone,
+    user_name: name,
     context: {
       plates: context.plates,
       cuisines: context.cuisines,
@@ -159,6 +176,7 @@ export async function submitTastingRequest(
       package_id: context.packageId,
       package_name: context.packageName,
       quoted_pp: context.quotedPp,
+      discounted_total: context.discountedTotal,
       selection: context.selection,
     },
   });
@@ -166,6 +184,7 @@ export async function submitTastingRequest(
 
   await notifyNewTastingRequest({
     vendorId,
+    name,
     phone,
     plates: context.plates,
     eventDate: context.eventDate,
@@ -174,6 +193,7 @@ export async function submitTastingRequest(
     cuisines: context.cuisines,
     packageName: context.packageName,
     quotedPp: context.quotedPp,
+    discountedTotal: context.discountedTotal,
     selection: context.selection,
   });
 

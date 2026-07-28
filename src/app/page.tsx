@@ -6,6 +6,7 @@ import { MatchMeForm } from "@/components/MatchMeForm";
 import { WorryCard } from "@/components/WorryCard";
 import { getCuisines, getEventTypes } from "@/lib/queries/lookups";
 import { PresentationIcon, PriceTagIcon, TasteIcon } from "@/components/icons/ValuePropIcons";
+import { DISCOUNT_PERCENT } from "@/lib/pricing";
 
 const FEATURES = [
   {
@@ -105,7 +106,7 @@ export default async function Home() {
           </h2>
           <p className="text-base text-cream-50/85 sm:text-lg">
             Spend the day with your loved ones, not chasing the caterer. Every Āgata booking comes with a
-            dedicated event manager for the day — and ₹1000 off your booking value.
+            dedicated event manager for the day — and {Math.round(DISCOUNT_PERCENT * 100)}% off your booking value.
           </p>
           <p className="text-xs text-cream-50/60">T&amp;C apply.</p>
           <Link

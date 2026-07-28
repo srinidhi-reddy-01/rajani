@@ -299,7 +299,11 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                 <ul className="flex flex-col gap-2">
                   {category.menu_items.map((item) => (
                     <li key={item.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border px-3 py-2">
-                      <span className="min-w-40 text-sm text-ink">
+                      <span className="flex min-w-40 items-center gap-1.5 text-sm text-ink">
+                        <span
+                          aria-hidden
+                          className={`h-2 w-2 shrink-0 rounded-full ${item.is_veg ? "bg-green-600" : "bg-red-600"}`}
+                        />
                         {item.name} <span className="text-xs text-ink-muted">({item.is_veg ? "veg" : "non-veg"})</span>
                       </span>
                       <form action={updateMenuItem.bind(null, item.id, vendor.id)} className="flex flex-wrap items-center gap-3">
@@ -321,6 +325,16 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                           defaultValue={item.image_url ?? ""}
                           className="h-9 w-48 rounded-lg border border-border bg-surface px-2 text-sm"
                         />
+                        <div className="flex items-center gap-2 text-xs text-ink-muted">
+                          <label className="flex items-center gap-1">
+                            <input type="radio" name="is_veg" value="veg" defaultChecked={item.is_veg} required className="h-4 w-4" />
+                            Veg
+                          </label>
+                          <label className="flex items-center gap-1">
+                            <input type="radio" name="is_veg" value="non_veg" defaultChecked={!item.is_veg} required className="h-4 w-4" />
+                            Non-veg
+                          </label>
+                        </div>
                         <label className="flex items-center gap-1 text-xs text-ink-muted">
                           <input type="checkbox" name="is_active" defaultChecked={item.is_active} className="h-5 w-5" />
                           Active
@@ -369,10 +383,16 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
                   Image URL (optional)
                   <input type="url" name="image_url" className={`${inputClass} h-9 w-48`} />
                 </label>
-                <label className="flex items-center gap-1 text-xs text-ink-muted">
-                  <input type="checkbox" name="is_veg" defaultChecked className="h-5 w-5" />
-                  Veg
-                </label>
+                <div className="flex items-center gap-2 text-xs text-ink-muted">
+                  <label className="flex items-center gap-1">
+                    <input type="radio" name="is_veg" value="veg" required className="h-4 w-4" />
+                    Veg
+                  </label>
+                  <label className="flex items-center gap-1">
+                    <input type="radio" name="is_veg" value="non_veg" required className="h-4 w-4" />
+                    Non-veg
+                  </label>
+                </div>
                 <button type="submit" className={secondaryButtonClass}>
                   Add item
                 </button>

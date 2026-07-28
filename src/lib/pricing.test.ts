@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getPlateMultiplier } from "@/lib/pricing";
+import { computeDiscountedTotal, DISCOUNT_PERCENT, getPlateMultiplier } from "@/lib/pricing";
 
 describe("getPlateMultiplier", () => {
   it("clamps at +10% below 100 plates", () => {
@@ -28,5 +28,24 @@ describe("getPlateMultiplier", () => {
 
   it("clamps at -10% above 1000 plates", () => {
     expect(getPlateMultiplier(1500)).toBeCloseTo(0.9);
+  });
+});
+
+describe("computeDiscountedTotal", () => {
+  it("is a flat 10% of the subtotal", () => {
+    expect(DISCOUNT_PERCENT).toBeCloseTo(0.1);
+  });
+
+  it("computes discount and total for a round subtotal", () => {
+    expect(computeDiscountedTotal(100000)).toEqual({ subtotal: 100000, discount: 10000, total: 90000 });
+  });
+
+  it("rounds the discount to the nearest rupee", () => {
+    // 12345 * 0.1 = 1234.5 -> rounds to 1235
+    expect(computeDiscountedTotal(12345)).toEqual({ subtotal: 12345, discount: 1235, total: 11110 });
+  });
+
+  it("is zero discount on a zero subtotal", () => {
+    expect(computeDiscountedTotal(0)).toEqual({ subtotal: 0, discount: 0, total: 0 });
   });
 });

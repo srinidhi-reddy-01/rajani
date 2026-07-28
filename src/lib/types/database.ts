@@ -141,6 +141,7 @@ export type Enquiry = {
   budget_pp: number | null;
   menu_selection: EnquirySelection;
   quoted_pp: number;
+  discounted_total: number | null;
   status: "new" | "accepted" | "declined" | "booked" | "expired";
   vendor_responded_at: string | null;
   created_at: string;
@@ -166,6 +167,7 @@ export type EnquiryContext = {
   package_id: string | null;
   package_name: string | null;
   quoted_pp: number | null;
+  discounted_total: number | null;
   selection: PackageItemSelection[];
 };
 

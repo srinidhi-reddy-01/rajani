@@ -9,6 +9,7 @@ import type { PackageItemSelection } from "@/lib/types/database";
 import { computeDiscountedTotal, DISCOUNT_PERCENT, formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
 import { submitEnquiry, submitTastingRequest } from "@/lib/consumer/actions";
 import { CtaModal } from "@/components/CtaModal";
+import { FssaiBadge } from "@/components/FssaiBadge";
 import { vendorCoverImage } from "@/lib/images";
 import { PackageSelector, type SlotSelection } from "@/components/PackageSelector";
 
@@ -132,7 +133,10 @@ export function VendorProfileBoard({
               />
             )}
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight text-cream-50 sm:text-4xl">{vendor.name}</h1>
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-3xl font-semibold tracking-tight text-cream-50 sm:text-4xl">{vendor.name}</h1>
+                <FssaiBadge fssaiLicenseNumber={vendor.fssai_license_number} />
+              </div>
               <p className="text-sm text-cream-50/80">
                 {vendor.area}
                 {vendor.area && vendor.established_year && " · "}
@@ -170,16 +174,26 @@ export function VendorProfileBoard({
           <div className="flex flex-col gap-3">
             <h2 className="text-lg font-semibold tracking-tight text-ink">Presentation</h2>
             <div className="flex gap-3 overflow-x-auto">
-              {galleryPhotos.map((m) => (
-                <Image
-                  key={m.id}
-                  src={m.url}
-                  alt={`${vendor.name} photo`}
-                  width={200}
-                  height={150}
-                  className="h-36 w-48 shrink-0 rounded-3xl border border-border object-cover"
-                />
-              ))}
+              {galleryPhotos.map((m) =>
+                m.media_type === "video" ? (
+                  <video
+                    key={m.id}
+                    src={m.url}
+                    controls
+                    playsInline
+                    className="h-36 w-48 shrink-0 rounded-3xl border border-border object-cover"
+                  />
+                ) : (
+                  <Image
+                    key={m.id}
+                    src={m.url}
+                    alt={`${vendor.name} photo`}
+                    width={200}
+                    height={150}
+                    className="h-36 w-48 shrink-0 rounded-3xl border border-border object-cover"
+                  />
+                )
+              )}
             </div>
           </div>
         )}

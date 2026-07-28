@@ -19,6 +19,7 @@ export type DiscoverableVendor = Pick<
   | "logo_url"
   | "events_completed"
   | "is_verified"
+  | "fssai_license_number"
 > & {
   packages: Package[];
 };

@@ -128,6 +128,7 @@ export async function updateVendorProfile(vendorId: string, formData: FormData):
       gbp_rating: formData.get("gbp_rating") ? Number(formData.get("gbp_rating")) : null,
       gbp_rating_count: formData.get("gbp_rating_count") ? Number(formData.get("gbp_rating_count")) : null,
       is_verified: formData.get("is_verified") === "on",
+      fssai_license_number: String(formData.get("fssai_license_number") ?? "").trim() || null,
       serviceable_everywhere: formData.get("serviceable_everywhere") === "on",
       pricing_model: String(formData.get("pricing_model") ?? "flexible") as "final" | "flexible",
     })
@@ -699,6 +700,8 @@ export async function uploadVendorOwnerPhoto(
   return { status: "success" };
 }
 
+const MAX_VIDEO_BYTES = 20 * 1024 * 1024;
+
 export async function uploadVendorMedia(
   vendorId: string,
   kind: "gallery" | "testimonial",
@@ -708,21 +711,31 @@ export async function uploadVendorMedia(
   await assertAdminSession();
   const file = formData.get("media");
   if (!(file instanceof File) || file.size === 0) {
-    return { status: "idle", error: "Choose an image file." };
+    return { status: "idle", error: "Choose a file." };
   }
 
-  const ext = file.name.split(".").pop() || "jpg";
+  // Videos are gallery-only (Presentation section) - testimonials stay WhatsApp
+  // screenshots, images only.
+  const isVideo = file.type.startsWith("video/");
+  if (isVideo && kind === "testimonial") {
+    return { status: "idle", error: "Testimonials must be an image, not a video." };
+  }
+  if (isVideo && file.size > MAX_VIDEO_BYTES) {
+    return { status: "idle", error: "Videos must be 20MB or smaller." };
+  }
+
+  const ext = file.name.split(".").pop() || (isVideo ? "mp4" : "jpg");
   const path = `${vendorId}/${kind}-${randomUUID()}.${ext}`;
   const { error: uploadError } = await supabaseAdmin.storage
     .from("vendor-media")
-    .upload(path, file, { contentType: file.type || "image/jpeg" });
+    .upload(path, file, { contentType: file.type || (isVideo ? "video/mp4" : "image/jpeg") });
   if (uploadError) return { status: "idle", error: uploadError.message };
 
   const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
 
   const { error } = await supabaseAdmin
     .from("vendor_media")
-    .insert({ vendor_id: vendorId, url: publicUrlData.publicUrl, kind });
+    .insert({ vendor_id: vendorId, url: publicUrlData.publicUrl, kind, media_type: isVideo ? "video" : "image" });
   if (error) throw error;
 
   revalidateVendor(vendorId);

@@ -7,6 +7,7 @@ import type { MatchedVendor } from "@/lib/matching";
 import { formatInr, quotePerPlate } from "@/lib/pricing";
 import { vendorCoverImage } from "@/lib/images";
 import { VendorAvatar } from "@/components/VendorAvatar";
+import { FssaiBadge } from "@/components/FssaiBadge";
 
 export function VendorMatchCard({
   vendor,
@@ -55,17 +56,9 @@ export function VendorMatchCard({
 
         <div className="flex flex-col gap-3 p-5 pt-9">
           <div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <h3 className="text-lg font-semibold tracking-tight text-ink">{vendor.name}</h3>
-              {vendor.is_verified && (
-                <span
-                  title="Personally verified by the Āgata team"
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-600 text-[10px] text-cream-50"
-                  aria-label="Verified: personally verified by the Āgata team"
-                >
-                  ✓
-                </span>
-              )}
+              <FssaiBadge fssaiLicenseNumber={vendor.fssai_license_number} />
             </div>
             <div className="flex flex-wrap items-center gap-x-2 text-sm text-ink-muted">
               {vendor.area && <span>{vendor.area}</span>}

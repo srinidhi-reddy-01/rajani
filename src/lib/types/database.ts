@@ -25,6 +25,7 @@ export type Vendor = {
   owner_photo_url: string | null;
   events_completed: number;
   is_verified: boolean;
+  fssai_license_number: string | null;
   is_demo: boolean;
   created_at: string;
   updated_at: string;
@@ -107,6 +108,7 @@ export type VendorMedia = {
   vendor_id: string;
   url: string;
   kind: "gallery" | "testimonial";
+  media_type: "image" | "video";
   event_date: string | null;
   created_at: string;
 };

@@ -140,11 +140,14 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
           circular
         />
         <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-medium text-ink">Gallery photos</h3>
+          <h3 className="text-sm font-medium text-ink">Gallery photos &amp; videos</h3>
+          <p className="text-xs text-ink-muted">Videos up to 20MB.</p>
           <MediaUploadForm
             action={uploadVendorMedia.bind(null, vendor.id, "gallery")}
             deleteAction={deleteVendorMedia.bind(null, vendor.id)}
             media={vendor.vendor_media.filter((m) => m.kind === "gallery")}
+            accept="image/*,video/*"
+            label="photo/video"
           />
         </div>
         <div className="flex flex-col gap-2">
@@ -225,8 +228,22 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
           </label>
           <label className="flex items-center gap-2 self-end text-sm text-ink-muted">
             <input type="checkbox" name="is_verified" defaultChecked={vendor.is_verified} className="h-5 w-5" />
-            Verified (personally vetted only)
+            Personally vetted (internal only, not shown to customers)
           </label>
+          <label className="flex flex-col gap-1 text-sm text-ink-muted">
+            FSSAI license number
+            <input
+              type="text"
+              name="fssai_license_number"
+              placeholder="Leave blank if not on file"
+              defaultValue={vendor.fssai_license_number ?? ""}
+              className={inputClass}
+            />
+          </label>
+          <p className="text-xs text-ink-muted sm:col-span-2">
+            The green &quot;FSSAI certified&quot; badge on the discovery card and profile page is driven ONLY by
+            this license number being filled in — check the vendor&apos;s actual FSSAI certificate before entering it.
+          </p>
           <div className="sm:col-span-2">
             <button type="submit" className={primaryButtonClass}>
               Save profile

@@ -16,6 +16,7 @@ function vendor(overrides: Partial<DiscoverableVendor> & { id: string; basePrice
     logo_url: null,
     events_completed: 0,
     is_verified: false,
+    fssai_license_number: null,
     packages: [
       {
         id: `${rest.id}-pkg`,

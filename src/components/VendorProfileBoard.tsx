@@ -286,7 +286,7 @@ export function VendorProfileBoard({
                           setSelectedPackageId(pkg.id);
                           document.getElementById("package-menu")?.scrollIntoView({ behavior: "smooth", block: "start" });
                         }}
-                        className="mt-1 flex cursor-pointer items-center gap-1 self-start text-xs font-medium text-royal-700 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+                        className="mt-1 flex cursor-pointer items-center gap-1 self-end text-xs font-medium text-royal-700 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
                       >
                         View full menu ↓
                       </button>

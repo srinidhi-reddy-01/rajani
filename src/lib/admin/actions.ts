@@ -621,122 +621,100 @@ export async function addExactDishesToPackage(packageId: string, vendorId: strin
 }
 
 // ---------- Vendor showcase: logo & media ----------
+//
+// Uploads go browser -> Supabase Storage directly via a signed URL, NOT through a
+// Server Action body - Vercel's Serverless Functions cap request bodies at ~4.5MB
+// regardless of next.config.ts's serverActions.bodySizeLimit, so routing raw file
+// bytes through an action silently 413s on anything bigger (a 5MB+ photo, any video).
+// Each upload is two small round-trips instead: createXUpload mints a short-lived
+// signed URL (admin-gated, no file bytes involved), the client PUTs the file straight
+// to Storage, then finalizeXUpload (also just a URL string, no bytes) writes the
+// resulting public URL to the DB. The 20MB size ceiling is enforced by the bucket's
+// own file_size_limit (see 0018 migration) - Storage rejects an oversized PUT itself,
+// so there's no orphaned-file cleanup to do for that case.
 
 export type UploadState = { status: "idle" | "success"; error?: string };
+export type SignedUploadResult = { status: "idle" | "success"; error?: string; path?: string; token?: string };
 
-export async function uploadVendorLogo(vendorId: string, _prevState: UploadState, formData: FormData): Promise<UploadState> {
+async function createSignedUpload(pathPrefix: string, fileName: string): Promise<SignedUploadResult> {
+  const ext = fileName.split(".").pop() || "jpg";
+  const path = `${pathPrefix}-${randomUUID()}.${ext}`;
+  const { data, error } = await supabaseAdmin.storage.from("vendor-media").createSignedUploadUrl(path);
+  if (error) return { status: "idle", error: error.message };
+  return { status: "success", path: data.path, token: data.token };
+}
+
+export async function createVendorLogoUpload(vendorId: string, fileName: string): Promise<SignedUploadResult> {
   await assertAdminSession();
-  const file = formData.get("logo");
-  if (!(file instanceof File) || file.size === 0) {
-    return { status: "idle", error: "Choose an image file." };
-  }
+  return createSignedUpload(`${vendorId}/logo`, fileName);
+}
 
-  const ext = file.name.split(".").pop() || "jpg";
-  const path = `${vendorId}/logo-${randomUUID()}.${ext}`;
-  const { error: uploadError } = await supabaseAdmin.storage
-    .from("vendor-media")
-    .upload(path, file, { contentType: file.type || "image/jpeg" });
-  if (uploadError) return { status: "idle", error: uploadError.message };
-
-  const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
-
-  const { error } = await supabaseAdmin.from("vendors").update({ logo_url: publicUrlData.publicUrl }).eq("id", vendorId);
-  if (error) throw error;
-
+export async function finalizeVendorLogoUpload(vendorId: string, path: string): Promise<UploadState> {
+  await assertAdminSession();
+  const { data } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
+  const { error } = await supabaseAdmin.from("vendors").update({ logo_url: data.publicUrl }).eq("id", vendorId);
+  if (error) return { status: "idle", error: error.message };
   revalidateVendor(vendorId);
   return { status: "success" };
 }
 
-export async function uploadVendorCoverImage(vendorId: string, _prevState: UploadState, formData: FormData): Promise<UploadState> {
+export async function createVendorCoverImageUpload(vendorId: string, fileName: string): Promise<SignedUploadResult> {
   await assertAdminSession();
-  const file = formData.get("cover_image");
-  if (!(file instanceof File) || file.size === 0) {
-    return { status: "idle", error: "Choose an image file." };
-  }
+  return createSignedUpload(`${vendorId}/cover`, fileName);
+}
 
-  const ext = file.name.split(".").pop() || "jpg";
-  const path = `${vendorId}/cover-${randomUUID()}.${ext}`;
-  const { error: uploadError } = await supabaseAdmin.storage
-    .from("vendor-media")
-    .upload(path, file, { contentType: file.type || "image/jpeg" });
-  if (uploadError) return { status: "idle", error: uploadError.message };
-
-  const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
-
-  const { error } = await supabaseAdmin.from("vendors").update({ cover_image_url: publicUrlData.publicUrl }).eq("id", vendorId);
-  if (error) throw error;
-
+export async function finalizeVendorCoverImageUpload(vendorId: string, path: string): Promise<UploadState> {
+  await assertAdminSession();
+  const { data } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
+  const { error } = await supabaseAdmin.from("vendors").update({ cover_image_url: data.publicUrl }).eq("id", vendorId);
+  if (error) return { status: "idle", error: error.message };
   revalidateVendor(vendorId);
   return { status: "success" };
 }
 
-export async function uploadVendorOwnerPhoto(
-  vendorId: string,
-  _prevState: UploadState,
-  formData: FormData
-): Promise<UploadState> {
+export async function createVendorOwnerPhotoUpload(vendorId: string, fileName: string): Promise<SignedUploadResult> {
   await assertAdminSession();
-  const file = formData.get("owner_photo");
-  if (!(file instanceof File) || file.size === 0) {
-    return { status: "idle", error: "Choose an image file." };
-  }
+  return createSignedUpload(`${vendorId}/owner`, fileName);
+}
 
-  const ext = file.name.split(".").pop() || "jpg";
-  const path = `${vendorId}/owner-${randomUUID()}.${ext}`;
-  const { error: uploadError } = await supabaseAdmin.storage
-    .from("vendor-media")
-    .upload(path, file, { contentType: file.type || "image/jpeg" });
-  if (uploadError) return { status: "idle", error: uploadError.message };
-
-  const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
-
-  const { error: updateError } = await supabaseAdmin
-    .from("vendors")
-    .update({ owner_photo_url: publicUrlData.publicUrl })
-    .eq("id", vendorId);
-  if (updateError) throw updateError;
-
+export async function finalizeVendorOwnerPhotoUpload(vendorId: string, path: string): Promise<UploadState> {
+  await assertAdminSession();
+  const { data } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
+  const { error } = await supabaseAdmin.from("vendors").update({ owner_photo_url: data.publicUrl }).eq("id", vendorId);
+  if (error) return { status: "idle", error: error.message };
   revalidateVendor(vendorId);
   return { status: "success" };
 }
 
-const MAX_VIDEO_BYTES = 20 * 1024 * 1024;
-
-export async function uploadVendorMedia(
+export async function createVendorMediaUpload(
   vendorId: string,
   kind: "gallery" | "testimonial",
-  _prevState: UploadState,
-  formData: FormData
+  fileName: string
+): Promise<SignedUploadResult> {
+  await assertAdminSession();
+  return createSignedUpload(`${vendorId}/${kind}`, fileName);
+}
+
+export async function finalizeVendorMediaUpload(
+  vendorId: string,
+  kind: "gallery" | "testimonial",
+  path: string,
+  mediaType: "image" | "video"
 ): Promise<UploadState> {
   await assertAdminSession();
-  const file = formData.get("media");
-  if (!(file instanceof File) || file.size === 0) {
-    return { status: "idle", error: "Choose a file." };
-  }
-
   // Videos are gallery-only (Presentation section) - testimonials stay WhatsApp
-  // screenshots, images only.
-  const isVideo = file.type.startsWith("video/");
-  if (isVideo && kind === "testimonial") {
+  // screenshots, images only. Checked here (not just client-side) since the server
+  // never sees the file until after it's already in Storage - clean up the orphan.
+  if (mediaType === "video" && kind === "testimonial") {
+    await supabaseAdmin.storage.from("vendor-media").remove([path]);
     return { status: "idle", error: "Testimonials must be an image, not a video." };
   }
-  if (isVideo && file.size > MAX_VIDEO_BYTES) {
-    return { status: "idle", error: "Videos must be 20MB or smaller." };
-  }
 
-  const ext = file.name.split(".").pop() || (isVideo ? "mp4" : "jpg");
-  const path = `${vendorId}/${kind}-${randomUUID()}.${ext}`;
-  const { error: uploadError } = await supabaseAdmin.storage
-    .from("vendor-media")
-    .upload(path, file, { contentType: file.type || (isVideo ? "video/mp4" : "image/jpeg") });
-  if (uploadError) return { status: "idle", error: uploadError.message };
-
-  const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
-
+  const { data } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
   const { error } = await supabaseAdmin
     .from("vendor_media")
-    .insert({ vendor_id: vendorId, url: publicUrlData.publicUrl, kind, media_type: isVideo ? "video" : "image" });
-  if (error) throw error;
+    .insert({ vendor_id: vendorId, url: data.publicUrl, kind, media_type: mediaType });
+  if (error) return { status: "idle", error: error.message };
 
   revalidateVendor(vendorId);
   return { status: "success" };
@@ -842,28 +820,16 @@ export async function updateHomeContent(formData: FormData): Promise<void> {
   revalidateSiteSettings();
 }
 
-export async function uploadFallbackCoverImage(_prevState: UploadState, formData: FormData): Promise<UploadState> {
+export async function createFallbackCoverImageUpload(fileName: string): Promise<SignedUploadResult> {
   await assertAdminSession();
-  const file = formData.get("fallback_image");
-  if (!(file instanceof File) || file.size === 0) {
-    return { status: "idle", error: "Choose an image file." };
-  }
+  return createSignedUpload("site/fallback-cover", fileName);
+}
 
-  const ext = file.name.split(".").pop() || "jpg";
-  const path = `site/fallback-cover-${randomUUID()}.${ext}`;
-  const { error: uploadError } = await supabaseAdmin.storage
-    .from("vendor-media")
-    .upload(path, file, { contentType: file.type || "image/jpeg" });
-  if (uploadError) return { status: "idle", error: uploadError.message };
-
-  const { data: publicUrlData } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
-
-  const { error } = await supabaseAdmin
-    .from("site_settings")
-    .update({ fallback_cover_image_url: publicUrlData.publicUrl })
-    .eq("id", 1);
-  if (error) throw error;
-
+export async function finalizeFallbackCoverImageUpload(path: string): Promise<UploadState> {
+  await assertAdminSession();
+  const { data } = supabaseAdmin.storage.from("vendor-media").getPublicUrl(path);
+  const { error } = await supabaseAdmin.from("site_settings").update({ fallback_cover_image_url: data.publicUrl }).eq("id", 1);
+  if (error) return { status: "idle", error: error.message };
   revalidateSiteSettings();
   return { status: "success" };
 }

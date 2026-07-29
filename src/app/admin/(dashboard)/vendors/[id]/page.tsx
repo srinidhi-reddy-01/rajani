@@ -27,10 +27,14 @@ import {
   updateVendorCuisines,
   updateVendorEventTypes,
   updateVendorProfile,
-  uploadVendorCoverImage,
-  uploadVendorLogo,
-  uploadVendorOwnerPhoto,
-  uploadVendorMedia,
+  createVendorCoverImageUpload,
+  finalizeVendorCoverImageUpload,
+  createVendorLogoUpload,
+  finalizeVendorLogoUpload,
+  createVendorOwnerPhotoUpload,
+  finalizeVendorOwnerPhotoUpload,
+  createVendorMediaUpload,
+  finalizeVendorMediaUpload,
 } from "@/lib/admin/actions";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { SpecialitySelector } from "@/components/SpecialitySelector";
@@ -119,7 +123,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
       <section className="flex flex-col gap-6 rounded-3xl border border-border bg-surface p-5 shadow-card">
         <h2 className="text-lg font-semibold tracking-tight text-ink">Showcase</h2>
         <LogoUploadForm
-          action={uploadVendorCoverImage.bind(null, vendor.id)}
+          createSignedUpload={createVendorCoverImageUpload.bind(null, vendor.id)}
+          finalize={finalizeVendorCoverImageUpload.bind(null, vendor.id)}
           currentUrl={vendor.cover_image_url}
           vendorName={vendor.name}
           fieldName="cover_image"
@@ -129,9 +134,15 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         <p className="-mt-4 text-xs text-ink-muted">
           Shown on discovery cards and the profile header. Leave unset to use the site-wide fallback (see Settings).
         </p>
-        <LogoUploadForm action={uploadVendorLogo.bind(null, vendor.id)} currentUrl={vendor.logo_url} vendorName={vendor.name} />
         <LogoUploadForm
-          action={uploadVendorOwnerPhoto.bind(null, vendor.id)}
+          createSignedUpload={createVendorLogoUpload.bind(null, vendor.id)}
+          finalize={finalizeVendorLogoUpload.bind(null, vendor.id)}
+          currentUrl={vendor.logo_url}
+          vendorName={vendor.name}
+        />
+        <LogoUploadForm
+          createSignedUpload={createVendorOwnerPhotoUpload.bind(null, vendor.id)}
+          finalize={finalizeVendorOwnerPhotoUpload.bind(null, vendor.id)}
           currentUrl={vendor.owner_photo_url}
           vendorName={vendor.name}
           fieldName="owner_photo"
@@ -143,7 +154,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
           <h3 className="text-sm font-medium text-ink">Gallery photos &amp; videos</h3>
           <p className="text-xs text-ink-muted">Videos up to 20MB.</p>
           <MediaUploadForm
-            action={uploadVendorMedia.bind(null, vendor.id, "gallery")}
+            createSignedUpload={createVendorMediaUpload.bind(null, vendor.id, "gallery")}
+            finalize={finalizeVendorMediaUpload.bind(null, vendor.id, "gallery")}
             deleteAction={deleteVendorMedia.bind(null, vendor.id)}
             media={vendor.vendor_media.filter((m) => m.kind === "gallery")}
             accept="image/*,video/*"
@@ -153,7 +165,8 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
         <div className="flex flex-col gap-2">
           <h3 className="text-sm font-medium text-ink">Testimonials (WhatsApp screenshots)</h3>
           <MediaUploadForm
-            action={uploadVendorMedia.bind(null, vendor.id, "testimonial")}
+            createSignedUpload={createVendorMediaUpload.bind(null, vendor.id, "testimonial")}
+            finalize={finalizeVendorMediaUpload.bind(null, vendor.id, "testimonial")}
             deleteAction={deleteVendorMedia.bind(null, vendor.id)}
             media={vendor.vendor_media.filter((m) => m.kind === "testimonial")}
           />

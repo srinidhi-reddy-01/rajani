@@ -1,24 +1,63 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition } from "react";
 import Image from "next/image";
 import type { UploadState } from "@/lib/admin/actions";
 import type { VendorMedia } from "@/lib/types/database";
+import { uploadFileDirect, type SignedUploadResult } from "@/lib/supabase/directUpload";
+
+const MAX_VIDEO_BYTES = 20 * 1024 * 1024;
 
 export function MediaUploadForm({
-  action,
+  createSignedUpload,
+  finalize,
   deleteAction,
   media,
   accept = "image/*",
   label = "photo",
 }: {
-  action: (prevState: UploadState, formData: FormData) => Promise<UploadState>;
+  createSignedUpload: (fileName: string) => Promise<SignedUploadResult>;
+  finalize: (path: string, mediaType: "image" | "video") => Promise<UploadState>;
   deleteAction: (mediaId: string) => Promise<void>;
   media: VendorMedia[];
   accept?: string;
   label?: string;
 }) {
-  const [state, formAction, pending] = useActionState<UploadState, FormData>(action, { status: "idle" });
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const input = form.elements.namedItem("media") as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      setError("Choose a file.");
+      return;
+    }
+    const isVideo = file.type.startsWith("video/");
+    // Client-side pre-check for fast feedback only - the bucket's own file_size_limit
+    // (see 0018 migration) is the real enforcement, since the server never sees these
+    // bytes to check them itself.
+    if (isVideo && file.size > MAX_VIDEO_BYTES) {
+      setError("Videos must be 20MB or smaller.");
+      return;
+    }
+    setError(null);
+    startTransition(async () => {
+      const uploaded = await uploadFileDirect(createSignedUpload, file);
+      if ("error" in uploaded) {
+        setError(uploaded.error);
+        return;
+      }
+      const finalized = await finalize(uploaded.path, isVideo ? "video" : "image");
+      if (finalized.status !== "success") {
+        setError(finalized.error ?? "Upload failed.");
+        return;
+      }
+      form.reset();
+    });
+  }
 
   return (
     <div className="flex flex-col gap-3">
@@ -43,7 +82,7 @@ export function MediaUploadForm({
           ))}
         </div>
       )}
-      <form action={formAction} className="flex items-end gap-2">
+      <form onSubmit={handleSubmit} className="flex items-end gap-2">
         <input type="file" name="media" accept={accept} required className="text-sm text-ink" />
         <button
           type="submit"
@@ -53,7 +92,7 @@ export function MediaUploadForm({
           {pending ? "Uploading..." : `Add ${label}`}
         </button>
       </form>
-      {state.error && <p className="text-xs text-red-600">{state.error}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 }

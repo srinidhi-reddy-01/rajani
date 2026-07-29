@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition } from "react";
 import Image from "next/image";
 import type { UploadState } from "@/lib/admin/actions";
+import { uploadFileDirect, type SignedUploadResult } from "@/lib/supabase/directUpload";
 
 function initialsOf(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
@@ -12,7 +13,8 @@ function initialsOf(name: string): string {
 }
 
 export function LogoUploadForm({
-  action,
+  createSignedUpload,
+  finalize,
   currentUrl,
   vendorName,
   fieldName = "logo",
@@ -20,7 +22,8 @@ export function LogoUploadForm({
   alt = "Vendor logo",
   circular = false,
 }: {
-  action: (prevState: UploadState, formData: FormData) => Promise<UploadState>;
+  createSignedUpload: (fileName: string) => Promise<SignedUploadResult>;
+  finalize: (path: string) => Promise<UploadState>;
   currentUrl: string | null;
   vendorName: string;
   fieldName?: string;
@@ -28,8 +31,34 @@ export function LogoUploadForm({
   alt?: string;
   circular?: boolean;
 }) {
-  const [state, formAction, pending] = useActionState<UploadState, FormData>(action, { status: "idle" });
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const shape = circular ? "rounded-full" : "rounded-lg";
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const input = form.elements.namedItem(fieldName) as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      setError("Choose an image file.");
+      return;
+    }
+    setError(null);
+    startTransition(async () => {
+      const uploaded = await uploadFileDirect(createSignedUpload, file);
+      if ("error" in uploaded) {
+        setError(uploaded.error);
+        return;
+      }
+      const finalized = await finalize(uploaded.path);
+      if (finalized.status !== "success") {
+        setError(finalized.error ?? "Upload failed.");
+        return;
+      }
+      form.reset();
+    });
+  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -44,7 +73,7 @@ export function LogoUploadForm({
             {initialsOf(vendorName)}
           </div>
         )}
-        <form action={formAction} className="flex items-end gap-2">
+        <form onSubmit={handleSubmit} className="flex items-end gap-2">
           <input type="file" name={fieldName} accept="image/*" required className="text-sm text-ink" />
           <button
             type="submit"
@@ -55,7 +84,7 @@ export function LogoUploadForm({
           </button>
         </form>
       </div>
-      {state.error && <p className="text-xs text-red-600">{state.error}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 }

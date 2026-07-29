@@ -1,5 +1,10 @@
 import { getSiteSettings } from "@/lib/admin/queries";
-import { clearFallbackCoverImage, updateHomeContent, uploadFallbackCoverImage } from "@/lib/admin/actions";
+import {
+  clearFallbackCoverImage,
+  createFallbackCoverImageUpload,
+  finalizeFallbackCoverImageUpload,
+  updateHomeContent,
+} from "@/lib/admin/actions";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { LogoUploadForm } from "@/components/LogoUploadForm";
 
@@ -28,7 +33,8 @@ export default async function AdminSettingsPage() {
           </p>
         </div>
         <LogoUploadForm
-          action={uploadFallbackCoverImage}
+          createSignedUpload={createFallbackCoverImageUpload}
+          finalize={finalizeFallbackCoverImageUpload}
           currentUrl={settings.fallback_cover_image_url}
           vendorName="Fallback"
           fieldName="fallback_image"

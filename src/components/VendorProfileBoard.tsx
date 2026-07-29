@@ -239,13 +239,20 @@ export function VendorProfileBoard({
               {vendor.packages.map((pkg) => {
                 const selected = pkg.id === selectedPackageId;
                 return (
-                  <motion.button
+                  <motion.div
                     key={pkg.id}
-                    type="button"
+                    role="button"
+                    tabIndex={0}
                     whileHover={{ y: -3 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     aria-pressed={selected}
                     onClick={() => setSelectedPackageId(pkg.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedPackageId(pkg.id);
+                      }
+                    }}
                     className={`flex min-h-11 cursor-pointer flex-col gap-1 rounded-3xl border p-4 text-left shadow-card transition-shadow duration-200 ease-out hover:shadow-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
                       selected
                         ? "border-royal-600 bg-royal-50 ring-2 ring-royal-100"
@@ -265,13 +272,26 @@ export function VendorProfileBoard({
                         )}
                       </div>
                     </div>
-                    {pkg.description && <p className="text-sm text-ink-muted">{pkg.description}</p>}
+                    {pkg.description && <p className="line-clamp-2 text-sm text-ink-muted">{pkg.description}</p>}
                     <p className="mt-2 text-lg font-semibold text-gold-600">
                       <AnimatedPrice amount={quotePerPlate(pkg.base_price_pp, plates)} />{" "}
                       <span className="text-sm font-normal text-ink-muted">/ plate at {plates} plates</span>
                     </p>
                     {pkg.min_plates && <p className="text-xs text-ink-muted">Minimum {pkg.min_plates} plates</p>}
-                  </motion.button>
+                    {pkg.slots.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedPackageId(pkg.id);
+                          document.getElementById("package-menu")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }}
+                        className="mt-1 flex cursor-pointer items-center gap-1 self-start text-xs font-medium text-royal-700 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600"
+                      >
+                        View full menu ↓
+                      </button>
+                    )}
+                  </motion.div>
                 );
               })}
             </div>
@@ -280,7 +300,7 @@ export function VendorProfileBoard({
         </section>
 
         {selectedPackage && hasSlots && (
-          <section className="flex flex-col gap-4 rounded-3xl border border-border bg-ivory p-4 sm:p-6">
+          <section id="package-menu" className="flex scroll-mt-4 flex-col gap-4 rounded-3xl border border-border bg-ivory p-4 sm:p-6">
             <div>
               <h2 className="text-lg font-semibold tracking-tight text-ink">Choose menu items to get the exact quote</h2>
               <p className="text-sm text-ink-muted">Optional — availability works with just the package above. Defaults are preselected.</p>
@@ -317,9 +337,6 @@ export function VendorProfileBoard({
               </div>
             </div>
           )}
-          <p className="text-[11px] text-ink-muted">
-            Don&apos;t book blind — order a sample tasting box and taste the menu before you decide.
-          </p>
           <div className="flex gap-3">
             <button
               type="button"
@@ -350,7 +367,7 @@ export function VendorProfileBoard({
         open={openModal === "tasting"}
         onClose={() => setOpenModal(null)}
         title="Get a sample box"
-        description="Don't book blind — taste the actual menu before you decide. You request, our team coordinates with the caterer, and the box reaches you."
+        description="Don't book blind — order a sample tasting box and taste the menu before you decide. You request, our team coordinates with the caterer, and the box reaches you."
         action={submitTastingRequest.bind(null, vendor.id, ctaContext)}
       />
     </div>

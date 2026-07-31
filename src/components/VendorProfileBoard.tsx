@@ -6,7 +6,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import type { VendorProfile } from "@/lib/queries/vendors";
 import type { PackageItemSelection } from "@/lib/types/database";
-import { computeDiscountedTotal, DISCOUNT_PERCENT, formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
+import { computeDiscountedTotal, formatInr, quotePerPlate, QUOTE_DISCLAIMER } from "@/lib/pricing";
 import { submitEnquiry, submitTastingRequest } from "@/lib/consumer/actions";
 import { CtaModal } from "@/components/CtaModal";
 import { FssaiBadge } from "@/components/FssaiBadge";
@@ -69,7 +69,7 @@ export function VendorProfileBoard({
   // Recomputes live off `plates` and `selectedPackage` - subtotal is the plate-count-adjusted
   // per-plate rate times the plate count, and the platform discount is a flat % off that.
   const subtotal = selectedPackage ? quotePerPlate(selectedPackage.base_price_pp, plates) * plates : 0;
-  const { discount, total: discountedTotal } = computeDiscountedTotal(subtotal);
+  const { discount, total: discountedTotal } = computeDiscountedTotal(subtotal, vendor.discount_percent);
 
   // Menu customisation is entirely optional and never blocks "Check availability" (#3).
   // The chooser renders expanded by default (no collapse toggle), so whenever a
@@ -165,7 +165,7 @@ export function VendorProfileBoard({
 
         <div className="flex items-center gap-2 rounded-2xl border border-gold-500/40 bg-gold-100 px-4 py-3 text-sm text-ink">
           <p>
-            <span className="font-semibold text-gold-600">Book through us and get {Math.round(DISCOUNT_PERCENT * 100)}% off your booking value</span>{" "}
+            <span className="font-semibold text-gold-600">Book through us and get {Math.round(vendor.discount_percent)}% off your booking value</span>{" "}
             <span className="text-ink-muted">T&amp;C apply.</span>
           </p>
         </div>
@@ -321,7 +321,7 @@ export function VendorProfileBoard({
                     : selectedPackage.name}
                 </span>
                 <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-700">
-                  {Math.round(DISCOUNT_PERCENT * 100)}% OFF
+                  {Math.round(vendor.discount_percent)}% OFF
                 </span>
               </div>
               <div className="flex flex-wrap items-baseline gap-x-2">

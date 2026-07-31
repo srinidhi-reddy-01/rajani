@@ -24,14 +24,16 @@ export function quotePerPlate(basePricePp: number, plates: number): number {
 export const QUOTE_DISCLAIMER =
   "Actual price may vary by 10–15% based on dish changes and plate-count updates. Please confirm with the caterer for final booking.";
 
-// Flat platform-wide discount applied to a booking's total (subtotal = quotePerPlate(...) *
-// plates), replacing the old flat ₹1000-off. A single tunable constant - every discount
-// display and every lead-capture write reads through computeDiscountedTotal below, never
-// this percentage directly.
-export const DISCOUNT_PERCENT = 0.1;
-
-export function computeDiscountedTotal(subtotal: number): { subtotal: number; discount: number; total: number } {
-  const discount = Math.round(subtotal * DISCOUNT_PERCENT);
+// Platform discount applied to a booking's total (subtotal = quotePerPlate(...) * plates),
+// funded by the vendor's commission - so it varies per vendor (vendors.discount_percent,
+// a whole percentage point, editable in the admin profile editor) instead of being one
+// site-wide constant. Every discount display and every lead-capture write reads through
+// computeDiscountedTotal below, never a raw percentage directly.
+export function computeDiscountedTotal(
+  subtotal: number,
+  discountPercent: number
+): { subtotal: number; discount: number; total: number } {
+  const discount = Math.round(subtotal * (discountPercent / 100));
   return { subtotal, discount, total: subtotal - discount };
 }
 

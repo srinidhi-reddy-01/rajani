@@ -235,6 +235,19 @@ export default async function AdminVendorEditorPage({ params }: { params: Promis
               <option value="final">final</option>
             </select>
           </label>
+          <label className="flex flex-col gap-1 text-sm text-ink-muted">
+            Customer discount % (funded by this vendor&apos;s commission)
+            <input
+              type="number"
+              min={0}
+              max={100}
+              step="0.1"
+              name="discount_percent"
+              defaultValue={vendor.discount_percent}
+              required
+              className={inputClass}
+            />
+          </label>
           <label className="flex items-center gap-2 self-end text-sm text-ink-muted">
             <input type="checkbox" name="serviceable_everywhere" defaultChecked={vendor.serviceable_everywhere} className="h-5 w-5" />
             Serviceable everywhere

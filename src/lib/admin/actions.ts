@@ -131,6 +131,7 @@ export async function updateVendorProfile(vendorId: string, formData: FormData):
       fssai_license_number: String(formData.get("fssai_license_number") ?? "").trim() || null,
       serviceable_everywhere: formData.get("serviceable_everywhere") === "on",
       pricing_model: String(formData.get("pricing_model") ?? "flexible") as "final" | "flexible",
+      discount_percent: Math.min(100, Math.max(0, Number(formData.get("discount_percent") ?? 10))),
     })
     .eq("id", vendorId);
   if (error) throw error;

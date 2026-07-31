@@ -27,6 +27,7 @@ export type Vendor = {
   is_verified: boolean;
   fssai_license_number: string | null;
   is_demo: boolean;
+  discount_percent: number;
   created_at: string;
   updated_at: string;
 };

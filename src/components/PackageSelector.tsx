@@ -82,15 +82,28 @@ export function PackageSelector({
                     whileTap={{ scale: 0.97 }}
                     aria-pressed={selected}
                     onClick={() => toggle(slot.id, option.itemId, slot.selectionsCount)}
-                    className={`flex min-h-11 cursor-pointer flex-col overflow-hidden rounded-2xl border text-left transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
+                    className={`group flex min-h-11 cursor-pointer flex-col overflow-hidden rounded-2xl border text-left transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
                       selected ? "border-royal-600 bg-royal-50 ring-2 ring-royal-100" : "border-border bg-surface hover:border-royal-600"
                     }`}
                   >
-                    {option.imageUrl && (
-                      <div className="relative h-20 w-full">
-                        <Image src={option.imageUrl} alt="" fill sizes="150px" className="object-cover" />
-                      </div>
-                    )}
+                    <div className="relative h-20 w-full overflow-hidden">
+                      {option.imageUrl ? (
+                        <Image
+                          src={option.imageUrl}
+                          alt=""
+                          fill
+                          sizes="150px"
+                          className="object-cover transition-transform duration-200 ease-out group-hover:scale-110"
+                        />
+                      ) : (
+                        <div
+                          className="flex h-full w-full items-center justify-center bg-gradient-to-br from-royal-600 to-royal-800 text-lg font-semibold text-cream-50"
+                          aria-hidden
+                        >
+                          {option.name.trim().charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 px-3 py-2">
                       <span
                         className={`inline-block h-2.5 w-2.5 shrink-0 rounded-sm border ${

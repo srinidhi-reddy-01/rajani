@@ -1,0 +1,395 @@
+{
+ "vendor": {
+  "id": "6911ebd7-fd31-4a66-951f-312ed234de35",
+  "name": "Sapthagiri Hospitality Services Pvt. Ltd",
+  "address": "H.No 3/16/6/9, Behind Varalaxmi Tiffins, Near West Side School, Bayleaf Road, Narsingi, Hyderabad",
+  "phones": [
+   "+91 95505 54545",
+   "+91 95504 98901"
+  ],
+  "website": "www.sapthagirihospitalityservices.com"
+ },
+ "terms": [
+  "Please keep a person at the Plates Counter.",
+  "Total amount should be paid for the ordered number of pax.",
+  "50% advance at the time of party booking, 40% before 9 days of the event, balance 10% after completion of the event.",
+  "Extra plates will be charged fully.",
+  "Mode of payment - Cash / Online.",
+  "Client scope: Buffet tables (2/4 size), fills, clothes, hand wash, old carpet for kitchen, power, lighting, water for washing."
+ ],
+ "menus": [
+  {
+   "menu_name": "House Veg Menu",
+   "menu_code": "HOUSE_VEG",
+   "price_per_pax": 400,
+   "currency": "INR",
+   "cuisine": "Indian (Telugu / North Indian) Vegetarian",
+   "is_veg": true,
+   "sections": [
+    {
+     "seq": 1,
+     "name": "Hot Items",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Mirchi bajji","Aloo bajji","Cut mirchi","Arati bajji","Dahi wada","Aloo bonda","Onion pakoda","Mix bonda","Palak pakoda","Tamalapaku bajji"]
+    },
+    {
+     "seq": 2,
+     "name": "Salad Counter",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Green salad","Sprouts salad","Corn salad","Papad chat","Mix salad","Aloo chat","Pasta salad","Channa chat","Russian salad"]
+    },
+    {
+     "seq": 3,
+     "name": "Indian Bread",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Phulka","Jonna Rotte","Poori","Tandoori Roti","Parata","Stuffed Kulcha","Palak puri","Stuffed parata","Butter Naan","Aloo parata","Masala Kulcha"]
+    },
+    {
+     "seq": 4,
+     "name": "Veg Curries",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Paneer butter masala","Paneer do pyaza","Paneer mutter","Malai methi paneer","Paneer makhani","Paneer kurma","Paneer chole","Kaju Paneer","Palak paneer","Paneer kofta","Paneer capsicum","Malai kofta","Veg kofta","Butter babycorn","Gutti Vankaya","Kadai babycorn","Mix veg curry","Babycorn Masala","Kadai veg","Babycorn with Green peas","Kaju Babycorn","Kadai Mushroom","Butter Babycorn with Mushroom","Babycorn with Mushroom","Kaju Mushroom","Mushroom Masala","Malai methi greenpeas","Malai methi veg","Capsicum masala","Gobi capsicum","Capsicum with gobi","Capsicum with greenpeas","Malai capsicum","Green Peas kurma","Meal maker kurma","Meal maker curry","Meal maker kheema fry","Kaju Green Peas","Kaju Aloo Tomato","Kaju Dosa Tomato","Beerakaya chanagapappu masala","Gongura macaroni","Cabbage chanagapappu masala","Mirchi ka salan","Aloo mutter","Aloo gobi","Aloo capsicum","Aloo scoop kurma","Aloo curry","Gobi mutter","Tomato Mulakkada","Aloo Tomato Green peas","Tomato drumstick kaju curry","Kaju Mulakkada Tomato","Tomato Mulakkada Vankaya","Dosakaya jeedipappu curry","Chamagadda Tomato Pulusu"]
+    },
+    {
+     "seq": 5,
+     "name": "Special Rice Items",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Dum ka veg biryani","Lemon rice","Veg pulav","Tomato rice","Peas pulav","Kothmir rice","Palak rice","Karivepaku rice","Avakaya biryani","Sambar rice","Usirikaya biryani","Bisbilla bath","Bagara rice","Vangi bath","Chintapandu Pulihora","Mango pulihora","Muddapappu Avakaya Annam","Jeera rice"]
+    },
+    {
+     "seq": 6,
+     "name": "Fry Items",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Bhendi Kaju Kobbari Fry","Bhendi pakoda","Dondakayi chilakalla pakodi fry","Arati fry","Chama dumpa finger chips","Aloo jeera","Kanda porutu","Aloo fry (thurumu)","Aloo allam green mirchi fry","Chamagadda fry","Kandagadda fry","Vankaya fry","Chikkudu Fry + Kaju","Donda pakoda"]
+    },
+    {
+     "seq": 7,
+     "name": "Dal Items",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Mamidikaya Pappu","Gangavali Pappu","Tomato Pappu","Dal tadka","Palak Pappu","Butter dal fry","Gongura Pappu","Kasturi Methi dal","Kothmir Pappu","Pesara pappu"]
+    },
+    {
+     "seq": 8,
+     "name": "Semi Liquids",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Sambar","Miryala Rasam","Majjiga pulusu","Tomato rasam","Pachipulusu","Ulava rasam","Ulavacharu with cream","Lemon rasam","Palli charu","Pineapple rasam","Beetroot rasam"]
+    },
+    {
+     "seq": 9,
+     "name": "Fresh Chutneys",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Tomato","Dosakaya Mukkalu","Beerakaya","Mamidi Mukkalu","Dondakaya","Kobbari pachadi","Vankaya","Sorakaya","Gongura","Cabbage","Donda Mukkalu Tomato","Jamakaya"]
+    },
+    {
+     "seq": 10,
+     "name": "Pickles",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Mango","Lemon","Usiri","Garlic","Tomato","Chinta Thokku"]
+    },
+    {
+     "seq": 11,
+     "name": "Common Items",
+     "selection_rule": { "type": "all" },
+     "items": ["White Rice","Curd","Raitha","Papad","Fryums","Ghee"]
+    },
+    {
+     "seq": 12,
+     "name": "Desserts",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Bobbatlu + Ghee","Kaddu ka halwa","Poornalu + Ghee","Carrot halwa","Gulab Jamoon","Rawa kesari","Kala Jamoon","Pineapple kesari","Mini jamoon","Semiya Payasam","Rasmalai","Khova puri","Angoor rasmalai","Badusha","Mini rasgulla","Milk Mysurpak","Boondi laddu","Chitti Kajalu"]
+    },
+    {
+     "seq": 13,
+     "name": "Ice Cream",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Vanilla","Strawberry","Butterscotch"]
+    },
+    {
+     "seq": 14,
+     "name": "Mineral Water",
+     "selection_rule": { "type": "all" },
+     "items": ["Mineral Water Bottle - Standard 250ml"]
+    },
+    {
+     "seq": 15,
+     "name": "Mouth Freshener",
+     "selection_rule": { "type": "all" },
+     "items": ["Sounf","Toothpicks"]
+    }
+   ]
+  },
+  {
+   "menu_name": "House Special Veg Menu",
+   "menu_code": "HOUSE_SPECIAL_VEG",
+   "price_per_pax": 600,
+   "currency": "INR",
+   "cuisine": "Indian (Telugu / North Indian) Vegetarian",
+   "is_veg": true,
+   "sections": [
+    {
+     "seq": 1,
+     "name": "Refreshments",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Fruit punch","Watermelon juice","Fruit Delight","Strawberry Fresh","Pineapple Punch","Grape","Mix punch","Guava","Orange Blossom","Lichi","Orange Milkshake","Fresh Mango Juice","Pineapple Milkshake","Ajanta Grape juice","Vanilla Milkshake","Lemon Juice","Chocolate Milkshake","Mango Lassi","Butterscotch Shake","Sweet Lassi","Banana Shake","Salt Lassi","Chiku Milkshake","Mint Guava","Kiwi Delight Shake","Lichi Coconut Shake","Veg Manchow Soup","Veg Corn Soup","Cream of Tomato Soup","Veg Wonton Soup","Hot & Sour Soup","Spinach Soup","Mulligatawny Soup","French Onion Soup"],
+     "subgroups": [
+      { "name": "Juices, Punches, Shakes & Lassi", "items": ["Fruit punch","Watermelon juice","Fruit Delight","Strawberry Fresh","Pineapple Punch","Grape","Mix punch","Guava","Orange Blossom","Lichi","Orange Milkshake","Fresh Mango Juice","Pineapple Milkshake","Ajanta Grape juice","Vanilla Milkshake","Lemon Juice","Chocolate Milkshake","Mango Lassi","Butterscotch Shake","Sweet Lassi","Banana Shake","Salt Lassi","Chiku Milkshake","Mint Guava","Kiwi Delight Shake","Lichi Coconut Shake"] },
+      { "name": "Soups", "items": ["Veg Manchow Soup","Veg Corn Soup","Cream of Tomato Soup","Veg Wonton Soup","Hot & Sour Soup","Spinach Soup","Mulligatawny Soup","French Onion Soup"] }
+     ],
+     "note": "Standard 250ml water bottles served throughout."
+    },
+    {
+     "seq": 2,
+     "name": "Starters",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Multani Paneer Tikka","Paneer Jali Kebab","Paneer Tikka","Paneer Finger","Paneer Chatar Patar","Paneer Kurkure","Paneer Shashlik","Chilli Paneer","Paneer-65","Salt & Pepper Fried Paneer","Mushroom Manchuria","Stuffed Mushroom","Mushroom Mozzarella Titans","Chilli Mushroom","Salt And Pepper Mushroom","Stuffed Tandoori Mushroom","Chatpata Pineapple Tikka","Chili Milli Kabab Veg","Almond Potato Croquettes","Jalapeno Cheese Poppers","Corn Cheese Nuggets","Spinach Cheese Melts","Corn Cheese Balls","Potato Cheese Shots","Cilantro Cheese Balls","Spinach Cheese Rolls","Cheese Broccoli Croquettes","Potato Cheese Balls","Scramble Broccoli","Cheese Broccoli Kabab","Golden Fried Baby Corn","Chilli Baby Corn","Baby Corn Majestic","Crispy Baby Corn","Babycorn Manchuria","Babycorn Stick","Crispy Corn","Crispy Veg","Veg Nuggets","Veg Galouti","Harabhara Kabab","Veg Sheekh Kabab","Veg Bullet","Veg Cigar Roll","Veg Cutlet","Veg Gold Coin","Veg Gold Finger","Veg Lollypop","Veg Spring Roll","Veg Sticks","Veg Shanghai Roll","Veg-65","Veg Manchuria","Gobi Manchurian","Onion Rings","Capsicum Rings","Irani Samosa","Corn Samosa","Crispy Vegetables","Bread Rolls","Spinach Corn Triangles","Zucchini With Peri Peri","Tandoori Aloo","Kungfu Potato","Aloo-65","French Fries","Shanghai Roll","Beetroot Galouti","Tempura Veg","Water Chestnut in Honey Chilli Sauce","Veg Momos","Masala wada","Spicy Fried Mirchi","Minapa gare","Cut Mirchi","Alasanda wada","Mirchi Bajji","Corn wada","Aratikaya bajji","Pesara Garelu","Aloo bajji","Onion pakoda","Mini bonda","Palak pakoda","Veg bonda"],
+     "subgroups": [
+      { "name": "North Indian / Continental", "items": ["Multani Paneer Tikka","Paneer Jali Kebab","Paneer Tikka","Paneer Finger","Paneer Chatar Patar","Paneer Kurkure","Paneer Shashlik","Chilli Paneer","Paneer-65","Salt & Pepper Fried Paneer","Mushroom Manchuria","Stuffed Mushroom","Mushroom Mozzarella Titans","Chilli Mushroom","Salt And Pepper Mushroom","Stuffed Tandoori Mushroom","Chatpata Pineapple Tikka","Chili Milli Kabab Veg","Almond Potato Croquettes","Jalapeno Cheese Poppers","Corn Cheese Nuggets","Spinach Cheese Melts","Corn Cheese Balls","Potato Cheese Shots","Cilantro Cheese Balls","Spinach Cheese Rolls","Cheese Broccoli Croquettes","Potato Cheese Balls","Scramble Broccoli","Cheese Broccoli Kabab","Golden Fried Baby Corn","Chilli Baby Corn","Baby Corn Majestic","Crispy Baby Corn","Babycorn Manchuria","Babycorn Stick","Crispy Corn","Crispy Veg","Veg Nuggets","Veg Galouti","Harabhara Kabab","Veg Sheekh Kabab","Veg Bullet","Veg Cigar Roll","Veg Cutlet","Veg Gold Coin","Veg Gold Finger","Veg Lollypop","Veg Spring Roll","Veg Sticks","Veg Shanghai Roll","Veg-65","Veg Manchuria","Gobi Manchurian","Onion Rings","Capsicum Rings","Irani Samosa","Corn Samosa","Crispy Vegetables","Bread Rolls","Spinach Corn Triangles","Zucchini With Peri Peri","Tandoori Aloo","Kungfu Potato","Aloo-65","French Fries","Shanghai Roll","Beetroot Galouti","Tempura Veg","Water Chestnut in Honey Chilli Sauce","Veg Momos"] },
+      { "name": "South Indian", "items": ["Masala wada","Spicy Fried Mirchi","Minapa gare","Cut Mirchi","Alasanda wada","Mirchi Bajji","Corn wada","Aratikaya bajji","Pesara Garelu","Aloo bajji","Onion pakoda","Mini bonda","Palak pakoda","Veg bonda"] }
+     ]
+    },
+    {
+     "seq": 3,
+     "name": "Salad Counter",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Green salad","Corn Pimento Salad","Cucumber Yogurt Salad","German Potato Salad","Asian Cucumber Salad","Three Bean Salad","Russian salad","Mexican Salad","Pasta salad","Antipasto Salad","Kimchi Salad","Boiled Vegetable Salad","Sprout Fetus Salad","Black Chana Salad","Hawaiian Salad","Vegetable Chickpea Salad","Cesar Salad","Tossed Salad","Sprouts salad","Mix salad","Papad chat","Aloo chat","Channa chat","Corn salad","Boiled palli","Anapa Ginjalu fry"]
+    },
+    {
+     "seq": 4,
+     "name": "Hot Items",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Mirchi bajji","Aloo bajji","Cut mirchi","Arati bajji","Dahi wada","Tamalapaku bajji","Onion pakoda","Aloo bonda","Palak pakoda","Mix bonda"]
+    },
+    {
+     "seq": 5,
+     "name": "Indian Bread",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Phulka","Masala Kulcha","Puri","Paneer Kulcha","Palak puri","Pudina Kulcha","Methi puri","Stuffed Kulcha","Masala puri","Puff Parota","Rumali Roti","Lacha Parota","Butter Rumali","Kerala Parota","Mini Tandoori Roti","Paneer Parota","Baby Naan","Mooli Parota","Butter Naan","Stuffed Parota","Pizza Naan","Parota","Pudina Naan","Aloo Parata","Dil Naan","Tavva Parota","Tandoori Roti","Peas Parota","Makkhai ki Roti","Jonna Rotte"]
+    },
+    {
+     "seq": 6,
+     "name": "Veg Curries",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Paneer butter masala","Paneer do pyaza","Paneer mutter","Malai methi paneer","Paneer makhani","Paneer kurma","Paneer chole","Kaju Paneer","Palak paneer","Paneer kofta","Paneer capsicum","Malai kofta","Veg kofta","Butter babycorn","Gutti Vankaya","Kadai babycorn","Mix veg curry","Babycorn Masala","Kadai veg","Babycorn with Green peas","Kaju Babycorn","Kadai Mushroom","Butter Babycorn with Mushroom","Babycorn with Mushroom","Kaju Mushroom","Mushroom Masala","Malai methi greenpeas","Malai methi veg","Capsicum masala","Gobi capsicum","Capsicum with gobi","Capsicum with greenpeas","Malai capsicum","Green Peas kurma","Meal maker kurma","Meal maker curry","Meal maker kheema fry","Kaju Green Peas","Kaju Aloo Tomato","Kaju Dosa Tomato","Beerakaya chanagapappu masala","Gongura macaroni","Cabbage chanagapappu masala","Mirchi ka salan","Aloo mutter","Aloo gobi","Aloo capsicum","Aloo scoop kurma","Aloo curry","Gobi mutter","Tomato Mulakkada","Aloo Tomato Green peas","Tomato drumstick kaju curry","Kaju Mulakkada Tomato","Tomato Mulakkada Vankaya","Dosakaya jeedipappu curry","Chamagadda Tomato Pulusu"]
+    },
+    {
+     "seq": 7,
+     "name": "Special Rice Items",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Dum ka veg biryani","Lemon rice","Panasakaya Biryani","Mamidikaya Pulihora","Gobi Biryani","Karivepaku rice","Ulavacharu Biryani","Coconut rice","Avakaya biryani","Chintapandu Pulihora","Usirikaya biryani","Tomato rice","Veg pulav","Palak rice","Bagara rice","Sambar rice","Peas pulav","Bisbilla bath","Gobi pulav","Kothmir rice","Vangi bath","Pudina rice","Daddojanam","Curd rice","Muddapappu Avakaya Annam","Jeera rice"]
+    },
+    {
+     "seq": 8,
+     "name": "Fry Items",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Bhendi Kaju Kobbari Fry","Kanda porutu","Bhendi pakoda","Aloo fry thuriminadi","Donda fry + Kaju","Cabbage fry","Donda pakoda","Mixed Porial","Dondakayi chilakalla pakodi fry","Arati fry","Nalla Vankaya fry","Aloo jeera","Chikkudu Fry","Beans fry with pallipodi","Chamagadda fry + Kaju","Sorakaya with pallipodi","Chama dumpa finger chips","Beerakaya with methi","Aloo green peas fry","Panasapottu fry","Kandagadda fry thuriminadi","Bheerakaya with Bobbarlu","Aloo allam green mirchi fry","Beerakaya with Pesarapappu"]
+    },
+    {
+     "seq": 9,
+     "name": "Dal Items",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Tomato","Gangavalli","Mamidikaya Pappu","Kasturi Methi dal","Beerakaya","Chukkakura pappu","Dosakaya","Chintachiguru pappu","Palak","Chintakaya pappu","Gongura","Dal thadka","Kothmir","Mudda Pappu","Butter dal fry","Pesara Pappu with Green chilli"]
+    },
+    {
+     "seq": 10,
+     "name": "Semi Liquids",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Sambar","Tomato rasam","Pappucharu","Miryala Rasam","Palli charu","Ulava rasam","Telangana Pachipulusu","Pineapple rasam","Majjiga pulusu","Lemon rasam","Ulavacharu with cream","Beetroot rasam"]
+    },
+    {
+     "seq": 11,
+     "name": "Fresh Chutneys",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Tomato","Donda Mukkalu Tomato","Beerakaya","Mamidi Mukkalu","Dondakaya","Kobbari pachadi","Vankaya","Kobbari mamidi pachadi","Dosakaya Mukkalu","Tomato palli","Gongura","Kothmir tomato","Pudina pachadi","Thurimina Mamidikaya pachadi","Onion pachadi","Kobbari kothmiri","Cabbage","Sorakaya","Jamakaya"]
+    },
+    {
+     "seq": 12,
+     "name": "Pickles",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Mango","Garlic","Lemon","Chinta Thokku","Tomato","Pandu mirchi","Usiri","Dosa avakaya"]
+    },
+    {
+     "seq": 13,
+     "name": "Common Items",
+     "selection_rule": { "type": "all" },
+     "items": ["White Rice","Curd","Raitha","Papad","Fryums","Ghee"]
+    },
+    {
+     "seq": 14,
+     "name": "Desserts",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Mangomisu","Poornalu + Ghee","Apricot Pudding","Bobbatlu + Ghee","Live Shibuya Toast","Gulab Jamoon","Live Waffle","Kala Jamoon","Tiramisu","Thawa Jamoon","Mango Pudding","Mini jamoon","Tender Coconut Mousse","Rasgulla","Jackfruit Mousse","Mini rasgulla","Trifle pudding","Baked rasgulla","Chocolate Mousse","Rasmalai","Panacotta Assorted","Angoor rasmalai","Mango Tres Leches","Carrot halwa","Biscoff Tres Leches","Kaddu ka halwa","Nutella Tres Leches","Kaddu ka kheer","Banana delight","Mini Rajbhog","Mango delight","Qurbani ka meeta","Apricot delight","Double ka meeta","Apple delight","Shahi tukda","Fruit salad with cream","Gummadikaya halwa","Fruit salad with rabdi","Khova puri","Fruit salad with custard","Badusha","Mango Burfi","Boondi laddu","Dry Fruit Halwa","Milk Mysurpak","Badam Rolls","Kesar Jilebi","Badam Burfi","Paneer jilebi","Kaju Burfi","Bellam jilebi","Kaju Rolls","Badam Halwa","Chitti Kajalu","Saffron kheer","Rawa kesari","Malai roll","Rawa laddu","Pineapple Chamcham","Pineapple kesari","Malai Chamcham","Kalakand Delight","Semiya Payasam"]
+    },
+    {
+     "seq": 15,
+     "name": "Ice Creams",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Vanilla","Honeymoon Delight","Butter Scotch","Jamaican Choco Fudge","Strawberry","Everything Nutty","Chocolate","Fruit Cocktail","Mango","Single Sundae","Seetaphal","Double Sundae","Orange","Melly Jelly","Pista","Choco Rocco","Kesar Pista","Beri Bonanja","Badam Pista","Malai Kulfi","Anjeer Badam","Keesar Pista Kulfi","Stick icecream","Chocolate Bar","Black forest","Belgium Dark","Chocobar","Dry fruit Temptations","Butterscotch Bar","Caramel Nuts"]
+    },
+    {
+     "seq": 16,
+     "name": "Pan Counter",
+     "selection_rule": { "type": "all" },
+     "items": ["Sweet Pan","Meenakshi pan","Sada Pan","Supari"]
+    },
+    {
+     "seq": 17,
+     "name": "Mineral Water",
+     "selection_rule": { "type": "all" },
+     "items": ["Mineral Water Bottle - Standard 250ml"]
+    }
+   ]
+  },
+  {
+   "menu_name": "Combo Veg Menu",
+   "menu_code": "COMBO_VEG",
+   "price_per_pax": 800,
+   "currency": "INR",
+   "cuisine": "Indian (Telugu / North Indian) Vegetarian",
+   "is_veg": true,
+   "sections": [
+    {
+     "seq": 1,
+     "name": "Refreshments",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Fruit punch","Watermelon juice","Fruit Delight","Strawberry Fresh","Pineapple Punch","Grape","Mix punch","Guava","Orange Blossom","Lichi","Orange Milkshake","Fresh Mango Juice","Pineapple Milkshake","Ajanta Grape juice","Vanilla Milkshake","Lemon Juice","Chocolate Milkshake","Mango Lassi","Butterscotch Shake","Sweet Lassi","Banana Shake","Salt Lassi","Chiku Milkshake","Mint Guava","Kiwi Delight Shake","Lichi Coconut Shake","Veg Manchow Soup","Veg Corn Soup","Cream of Tomato Soup","Veg Wonton Soup","Hot & Sour Soup","Spinach Soup","Mulligatawny Soup","French Onion Soup"],
+     "subgroups": [
+      { "name": "Juices, Punches, Shakes & Lassi", "items": ["Fruit punch","Watermelon juice","Fruit Delight","Strawberry Fresh","Pineapple Punch","Grape","Mix punch","Guava","Orange Blossom","Lichi","Orange Milkshake","Fresh Mango Juice","Pineapple Milkshake","Ajanta Grape juice","Vanilla Milkshake","Lemon Juice","Chocolate Milkshake","Mango Lassi","Butterscotch Shake","Sweet Lassi","Banana Shake","Salt Lassi","Chiku Milkshake","Mint Guava","Kiwi Delight Shake","Lichi Coconut Shake"] },
+      { "name": "Soups", "items": ["Veg Manchow Soup","Veg Corn Soup","Cream of Tomato Soup","Veg Wonton Soup","Hot & Sour Soup","Spinach Soup","Mulligatawny Soup","French Onion Soup"] }
+     ],
+     "note": "Standard 250ml water bottles served throughout."
+    },
+    {
+     "seq": 2,
+     "name": "Starters",
+     "selection_rule": { "type": "choose", "count": 3 },
+     "items": ["Multani Paneer Tikka","Paneer Jali Kebab","Paneer Tikka","Paneer Finger","Paneer Chatar Patar","Paneer Kurkure","Paneer Shashlik","Chilli Paneer","Paneer-65","Salt & Pepper Fried Paneer","Mushroom Manchuria","Stuffed Mushroom","Mushroom Mozzarella Titans","Chilli Mushroom","Salt And Pepper Mushroom","Stuffed Tandoori Mushroom","Chatpata Pineapple Tikka","Chili Milli Kabab Veg","Almond Potato Croquettes","Jalapeno Cheese Poppers","Corn Cheese Nuggets","Spinach Cheese Melts","Corn Cheese Balls","Potato Cheese Shots","Cilantro Cheese Balls","Spinach Cheese Rolls","Cheese Broccoli Croquettes","Potato Cheese Balls","Scramble Broccoli","Cheese Broccoli Kabab","Golden Fried Baby Corn","Chilli Baby Corn","Baby Corn Majestic","Crispy Baby Corn","Babycorn Manchuria","Babycorn Stick","Crispy Corn","Crispy Veg","Veg Nuggets","Veg Galouti","Harabhara Kabab","Veg Sheekh Kabab","Veg Bullet","Veg Cigar Roll","Veg Cutlet","Veg Gold Coin","Veg Gold Finger","Veg Lollypop","Veg Spring Roll","Veg Sticks","Veg Shanghai Roll","Veg-65","Veg Manchuria","Gobi Manchurian","Onion Rings","Capsicum Rings","Irani Samosa","Corn Samosa","Crispy Vegetables","Bread Rolls","Spinach Corn Triangles","Zucchini With Peri Peri","Tandoori Aloo","Kungfu Potato","Aloo-65","French Fries","Shanghai Roll","Beetroot Galouti","Tempura Veg","Water Chestnut in Honey Chilli Sauce","Veg Momos","Masala wada","Spicy Fried Mirchi","Minapa gare","Cut Mirchi","Alasanda wada","Mirchi Bajji","Corn wada","Aratikaya bajji","Pesara Garelu","Aloo bajji","Onion pakoda","Mini bonda","Palak pakoda","Veg bonda"],
+     "subgroups": [
+      { "name": "North Indian / Continental", "items": ["Multani Paneer Tikka","Paneer Jali Kebab","Paneer Tikka","Paneer Finger","Paneer Chatar Patar","Paneer Kurkure","Paneer Shashlik","Chilli Paneer","Paneer-65","Salt & Pepper Fried Paneer","Mushroom Manchuria","Stuffed Mushroom","Mushroom Mozzarella Titans","Chilli Mushroom","Salt And Pepper Mushroom","Stuffed Tandoori Mushroom","Chatpata Pineapple Tikka","Chili Milli Kabab Veg","Almond Potato Croquettes","Jalapeno Cheese Poppers","Corn Cheese Nuggets","Spinach Cheese Melts","Corn Cheese Balls","Potato Cheese Shots","Cilantro Cheese Balls","Spinach Cheese Rolls","Cheese Broccoli Croquettes","Potato Cheese Balls","Scramble Broccoli","Cheese Broccoli Kabab","Golden Fried Baby Corn","Chilli Baby Corn","Baby Corn Majestic","Crispy Baby Corn","Babycorn Manchuria","Babycorn Stick","Crispy Corn","Crispy Veg","Veg Nuggets","Veg Galouti","Harabhara Kabab","Veg Sheekh Kabab","Veg Bullet","Veg Cigar Roll","Veg Cutlet","Veg Gold Coin","Veg Gold Finger","Veg Lollypop","Veg Spring Roll","Veg Sticks","Veg Shanghai Roll","Veg-65","Veg Manchuria","Gobi Manchurian","Onion Rings","Capsicum Rings","Irani Samosa","Corn Samosa","Crispy Vegetables","Bread Rolls","Spinach Corn Triangles","Zucchini With Peri Peri","Tandoori Aloo","Kungfu Potato","Aloo-65","French Fries","Shanghai Roll","Beetroot Galouti","Tempura Veg","Water Chestnut in Honey Chilli Sauce","Veg Momos"] },
+      { "name": "South Indian", "items": ["Masala wada","Spicy Fried Mirchi","Minapa gare","Cut Mirchi","Alasanda wada","Mirchi Bajji","Corn wada","Aratikaya bajji","Pesara Garelu","Aloo bajji","Onion pakoda","Mini bonda","Palak pakoda","Veg bonda"] }
+     ]
+    },
+    {
+     "seq": 3,
+     "name": "Chat Counter",
+     "selection_rule": { "type": "choose", "count": 5 },
+     "items": ["Pav Bhaji","Banana Samosa","Chole bhatura","Nauratan kaju Samosa","Lacha cutlet","Fruit Samosa","Raj kachori","Ragda Kachori","Kesar Jilebi","Dhairaj kachori","Dhokla","Golgappa","Paneer masala kachori","Aloo Ragada samosa","Corn kachori","Paneer Samosa","Club kachori","Corn Samosa","Veg Samosa","Mewa dry fruit bujia","Fruit kulla","Malai Dhaiwade","Rajasthani kaanjiwada","Chenna dhaiwade","Mango kulfi dhaiwada","Chocolate dhaiwade","Rajasthani jaljeera pani","Makana dhaiwada","Angoori Dhai pakodi chat","Dry fruit lacha toast","Dhaiwade","Dhai papdi","Dhaipuri chat","Dethi dhaipapdi","Palak patta chat","Karela papdi chat","Panpatta chat","Delhi dhai komcha","Dhai biscuit chat","Dhai missal","Hanny fanny chat","Bhalla papdi chat","Chilam chat","Matri chat","Lacha papdi chat","Mix Lacha papdi chat","Punjabi chole batura","Delhi mutter kulcha","Delhi chole kulcha","Gujarati Daavali","Delhi chole pav","Pav masala paneer","Masala mirchi","Bombay banana mirchi","Potato masala mirchi","Jyothpuri mirchi","Babycorn pasanda","Babycorn mirchi","Stick pasanda","Delhi cutlet","Lacha tikki","Paneer cutlet","Banana cutlet","Veg masala cutlet","Mutter cutlet","Ragda cutlet","Delhi chola tikki","Bombay masala wadapav","Butter pavbhaji","Cheese pavbhaji","Banana jain pavbhaji","Mutter curry belma badai","Moongdal pakoda","Potato stick masala","Cauliflower pakoda","Paneer pakoda masala","Punjabi mix pakoda","Delhi banana wada","Masala Bombay wada","Paneer cova cutlet","Makhana cutlet","Sweetcorn cutlet","Bread cutlet","Singada cutlet","Saker kandi cutlet","Lacha milkmaid cutlet","Mutter sandwich cutlet","Angoori tikki","Ragada sandwich cutlet","Pineapple cutlet","Chola sandwich cutlet","Dry fruits cutlet","Paneer kangna chat","Veg kangna chat","Potato kangna chat","Banana kangna chat","Raja rani chat","Thawa Masala dry fruit chat","Veg franky","Banana franky","Handi icecream dhaiwada","Handi dhai angoori chat","Handi mango dhaiwada","Handi Navratan dhai wada","Handi chocolate dhaiwada","Handi sheerkand papdi chat","Handi dhai Bhalla chat","Handi dhai koncha","Handi dry fruit dhaiwade","Handi pineapple dhaiwada","Handi malai dhaiwada","Rabdi jilebi","Pineapple jilebi","Paneer jilebi","Apple jilebi","Hot thawa sweet","Dohalat ki chat","Dry fruit malai pav","Rabdi malai pav","Hot fry ice cream","Hot kesar badam milk","Cool dry fruit badam milk","Dalwati kurma","Rawa delhi panipuri","Thawa paneer chat","Thawa paneer alu chat","Thawa sheerkhand chat","Thawa navratan chat","Masala paneer tikka","Tandoori aloo chat","Potato franky","Navratan masala franki","Pudina rawa pani puri","Bombay moongdal panipuri","Sada panipuri","Palak panipuri","Bangalore white panipuri"],
+     "subgroups": [
+      { "name": "Chat & Kachori", "items": ["Pav Bhaji","Banana Samosa","Chole bhatura","Nauratan kaju Samosa","Lacha cutlet","Fruit Samosa","Raj kachori","Ragda Kachori","Kesar Jilebi","Dhairaj kachori","Dhokla","Golgappa","Paneer masala kachori","Aloo Ragada samosa","Corn kachori","Paneer Samosa","Club kachori","Corn Samosa","Veg Samosa"] },
+      { "name": "Agra UP Special Chat", "items": ["Mewa dry fruit bujia","Fruit kulla","Malai Dhaiwade","Rajasthani kaanjiwada","Chenna dhaiwade","Mango kulfi dhaiwada","Chocolate dhaiwade","Rajasthani jaljeera pani","Makana dhaiwada","Angoori Dhai pakodi chat","Dry fruit lacha toast","Dhaiwade"] },
+      { "name": "Agra UP Special - Cool Items", "items": ["Dhai papdi","Dhaipuri chat","Dethi dhaipapdi","Palak patta chat","Karela papdi chat","Panpatta chat","Delhi dhai komcha","Dhai biscuit chat","Dhai missal","Hanny fanny chat","Bhalla papdi chat","Chilam chat","Matri chat","Lacha papdi chat","Mix Lacha papdi chat","Punjabi chole batura","Delhi mutter kulcha","Delhi chole kulcha","Gujarati Daavali","Delhi chole pav","Pav masala paneer","Masala mirchi","Bombay banana mirchi","Potato masala mirchi","Jyothpuri mirchi","Babycorn pasanda","Babycorn mirchi","Stick pasanda","Delhi cutlet","Lacha tikki","Paneer cutlet","Banana cutlet","Veg masala cutlet","Mutter cutlet","Ragda cutlet","Delhi chola tikki"] },
+      { "name": "Agra UP Special - Hot Items", "items": ["Bombay masala wadapav","Butter pavbhaji","Cheese pavbhaji","Banana jain pavbhaji","Mutter curry belma badai","Moongdal pakoda","Potato stick masala","Cauliflower pakoda","Paneer pakoda masala","Punjabi mix pakoda","Delhi banana wada","Masala Bombay wada","Paneer cova cutlet","Makhana cutlet","Sweetcorn cutlet","Bread cutlet","Singada cutlet","Saker kandi cutlet","Lacha milkmaid cutlet","Mutter sandwich cutlet","Angoori tikki","Ragada sandwich cutlet","Pineapple cutlet","Chola sandwich cutlet","Dry fruits cutlet","Paneer kangna chat","Veg kangna chat","Potato kangna chat","Banana kangna chat","Raja rani chat","Thawa Masala dry fruit chat","Veg franky","Banana franky"] },
+      { "name": "Agra UP Special - Handi Special Cool Items", "items": ["Handi icecream dhaiwada","Handi dhai angoori chat","Handi mango dhaiwada","Handi Navratan dhai wada","Handi chocolate dhaiwada","Handi sheerkand papdi chat","Handi dhai Bhalla chat","Handi dhai koncha","Handi dry fruit dhaiwade","Handi pineapple dhaiwada","Handi malai dhaiwada"] },
+      { "name": "Agra UP Special - Live Items", "items": ["Kesar Jilebi","Rabdi jilebi","Pineapple jilebi","Paneer jilebi","Apple jilebi","Hot thawa sweet","Dohalat ki chat","Dry fruit malai pav","Rabdi malai pav","Hot fry ice cream","Hot kesar badam milk","Cool dry fruit badam milk","Dalwati kurma"] },
+      { "name": "Agra UP Special - Pani Puri & Thawa Chat", "items": ["Rawa delhi panipuri","Thawa paneer chat","Thawa paneer alu chat","Thawa sheerkhand chat","Thawa navratan chat","Masala paneer tikka","Tandoori aloo chat","Potato franky","Navratan masala franki","Pudina rawa pani puri","Bombay moongdal panipuri","Sada panipuri","Palak panipuri","Bangalore white panipuri"] }
+     ]
+    },
+    {
+     "seq": 4,
+     "name": "Salad Counter",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Green salad","Corn Pimento Salad","Cucumber Yogurt Salad","German Potato Salad","Asian Cucumber Salad","Three Bean Salad","Russian salad","Mexican Salad","Pasta salad","Antipasto Salad","Kimchi Salad","Boiled Vegetable Salad","Sprout Fetus Salad","Black Chana Salad","Hawaiian Salad","Vegetable Chickpea Salad","Cesar Salad","Tossed Salad","Sprouts salad","Mix salad","Papad chat","Aloo chat","Channa chat","Corn salad","Boiled palli","Anapa Ginjalu fry"]
+    },
+    {
+     "seq": 5,
+     "name": "Chinese Items",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Veg Soft Noodles","Veg Manchuria","Singapore Noodles","Gobi Manchuria","Thai Noodles","Aloo-65","Shezwan Noodles","Gobi-65","American Chopsuey","Aloo Manchuria"]
+    },
+    {
+     "seq": 6,
+     "name": "Indian Bread",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Phulka","Masala Kulcha","Puri","Paneer Kulcha","Palak puri","Pudina Kulcha","Methi puri","Stuffed Kulcha","Masala puri","Puff Parota","Rumali Roti","Lacha Parota","Butter Rumali","Kerala Parota","Mini Tandoori Roti","Paneer Parota","Baby Naan","Mooli Parota","Butter Naan","Stuffed Parota","Pizza Naan","Parota","Pudina Naan","Aloo Parata","Dil Naan","Tavva Parota","Tandoori Roti","Peas Parota","Makkhai ki Roti","Jonna Rotte"]
+    },
+    {
+     "seq": 7,
+     "name": "Veg Curries",
+     "selection_rule": { "type": "choose", "count": 3 },
+     "items": ["Paneer butter masala","Paneer do pyaza","Paneer mutter","Malai methi paneer","Paneer makhani","Paneer kurma","Paneer chole","Kaju Paneer","Palak paneer","Paneer kofta","Paneer capsicum","Malai kofta","Veg kofta","Butter babycorn","Gutti Vankaya","Kadai babycorn","Mix veg curry","Babycorn Masala","Kadai veg","Babycorn with Green peas","Kaju Babycorn","Kadai Mushroom","Butter Babycorn with Mushroom","Babycorn with Mushroom","Kaju Mushroom","Mushroom Masala","Malai methi greenpeas","Malai methi veg","Capsicum masala","Gobi capsicum","Capsicum with gobi","Capsicum with greenpeas","Malai capsicum","Green Peas kurma","Meal maker kurma","Meal maker curry","Meal maker kheema fry","Kaju Green Peas","Kaju Aloo Tomato","Kaju Dosa Tomato","Beerakaya chanagapappu masala","Gongura macaroni","Cabbage chanagapappu masala","Mirchi ka salan","Aloo mutter","Aloo gobi","Aloo capsicum","Aloo scoop kurma","Aloo curry","Gobi mutter","Tomato Mulakkada","Aloo Tomato Green peas","Tomato drumstick kaju curry","Kaju Mulakkada Tomato","Tomato Mulakkada Vankaya","Dosakaya jeedipappu curry","Chamagadda Tomato Pulusu"]
+    },
+    {
+     "seq": 8,
+     "name": "Special Rice Items",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Dum ka veg biryani","Lemon rice","Panasakaya Biryani","Mamidikaya Pulihora","Gobi Biryani","Karivepaku rice","Ulavacharu Biryani","Coconut rice","Avakaya biryani","Chintapandu Pulihora","Usirikaya biryani","Tomato rice","Veg pulav","Palak rice","Bagara rice","Sambar rice","Peas pulav","Bisbilla bath","Gobi pulav","Kothmir rice","Vangi bath","Pudina rice","Daddojanam","Curd rice","Muddapappu Avakaya Annam","Jeera rice"]
+    },
+    {
+     "seq": 9,
+     "name": "Fry Items",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Bhendi Kaju Kobbari Fry","Kanda porutu","Bhendi pakoda","Aloo fry thuriminadi","Donda fry + Kaju","Cabbage fry","Donda pakoda","Mixed Porial","Dondakayi chilakalla pakodi fry","Arati fry","Nalla Vankaya fry","Aloo jeera","Chikkudu Fry","Beans fry with pallipodi","Chamagadda fry + Kaju","Sorakaya with pallipodi","Chama dumpa finger chips","Beerakaya with methi","Aloo green peas fry","Panasapottu fry","Kandagadda fry thuriminadi","Bheerakaya with Bobbarlu","Aloo allam green mirchi fry","Beerakaya with Pesarapappu"]
+    },
+    {
+     "seq": 10,
+     "name": "Dal Items",
+     "selection_rule": { "type": "choose", "count": 1 },
+     "items": ["Tomato","Gangavalli","Mamidikaya Pappu","Kasturi Methi dal","Beerakaya","Chukkakura pappu","Dosakaya","Chintachiguru pappu","Palak","Chintakaya pappu","Gongura","Dal thadka","Kothmir","Mudda Pappu","Butter dal fry","Pesara Pappu with Green chilli"]
+    },
+    {
+     "seq": 11,
+     "name": "Semi Liquids",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Sambar","Tomato rasam","Pappucharu","Miryala Rasam","Palli charu","Ulava rasam","Telangana Pachipulusu","Pineapple rasam","Majjiga pulusu","Lemon rasam","Ulavacharu with cream","Beetroot rasam"]
+    },
+    {
+     "seq": 12,
+     "name": "Powders",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Gun powder","Kobbari karam","Nalla karam","Putnalapodi","Karivepaku","Palli","Ghee"]
+    },
+    {
+     "seq": 13,
+     "name": "Fresh Chutneys",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Tomato","Donda Mukkalu Tomato","Beerakaya","Mamidi Mukkalu","Dondakaya","Kobbari pachadi","Vankaya","Kobbari mamidi pachadi","Dosakaya Mukkalu","Tomato palli","Gongura","Kothmir tomato","Pudina pachadi","Thurimina Mamidikaya pachadi","Onion pachadi","Kobbari kothmiri","Cabbage","Sorakaya","Jamakaya"]
+    },
+    {
+     "seq": 14,
+     "name": "Pickles",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Mango","Garlic","Lemon","Chinta Thokku","Tomato","Pandu mirchi","Usiri","Dosa avakaya"]
+    },
+    {
+     "seq": 15,
+     "name": "Common Items",
+     "selection_rule": { "type": "all" },
+     "items": ["White Rice","Curd","Raitha","Papad","Fryums","Ghee"]
+    },
+    {
+     "seq": 16,
+     "name": "Desserts",
+     "selection_rule": { "type": "choose", "count": 3 },
+     "items": ["Mangomisu","Poornalu + Ghee","Apricot Pudding","Bobbatlu + Ghee","Live Shibuya Toast","Gulab Jamoon","Live Waffle","Kala Jamoon","Tiramisu","Thawa Jamoon","Mango Pudding","Mini jamoon","Tender Coconut Mousse","Rasgulla","Jackfruit Mousse","Mini rasgulla","Trifle pudding","Baked rasgulla","Chocolate Mousse","Rasmalai","Panacotta Assorted","Angoor rasmalai","Mango Tres Leches","Carrot halwa","Biscoff Tres Leches","Kaddu ka halwa","Nutella Tres Leches","Kaddu ka kheer","Banana delight","Mini Rajbhog","Mango delight","Qurbani ka meeta","Apricot delight","Double ka meeta","Apple delight","Shahi tukda","Fruit salad with cream","Gummadikaya halwa","Fruit salad with rabdi","Khova puri","Fruit salad with custard","Badusha","Mango Burfi","Boondi laddu","Dry Fruit Halwa","Milk Mysurpak","Badam Rolls","Kesar Jilebi","Badam Burfi","Paneer jilebi","Kaju Burfi","Bellam jilebi","Kaju Rolls","Badam Halwa","Chitti Kajalu","Saffron kheer","Rawa kesari","Malai roll","Rawa laddu","Pineapple Chamcham","Pineapple kesari","Malai Chamcham","Kalakand Delight","Semiya Payasam"]
+    },
+    {
+     "seq": 17,
+     "name": "Ice Creams",
+     "selection_rule": { "type": "choose", "count": 2 },
+     "items": ["Vanilla","Honeymoon Delight","Butter Scotch","Jamaican Choco Fudge","Strawberry","Everything Nutty","Chocolate","Fruit Cocktail","Mango","Single Sundae","Seetaphal","Double Sundae","Orange","Melly Jelly","Pista","Choco Rocco","Kesar Pista","Beri Bonanja","Badam Pista","Malai Kulfi","Anjeer Badam","Keesar Pista Kulfi","Stick icecream","Chocolate Bar","Black forest","Belgium Dark","Chocobar","Dry fruit Temptations","Butterscotch Bar","Caramel Nuts"]
+    },
+    {
+     "seq": 18,
+     "name": "Fruit Stall",
+     "selection_rule": { "type": "choose_split", "indian": 6, "imported": 2 },
+     "items": ["Apple","Pineapple","Grapes","Anjeer","Mango","Dates","Sweet tamarind","Watermelon","Papaya","Orange","Alubukara","Banana","Strawberry","Guava","Sapota","Muskmelon","Pears","Dragon fruit","Australian grapes","Cherry","Lichi"],
+     "subgroups": [
+      { "name": "Indian", "items": ["Apple","Pineapple","Grapes","Anjeer","Mango","Dates","Sweet tamarind","Watermelon","Papaya","Orange","Alubukara","Banana","Strawberry","Guava","Sapota","Muskmelon","Pears"] },
+      { "name": "Imported", "items": ["Dragon fruit","Australian grapes","Cherry","Lichi"] }
+     ]
+    },
+    {
+     "seq": 19,
+     "name": "Pan Counter",
+     "selection_rule": { "type": "all" },
+     "items": ["Sweet Pan","Meenakshi pan","Sada Pan","Supari"]
+    },
+    {
+     "seq": 20,
+     "name": "Mineral Water",
+     "selection_rule": { "type": "all" },
+     "items": ["Mineral Water Bottle - Standard 250ml"]
+    }
+   ]
+  }
+ ]
+}

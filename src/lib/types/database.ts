@@ -28,6 +28,9 @@ export type Vendor = {
   fssai_license_number: string | null;
   is_demo: boolean;
   discount_percent: number;
+  // Admin-only T&Cs (payment schedule, plates-counter instructions, client-scope
+  // obligations) - never selected by any consumer-facing query. See queries/vendors.ts.
+  internal_terms: string[] | null;
   created_at: string;
   updated_at: string;
 };
@@ -59,6 +62,9 @@ export type MenuItem = {
   base_price_pp: number | null;
   image_url: string | null;
   is_active: boolean;
+  // Display-only sub-heading within a pooled slot (e.g. "Juices" vs "Soups" inside
+  // "Refreshments"). Never read for selection-count math.
+  group_label: string | null;
   created_at: string;
 };
 
@@ -95,6 +101,9 @@ export type PackageSlot = {
   category_id: string;
   selections_count: number;
   sort_order: number;
+  // Always fully included, never presented as a choice (e.g. "Common Items"). Distinct
+  // from a pick-N-of-N slot, which would still be technically togglable in the UI.
+  is_locked: boolean;
 };
 
 export type PackageSlotItem = {
@@ -102,6 +111,9 @@ export type PackageSlotItem = {
   slot_id: string;
   item_id: string;
   is_default: boolean;
+  // Preserves source-menu item order within a slot. Null on existing (pre-migration)
+  // rows - the read path treats null as "sorts last".
+  sort_order: number | null;
 };
 
 export type VendorMedia = {

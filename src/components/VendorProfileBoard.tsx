@@ -78,7 +78,9 @@ export function VendorProfileBoard({
   const itemSelection: PackageItemSelection[] = useMemo(() => {
     if (!selectedPackage || !hasSlots) return [];
     return selectedPackage.slots.map((slot) => {
-      const selectedIds = slotSelection[slot.id] ?? [];
+      // Locked slots are never in slotSelection (nothing to toggle) but are still fully
+      // part of the order, so the enquiry snapshot must list all of their items, not none.
+      const selectedIds = slot.isLocked ? slot.options.map((o) => o.itemId) : slotSelection[slot.id] ?? [];
       const selectedOptions = slot.options.filter((o) => selectedIds.includes(o.itemId));
       return {
         category_id: slot.categoryId,

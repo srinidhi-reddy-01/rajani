@@ -8,6 +8,7 @@ export type SlotOption = {
   imageUrl: string | null;
   isVeg: boolean;
   isDefault: boolean;
+  groupLabel: string | null;
 };
 
 export type SlotWithItems = {
@@ -15,6 +16,9 @@ export type SlotWithItems = {
   categoryId: string;
   categoryName: string;
   selectionsCount: number;
+  // Always fully included, never a choice - PackageSelector renders this as a plain
+  // "Included" list instead of a pick-N chooser.
+  isLocked: boolean;
   options: SlotOption[];
 };
 
@@ -32,12 +36,22 @@ type VendorProfileRow = Vendor & {
 };
 type CategoryWithItemsRow = MenuCategory & { menu_items: MenuItem[] };
 
+// Every vendors column EXCEPT internal_terms (admin-only T&Cs - payment schedule,
+// plates-counter instructions, client-scope obligations - must never reach this
+// anon-key, consumer-facing query). Deliberately not "*" so a future vendors column
+// doesn't silently start leaking here.
+const PUBLIC_VENDOR_COLUMNS =
+  "id, name, slug, phone, address, area, gbp_place_id, gbp_rating, gbp_rating_count, established_year, " +
+  "cuisine_specialities, event_specialities, serviceable_everywhere, serviceable_areas, pricing_model, status, " +
+  "description, logo_url, cover_image_url, owner_photo_url, events_completed, is_verified, fssai_license_number, " +
+  "is_demo, discount_percent, created_at, updated_at";
+
 // Wrapped in React's cache() so generateMetadata and the page component (both call
 // this per-request) share one fetch instead of hitting Supabase twice.
 export const getVendorProfile = cache(async (slug: string): Promise<VendorProfile | null> => {
   const { data: vendor, error } = await supabase
     .from("vendors")
-    .select("*, packages(*, package_slots(*, package_slot_items(*))), vendor_media(*)")
+    .select(`${PUBLIC_VENDOR_COLUMNS}, packages(*, package_slots(*, package_slot_items(*))), vendor_media(*)`)
     .eq("slug", slug)
     .eq("status", "live")
     .maybeSingle()
@@ -74,11 +88,27 @@ export const getVendorProfile = cache(async (slug: string): Promise<VendorProfil
           categoryId: slot.category_id,
           categoryName: categoryNameById.get(slot.category_id) ?? "Other",
           selectionsCount: slot.selections_count,
-          options: slot.package_slot_items
+          isLocked: slot.is_locked,
+          // ORDER BY sort_order NULLS LAST, id - existing (pre-migration) rows are all
+          // null, so this is a no-op for them and preserves today's behaviour.
+          options: [...slot.package_slot_items]
+            .sort((a, b) => {
+              const aOrder = a.sort_order ?? Number.POSITIVE_INFINITY;
+              const bOrder = b.sort_order ?? Number.POSITIVE_INFINITY;
+              if (aOrder !== bOrder) return aOrder - bOrder;
+              return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+            })
             .map((si) => {
               const item = itemById.get(si.item_id);
               if (!item || !item.is_active) return null;
-              return { itemId: item.id, name: item.name, imageUrl: item.image_url, isVeg: item.is_veg, isDefault: si.is_default };
+              return {
+                itemId: item.id,
+                name: item.name,
+                imageUrl: item.image_url,
+                isVeg: item.is_veg,
+                isDefault: si.is_default,
+                groupLabel: item.group_label,
+              };
             })
             .filter((o): o is SlotOption => o !== null),
         })),

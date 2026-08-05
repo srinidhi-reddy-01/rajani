@@ -1,19 +1,29 @@
-// One-time (but idempotent) bulk image assignment for menu_items.image_url, across every
-// vendor. Sourced images live in scripts/data/menu_item_images.json (105 curated, verified
-// images.unsplash.com photo URLs keyed by a short dish/category slug - same hotlinking
-// convention already used for vendor cover images, no download/attribution needed under the
-// Unsplash License).
+// Bulk image assignment for menu_items.image_url, across every vendor. Sourced images
+// live in scripts/data/menu_item_images.json (curated, verified images.unsplash.com
+// photo URLs keyed by a short slug - same hotlinking convention already used for vendor
+// cover images, no download/attribution needed under the Unsplash License).
 //
-// Two-stage resolver per item, mirroring the "specific beats generic, ambiguous goes to
-// review" approach used in fix-chikkas-veg-classification.mjs:
+// Three-tier resolver per item (most specific wins):
 //   1. DISH_ALIASES: normalized dish name -> image key (exact match, highest fidelity).
-//   2. CATEGORY_FALLBACK: category name -> image key (or a function of is_veg for buckets
-//      that mix veg/non-veg), used only when no dish alias matched.
-// Anything matching neither (garbage/typo names in an unmapped category) is left on a
-// review list, untouched - never guessed.
+//   2. INGREDIENT_KEYWORDS: when no exact dish match, scan the name for an ingredient
+//      keyword (English + common Telugu/Hindi transliterations) and use a photo of that
+//      ingredient - "if the exact dish isn't available, show the main ingredient"
+//      (e.g. baingan ka bharta -> a brinjal/eggplant photo). Keywords are grouped into
+//      priority tiers (protein > vegetable/fruit > grain > nut > spice/aromatic) because
+//      Indian dish names often lead with a flavour/prep word ("Chilli Paneer", "Chatpata
+//      Pineapple Tikka") rather than the headline ingredient - within a name, the
+//      highest-priority tier with any match wins; ties within a tier go to whichever
+//      keyword appears earliest in the string.
+//   3. CATEGORY_FALLBACK: category name -> image key (or a function of is_veg for
+//      buckets that mix veg/non-veg), used only when neither of the above matched.
+// Anything matching none of the three (garbage/typo names in an unmapped category) is
+// left on a review list, untouched - never guessed.
 //
-// Idempotent: only rows where image_url IS NULL are updated, so reruns after an admin
-// manually overrides an item's image never clobber that override.
+// Recomputes and overwrites EVERY item's image_url on every run (not just nulls) - every
+// image on this table so far was set by this script, never hand-picked by an admin via
+// the per-item "Image URL" admin field, so re-deriving from an improved resolver is safe
+// and is the point of rerunning (replace a generic category photo with a more specific
+// ingredient one now that the keyword/photo library has grown).
 
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
@@ -143,6 +153,7 @@ const DISH_ALIASES = {
   "noodles": "noodles",
   "idly": "idly",
   "sambar": "sambar",
+  "sambar idly": "idly",
   "butter garlic prawns": "butter_garlic_prawns",
   "wada": "wada",
   "masala wada": "wada",
@@ -211,8 +222,139 @@ const DISH_ALIASES = {
   "manchuria": "veg_manchurian",
   "schezwan fried rice": "fried_rice",
   "masala dosa": "dosa",
-  "sambar idly": "idly",
+  // Sapthagiri's locked "Common Items" section (White Rice/Curd/Papad/Fryums/Ghee/Raitha)
+  // - the pre-existing "Common Items" category fallback (curry_generic) was tuned for a
+  // different vendor's unrelated catch-all category and would be wrong here, so these get
+  // exact aliases instead so category fallback never triggers for this section.
+  "white rice": "plain_rice",
+  "raitha": "raita",
+  "curd": "raita",
+  "fryums": "papad",
+  "ghee": "milk_glass",
 };
+
+// ---------- Ingredient keyword fallback (tiered: protein > veg/fruit > grain > nut > spice) ----------
+
+const INGREDIENT_TIERS = [
+  {
+    // Proteins reuse existing dish-tier photos where a dedicated one already exists
+    // (curry_chicken/curry_mutton/fish_fry/eggs) - no new sourcing needed for those.
+    name: "protein",
+    keywords: {
+      paneer_cubes: ["paneer", "panner"],
+      curry_chicken: ["chicken"],
+      curry_mutton: ["mutton"],
+      fish_fry: ["fish", "chepa"],
+      eggs: ["egg", "anda", "guddu"],
+      prawns_raw: ["prawns", "royyala", "shrimp"],
+      soychunks: ["meal maker", "nutrila", "soya"],
+    },
+  },
+  {
+    name: "vegetable_fruit",
+    keywords: {
+      babycorn: ["babycorn", "baby corn"],
+      rawbanana: ["aratikaya", "arati"],
+      brinjal: ["brinjal", "baigan", "vankaya", "eggplant", "guttivankaya"],
+      okra: ["okra", "bhindi", "bendi", "bendakaya"],
+      cauliflower: ["cauliflower", "gobi"],
+      capsicum: ["capsicum"],
+      tomato: ["tomato"],
+      spinach: ["spinach", "palak", "palakura"],
+      corn: ["corn", "makkai"],
+      greenpeas: ["green peas", "greenpeas", "peas", "mutter", "matar"],
+      mushroom: ["mushroom"],
+      cabbage: ["cabbage"],
+      carrot: ["carrot"],
+      beans: ["beans", "chikkudu", "alasanda", "anapa"],
+      pumpkin: ["pumpkin", "gummadikaya"],
+      drumstick: ["drumstick", "munakkaya", "munaga", "mulakkada"],
+      potato: ["potato", "aloo", "alu"],
+      onion: ["onion", "kanda", "pyaza", "ulli"],
+      garlic: ["garlic"],
+      ginger: ["ginger", "allam"],
+      coconut: ["coconut", "kobbari", "nariyal"],
+      fenugreek: ["methi", "fenugreek"],
+      cucumber: ["cucumber", "dosakaya"],
+      ivygourd: ["dondakaya", "tindora"],
+      ridgegourd: ["beerakaya", "bheerakaya"],
+      bottlegourd: ["sorakaya"],
+      yam: ["chamagadda", "kandagadda", "suran"],
+      gongura: ["gongura"],
+      apple: ["apple"],
+      pineapple: ["pineapple"],
+      grapes: ["grape"],
+      fig: ["anjeer"],
+      mango: ["mango", "mamidi"],
+      dates: ["dates", "khajur"],
+      tamarind: ["tamarind", "chintapandu", "chinta", "imli"],
+      watermelon: ["watermelon"],
+      papaya: ["papaya"],
+      orange: ["orange"],
+      plum: ["alubukara"],
+      banana: ["banana"],
+      strawberry: ["strawberry"],
+      guava: ["guava", "jama"],
+      sapota: ["sapota", "chiku"],
+      muskmelon: ["muskmelon"],
+      pear: ["pear"],
+      dragonfruit: ["dragon fruit", "dragonfruit"],
+      cherry: ["cherry"],
+      litchi: ["litchi", "lichi", "lychee"],
+      pomegranate: ["pomegranate"],
+    },
+  },
+  {
+    name: "grain",
+    keywords: {
+      pasta: ["pasta"],
+      semolina: ["rava", "sooji"],
+      gramflour: ["besan"],
+    },
+  },
+  {
+    name: "nut",
+    keywords: {
+      cashew: ["kaju", "cashew"],
+      almond: ["badam", "almond"],
+      pistachio: ["pista", "pistachio"],
+    },
+  },
+  {
+    name: "spice_aromatic",
+    keywords: {
+      mint: ["pudina", "mint"],
+      lemon: ["lemon", "nimbu"],
+      chili: ["mirchi", "chilli", "chili"],
+      coriander: ["kothimeer", "kothmir", "coriander", "cilantro"],
+      saffron: ["kesar", "saffron"],
+      jaggery: ["bellam", "jaggery"],
+      curryleaves: ["karivepaku"],
+      milk_glass: ["milk"],
+      cheese_cubes: ["cheese"],
+      chocolate: ["chocolate", "choco"],
+    },
+  },
+];
+
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function matchIngredient(normalizedName) {
+  for (const tier of INGREDIENT_TIERS) {
+    let best = null; // { key, pos }
+    for (const [key, terms] of Object.entries(tier.keywords)) {
+      for (const term of terms) {
+        const re = new RegExp(`\\b${escapeRegExp(term)}\\b`, "i");
+        const m = normalizedName.match(re);
+        if (m && (best === null || m.index < best.pos)) best = { key, pos: m.index };
+      }
+    }
+    if (best) return best.key;
+  }
+  return null;
+}
 
 // ---------- Category fallback (category name -> image key, or a resolver fn(isVeg)) ----------
 
@@ -280,15 +422,47 @@ const CATEGORY_FALLBACK = {
   "Bakery counter": "sweets",
   // "Continental (optional)" (pizza/pasta/burger) has no matching curated photo -
   // deliberately left unmapped, same as goidl (garbage category name): review list, not guessed.
+
+  // ---- Sapthagiri category-name strings not already covered above ----
+  "Hot Items": "fritters",
+  "Salad Counter": "salads",
+  "Indian Bread": "breads",
+  "Veg Curries": "curry_veg_north",
+  "Special Rice Items": "rice_generic",
+  "Fry Items": "fry_items",
+  "Dal Items": "dal",
+  "Semi Liquids": "rasam_sambar",
+  "Fresh Chutneys": "chutneys_pickles",
+  "Pickles": "chutneys_pickles",
+  "Common Items": "curry_generic", // superseded per-item by the DISH_ALIASES fix above
+  "Ice Cream": "ice_cream",
+  "Mineral Water": null, // a water bottle photo isn't worth sourcing for one item per menu
+  "Mouth Freshener": "paan",
+  "Refreshments": "welcome_drinks",
+  "Starters veg": "starters_veg",
+  "Chinese Items": "noodles",
+  "Ice Creams": "ice_cream",
+  "Pan Counter": "paan",
+  "Chat Counter": "chaat",
+  "Fruit Stall": "fruit_counter",
 };
 
+// Each tier only "claims" a match if IMAGE_MAP actually has a photo for that key -
+// a keyword match against a key with no sourced photo (e.g. drumstick, honestly
+// omitted by the sourcing pass - no good match found) must fall through to the next
+// tier rather than leaving the item unmatched entirely.
 function resolveKey(itemName, categoryName, isVeg) {
-  const alias = DISH_ALIASES[norm(itemName)];
-  if (alias) return { key: alias, via: "dish name" };
+  const normalized = norm(itemName);
+
+  const alias = DISH_ALIASES[normalized];
+  if (alias && IMAGE_MAP[alias]) return { key: alias, via: "dish name" };
+
+  const ingredientKey = matchIngredient(normalized);
+  if (ingredientKey && IMAGE_MAP[ingredientKey]) return { key: ingredientKey, via: "ingredient" };
 
   const fallback = CATEGORY_FALLBACK[categoryName];
-  if (typeof fallback === "function") return { key: fallback(isVeg), via: "category (veg-aware)" };
-  if (fallback) return { key: fallback, via: "category" };
+  const fallbackKey = typeof fallback === "function" ? fallback(isVeg) : fallback;
+  if (fallbackKey && IMAGE_MAP[fallbackKey]) return { key: fallbackKey, via: "category" };
 
   return null;
 }
@@ -298,7 +472,7 @@ function resolveKey(itemName, categoryName, isVeg) {
 const categories = mustSucceed("fetch categories", await supabase.from("menu_categories").select("id, name"));
 const catNameById = new Map(categories.map((c) => [c.id, c.name]));
 
-// PostgREST caps a single select() at 1000 rows by default - paginate to get all 1592.
+// PostgREST caps a single select() at 1000 rows by default - paginate to get everything.
 const items = [];
 for (let from = 0; ; from += 1000) {
   const page = mustSucceed(
@@ -310,17 +484,16 @@ for (let from = 0; ; from += 1000) {
 }
 
 console.log(`Loaded ${items.length} menu_items across ${categories.length} categories.`);
-console.log(`Already have image_url set: ${items.filter((i) => i.image_url).length} (left untouched).`);
 
-// ---------- 2. Classify ----------
+// ---------- 2. Classify (recompute for every item, regardless of current image_url) ----------
 
 const toUpdate = [];
 const reviewList = [];
-const keyUsage = new Map();
+const tierUsage = new Map();
+let changed = 0;
+let unchanged = 0;
 
 for (const item of items) {
-  if (item.image_url) continue; // idempotent: never override an existing/admin-set image
-
   const categoryName = catNameById.get(item.category_id) ?? "unknown";
   const resolved = resolveKey(item.name, categoryName, item.is_veg);
 
@@ -329,23 +502,27 @@ for (const item of items) {
     continue;
   }
 
-  toUpdate.push({ id: item.id, name: item.name, category: categoryName, key: resolved.key, via: resolved.via, url: IMAGE_MAP[resolved.key] });
-  keyUsage.set(resolved.key, (keyUsage.get(resolved.key) ?? 0) + 1);
+  const url = IMAGE_MAP[resolved.key];
+  tierUsage.set(resolved.via, (tierUsage.get(resolved.via) ?? 0) + 1);
+  if (item.image_url !== url) {
+    changed += 1;
+    toUpdate.push({ id: item.id, name: item.name, category: categoryName, key: resolved.key, via: resolved.via, url });
+  } else {
+    unchanged += 1;
+  }
 }
 
 console.log(`\n=== Plan ===`);
-console.log(`Will assign an image to ${toUpdate.length} item(s).`);
+console.log(`${toUpdate.length} item(s) will get a new/changed image_url (${changed} changed, ${unchanged} already correct).`);
 console.log(`Left unmatched, no image assigned (${reviewList.length}):`);
-for (const r of reviewList) console.log(`  ${r.name} | ${r.category}`);
+for (const r of reviewList.slice(0, 40)) console.log(`  ${r.name} | ${r.category}`);
+if (reviewList.length > 40) console.log(`  ... and ${reviewList.length - 40} more`);
 
-console.log(`\nImage key usage (top 20):`);
-[...keyUsage.entries()]
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 20)
-  .forEach(([key, n]) => console.log(`  ${n}\t${key}`));
+console.log(`\nResolution tier usage:`);
+for (const [via, n] of [...tierUsage.entries()].sort((a, b) => b[1] - a[1])) console.log(`  ${n}\t${via}`);
 
-console.log(`\nSample of 15 assignments:`);
-for (const u of toUpdate.slice(0, 15)) console.log(`  "${u.name}" (${u.category}) -> ${u.key} [${u.via}]`);
+console.log(`\nSample of 20 changes:`);
+for (const u of toUpdate.slice(0, 20)) console.log(`  "${u.name}" (${u.category}) -> ${u.key} [${u.via}]`);
 
 // ---------- 3. Apply ----------
 
@@ -354,14 +531,22 @@ if (process.env.DRY_RUN === "1") {
   process.exit(0);
 }
 
+// Plain per-row .update() (not upsert): upsert's ON CONFLICT DO UPDATE still requires
+// the INSERT branch's row to satisfy every NOT NULL column with no default (vendor_id,
+// category_id, name) even though it always resolves to the update branch - a payload of
+// just {id, image_url} fails that validation. .update() only ever touches the columns
+// given and never constructs an insert row, so it has no such requirement.
 let applied = 0;
-for (const u of toUpdate) {
-  const { error } = await supabase.from("menu_items").update({ image_url: u.url }).eq("id", u.id);
-  if (error) {
-    console.error(`FAILED updating "${u.name}" (${u.id})`, error);
-    continue;
-  }
-  applied += 1;
+const CONCURRENCY = 25;
+for (let i = 0; i < toUpdate.length; i += CONCURRENCY) {
+  const batch = toUpdate.slice(i, i + CONCURRENCY);
+  const results = await Promise.all(
+    batch.map((u) => supabase.from("menu_items").update({ image_url: u.url }).eq("id", u.id))
+  );
+  results.forEach((r, idx) => {
+    if (r.error) console.error(`FAILED updating "${batch[idx].name}" (${batch[idx].id})`, r.error);
+    else applied += 1;
+  });
 }
 console.log(`\nApplied ${applied} update(s).`);
 

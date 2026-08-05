@@ -40,20 +40,17 @@ function groupOptions(options: SlotOption[]): { label: string | null; options: S
   return groups;
 }
 
-function ItemImage({ option }: { option: SlotOption }) {
+// Small circular thumbnail, not a big rectangular photo - a category can easily have
+// 10-100+ options (see Chat Counter's 137), so each row stays compact and scannable
+// instead of a wall of large image cards.
+function ItemAvatar({ option }: { option: SlotOption }) {
   return (
-    <div className="relative h-20 w-full overflow-hidden">
+    <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
       {option.imageUrl ? (
-        <Image
-          src={option.imageUrl}
-          alt=""
-          fill
-          sizes="150px"
-          className="object-cover transition-transform duration-200 ease-out group-hover:scale-110"
-        />
+        <Image src={option.imageUrl} alt="" fill sizes="36px" className="object-cover" />
       ) : (
         <div
-          className="flex h-full w-full items-center justify-center bg-gradient-to-br from-royal-600 to-royal-800 text-lg font-semibold text-cream-50"
+          className="flex h-full w-full items-center justify-center bg-gradient-to-br from-royal-600 to-royal-800 text-xs font-semibold text-cream-50"
           aria-hidden
         >
           {option.name.trim().charAt(0).toUpperCase()}
@@ -135,18 +132,16 @@ export function PackageSelector({
             {groups.map((group) => (
               <div key={group.label ?? "__ungrouped__"} className="flex flex-col gap-2">
                 {group.label && <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">{group.label}</p>}
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {group.options.map((option) =>
                     slot.isLocked ? (
                       <div
                         key={option.itemId}
-                        className="flex min-h-11 flex-col overflow-hidden rounded-2xl border border-border bg-surface text-left"
+                        className="flex h-11 items-center gap-2 rounded-xl border border-border bg-surface px-2 text-left"
                       >
-                        <ItemImage option={option} />
-                        <div className="flex items-center gap-2 px-3 py-2">
-                          <VegDot isVeg={option.isVeg} />
-                          <span className="text-sm text-ink">{option.name}</span>
-                        </div>
+                        <ItemAvatar option={option} />
+                        <VegDot isVeg={option.isVeg} />
+                        <span className="truncate text-sm text-ink">{option.name}</span>
                       </div>
                     ) : (
                       <motion.button
@@ -155,18 +150,16 @@ export function PackageSelector({
                         whileTap={{ scale: 0.97 }}
                         aria-pressed={picked.includes(option.itemId)}
                         onClick={() => toggle(slot.id, option.itemId, slot.selectionsCount)}
-                        className={`group flex min-h-11 cursor-pointer flex-col overflow-hidden rounded-2xl border text-left transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
+                        className={`flex h-11 cursor-pointer items-center gap-2 rounded-xl border px-2 text-left transition-colors duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-600 ${
                           picked.includes(option.itemId)
                             ? "border-royal-600 bg-royal-50 ring-2 ring-royal-100"
                             : "border-border bg-surface hover:border-royal-600"
                         }`}
                       >
-                        <ItemImage option={option} />
-                        <div className="flex items-center gap-2 px-3 py-2">
-                          <VegDot isVeg={option.isVeg} />
-                          <span className="text-sm text-ink">{option.name}</span>
-                          {picked.includes(option.itemId) && <span className="ml-auto text-royal-700">✓</span>}
-                        </div>
+                        <ItemAvatar option={option} />
+                        <VegDot isVeg={option.isVeg} />
+                        <span className="truncate text-sm text-ink">{option.name}</span>
+                        {picked.includes(option.itemId) && <span className="ml-auto shrink-0 text-royal-700">✓</span>}
                       </motion.button>
                     )
                   )}

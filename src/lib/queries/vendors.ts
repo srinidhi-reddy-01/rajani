@@ -79,6 +79,7 @@ export const getVendorProfile = cache(async (slug: string): Promise<VendorProfil
   // the number, since "Check availability" needs a real quote to show.
   const packages: PackageWithSlots[] = (vendor.packages ?? [])
     .filter((p): p is typeof p & { base_price_pp: number } => p.is_active && p.base_price_pp !== null)
+    .sort((a, b) => a.base_price_pp - b.base_price_pp)
     .map((pkg) => ({
       ...pkg,
       slots: (pkg.package_slots ?? [])
